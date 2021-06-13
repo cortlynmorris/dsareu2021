@@ -1,0 +1,92 @@
+---
+title: "Visualizing, Modeling and Forecasting Crashes in Wake County, North Carolina"
+author: "Cortlyn Morris, Kelly Wentzlof, Ayan Gulzar"
+date: "6/11/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Here we will be loading necessary packages.
+
+```{r, message=FALSE, warning=FALSE}
+library(reshape2)
+library(tidyverse)
+library(ggplot2)
+library(dplyr)
+library(dslabs)
+library(ggrepel)
+library(ggthemes)
+```
+
+### Setting working directory.
+
+```{r}
+setwd("/Users/cmorris/Desktop/dsreu2021/rstudiodirectory/ResearchProject")
+```
+
+### Reading and merging the data.
+
+```{r}
+persons <- read.csv(file="Persons_Involved_in_Crashes.csv")
+glimpse(persons)
+
+locations <- read.csv(file="Reported_Crash_Locations.csv")
+glimpse(locations)
+
+crashes <- persons %>% left_join(locations, by="key_crash")
+```
+
+## Exploratory data analysis using log transformed data.
+
+### Frequency of crashes by vehicle type
+#### 
+```{r}
+crashes %>% 
+  filter(VehicleType != "Unknown", VehicleType != "") %>%
+  count(VehicleType) %>% 
+  mutate(logtrans = round(log10(n), digits = 2), 
+         VehicleType = reorder(VehicleType,logtrans)) %>% 
+  ggplot(aes(x=VehicleType, y=logtrans, fill=VehicleType)) +
+  geom_bar(stat = "identity", show.legend = FALSE) +
+  coord_flip() + 
+  geom_text(aes(label=logtrans),nudge_y=0.5) + 
+  labs(title = "Frequency of Crashes by Vehicle Type", 
+       x = "Vehicle Type", 
+       y = "Count (log10 Scale)")
+```
+
+### Frequency of crashes by weather condition.
+```{r}
+crashes %>% 
+  count(WeatherCondition1) %>% 
+  mutate(logtrans = round(log10(n), digits = 2)) %>% 
+  ggplot(aes(x=WeatherCondition1, y=logtrans, fill=WeatherCondition1)) +
+  geom_bar(stat = "identity", show.legend = FALSE) +
+  coord_flip() + 
+  geom_text(aes(label=logtrans),nudge_y=0.5)
+```
+
+### Frequency of crashes by traffic control type.
+```{r}
+crashes %>% 
+  count(TrafficControlType) %>% 
+  mutate(logtrans = round(log10(n), digits = 2)) %>% 
+  ggplot(aes(x=TrafficControlType, y=logtrans, fill=TrafficControlType)) +
+  geom_bar(stat = "identity", show.legend = FALSE) +
+  coord_flip() + 
+  geom_text(aes(label=logtrans),nudge_y=0.5)
+```
+ 
+### Frequency of crashes by road feature.
+```{r}
+crashes %>% 
+  count(RoadFeature) %>% 
+  mutate(logtrans = round(log10(n), digits = 2)) %>% 
+  ggplot(aes(x=RoadFeature, y=logtrans, fill=RoadFeature)) +
+  geom_bar(stat = "identity", show.legend = FALSE) +
+  coord_flip() + 
+  geom_text(aes(label=logtrans),nudge_y=0.5)
+```
