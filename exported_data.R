@@ -50,3 +50,6 @@ crashes %>%
   geom_bar(stat = "identity", show.legend = FALSE) +
   coord_flip() + 
   geom_text(aes(label=logtrans),nudge_y=0.5)
+
+
+### Test line
