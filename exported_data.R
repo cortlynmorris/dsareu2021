@@ -16,7 +16,6 @@ library(dslabs)
 library(ggrepel)
 library(ggthemes)
 
-## After log transformation
 crashes %>% 
   filter(VehicleType != "Unknown", VehicleType != "") %>%
   count(VehicleType) %>% 
@@ -25,33 +24,47 @@ crashes %>%
   ggplot(aes(x=VehicleType, y=logtrans, fill=VehicleType)) +
   geom_bar(stat = "identity", show.legend = FALSE) +
   coord_flip() + 
-  geom_text(aes(label=logtrans),nudge_y=0.5) 
+  geom_text(aes(label=logtrans),nudge_y=0.5) + 
+  labs(title = "Frequency of Crashes by Vehicle Type", 
+       x = "Vehicle Type", 
+       y = "Count (log10 Scale)") 
 
 crashes %>% 
+  filter(WeatherCondition1 != "NA") %>%
   count(WeatherCondition1) %>% 
-  mutate(logtrans = round(log10(n), digits = 2)) %>% 
+  mutate(logtrans = round(log10(n), digits = 2),
+         WeatherCondition1 = reorder(WeatherCondition1,logtrans)) %>% 
   ggplot(aes(x=WeatherCondition1, y=logtrans, fill=WeatherCondition1)) +
   geom_bar(stat = "identity", show.legend = FALSE) +
   coord_flip() + 
-  geom_text(aes(label=logtrans),nudge_y=0.5)
+  geom_text(aes(label=logtrans),nudge_y=0.5) +
+  labs(title = "Frequency of Crashes by Weather Condition",
+       x = "Weather Condition",
+       y = "Count (log10 Scale)")
 
 crashes %>% 
+  filter(TrafficControlType != "NA", TrafficControlType != "", 
+         TrafficControlType != "NaN") %>%
   count(TrafficControlType) %>% 
-  mutate(logtrans = round(log10(n), digits = 2)) %>% 
+  mutate(logtrans = round(log10(n), digits = 2),
+         TrafficControlType = reorder(TrafficControlType,logtrans)) %>% 
   ggplot(aes(x=TrafficControlType, y=logtrans, fill=TrafficControlType)) +
   geom_bar(stat = "identity", show.legend = FALSE) +
   coord_flip() + 
-  geom_text(aes(label=logtrans),nudge_y=0.5)
+  geom_text(aes(label=logtrans),nudge_y=0.5) +
+  labs(title = "Frequency of Crashes by Traffic Control Type",
+       x = "Traffic Control Type",
+       y = "Count (log10 Scale)")
 
 crashes %>% 
+  filter(RoadFeature != "NA", RoadFeature != "", RoadFeature != "NaN") %>%
   count(RoadFeature) %>% 
-  mutate(logtrans = round(log10(n), digits = 2)) %>% 
+  mutate(logtrans = round(log10(n), digits = 2),
+         RoadFeature = reorder(RoadFeature,logtrans)) %>% 
   ggplot(aes(x=RoadFeature, y=logtrans, fill=RoadFeature)) +
   geom_bar(stat = "identity", show.legend = FALSE) +
   coord_flip() + 
-  geom_text(aes(label=logtrans),nudge_y=0.5)
-
-
-### Test line
-
-### second test
+  geom_text(aes(label=logtrans),nudge_y=0.5) +
+  labs(title = "Frequency of Crashes by Road Feature",
+       x = "Road Feature",
+       y = "Count (log10 Sclae)")
