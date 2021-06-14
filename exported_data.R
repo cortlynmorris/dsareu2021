@@ -68,3 +68,10 @@ crashes %>%
   labs(title = "Frequency of Crashes by Road Feature",
        x = "Road Feature",
        y = "Count (log10 Sclae)")
+
+crashes %>%
+  filter(PersonType == "Driver", Age != "NA", Age != "NaN", Age != "") %>%
+  ggplot() +
+  geom_histogram(aes(x=Age), binwidth = 5, col="red", fill="darkgrey") +
+  labs(title="Histogram for Drivers' Ages", x="Age", y="Frequency")
+
