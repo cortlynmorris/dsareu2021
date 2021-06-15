@@ -24,7 +24,7 @@ library(ggthemes)
 ### Setting working directory.
 
 ```{r}
-setwd("/Users/cmorris/Desktop/dsreu2021/rstudiodirectory/ResearchProject")
+#setwd("/Users/cmorris/Desktop/dsreu2021/rstudiodirectory/ResearchProject")
 ```
 
 ### Reading and merging the data.
