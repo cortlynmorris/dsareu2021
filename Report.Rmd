@@ -42,7 +42,9 @@ crashes <- persons %>% left_join(locations, by="key_crash")
 ## Exploratory data analysis using log transformed data.
 
 ### Frequency of crashes by vehicle type
-#### 
+
+The highest frequency of crashes occur in a passenger car. However, this is not very surprising because passenger cars are relatively common. An interesting note is that sport utility vehicles have the second highest frequency of crashes, however, sport utility vehicles are not nearly as common of a car.
+
 ```{r}
 crashes %>% 
   filter(VehicleType != "Unknown", VehicleType != "") %>%
@@ -59,7 +61,9 @@ crashes %>%
 ```
 
 ### Frequency of crashes by weather condition.
-#### 
+
+The highest frequency of crashes occur when the weather conditions are clear. This is not very surprising because in North Carolina, the majority of the time the weather is clear. An interesting note is that snow still has a relatively high frequency despite it snowing minimally in North Carolina. 
+
 ```{r}
 crashes %>% 
   filter(WeatherCondition1 != "NA") %>%
@@ -76,7 +80,9 @@ crashes %>%
 ```
 
 ### Frequency of crashes by traffic control type.
-#### 
+
+The highest frequency of crashes occur when there is no traffic control present. Without a control present, drivers may be less confident in their actions. 
+
 ```{r}
 crashes %>% 
   filter(TrafficControlType != "NA", TrafficControlType != "", 
@@ -94,7 +100,9 @@ crashes %>%
 ```
  
 ### Frequency of crashes by road feature.
-#### 
+
+The highest frequency of crashes occur when there is no special road feature present. Without a road feature present, drivers may be less confident in their actions. 
+
 ```{r}
 crashes %>% 
   filter(RoadFeature != "NA", RoadFeature != "", RoadFeature != "NaN") %>%
@@ -110,7 +118,9 @@ crashes %>%
        y = "Count (log10 Sclae)")
 ```
 
-###Frequency of Crashes by Drivers' v. Passengers' Age
+### Frequency of Crashes by Drivers' v. Passengers' Age
+
+The range of drivers' ages is from about 16 to 100. The range of passengers' ages is from about 0 to 100. The range of drivers' ages is slightly larger due to the age restrictions for getting a license. 
 
 ```{r}
 crashes %>% 
@@ -120,9 +130,12 @@ crashes %>%
   labs(x="Age", y="Frequency", title="Drivers' vs. Passengers' Age") +
   theme(legend.position = "top") +
   facet_wrap(~PersonType)
+  #Question how do you fix the warning (Removed 34418 rows containing non-finite values (stat_bin))
 ```
 
-###Frequency of Crashes by Vehicle Seizure
+### Frequency of Crashes by Vehicle Seizure
+
+About half as many vehicles were seized compared to vehicles not seized. 
 
 ```{r} 
 crashes %>% 
@@ -137,7 +150,9 @@ crashes %>%
        y = "Count (log10 Scale)")
 ```
 
-###Frequency of Crashes by Airbag Deployed
+### Frequency of Crashes by Airbag Deployed
+
+The highest frequency of crashes occured where the airbags were not deployed. It is interesting to note that the second highest frequency of crashes occured where the car(s) did not have airbags to begin with. 
 
 ```{r}
 crashes %>% 
@@ -154,7 +169,9 @@ crashes %>%
        y = "Count (log10 Scale)")
 ```
 
-###Frequency of Crashes by Ejection
+### Frequency of Crashes by Ejection
+
+Most car crashes resulted in drivers and passengers not being ejected. More people were totally ejected from the vehicle than partially ejected. 
 
 ```{r}
 crashes %>% 
@@ -171,7 +188,9 @@ crashes %>%
        y = "Count (log10 Scale)")
 ```
 
-###Frequency of Crashes by Gender
+### Frequency of Crashes by Gender
+
+There does not seem to be a significant difference between frequency of crashes between males and females. 
 
 ```{r}
 crashes %>% 
@@ -188,7 +207,7 @@ crashes %>%
        y = "Count (log10 Scale)")
 ```
 
-###Frequency of Crashes by Race
+### Frequency of Crashes by Race
 
 ```{r}
 crashes %>% 
@@ -205,7 +224,9 @@ crashes %>%
        y = "Count (log10 Scale)")
 ```
 
-###Frequency of Crashes by Injury
+### Frequency of Crashes by Injury
+
+THe highest frequency of crashes did not result in any injury. Following the highest frequency, the more serious the injury, the less crashes occured. 
 
 ```{r}
 crashes %>% 
@@ -222,7 +243,9 @@ crashes %>%
        y = "Count (log10 Scale)")
 ```
 
-###Frequency of Crashes by Protection
+### Frequency of Crashes by Protection
+
+The highest frequency of crashes occured when drivers and passengers wore a shoulder and lap belt protection which are common protections in more recent vehicles. However, the second highest frequency of crashes occured when drivers and passengers had used no protection. Could this be because the vehicles they were driving didn't provide protection or that the vehicles had protection, the people just chose not to use any. 
 
 ```{r}
 crashes %>% 
@@ -239,7 +262,9 @@ crashes %>%
        y = "Count (log10 Scale)")
 ```
 
-###Frequency of Crashes by Trapped
+### Frequency of Crashes by Trapped
+
+More crashes resulted in people in the vehicle not being trapped than people in the vehicle being trapped. 
 
 ```{r}
 crashes %>% 
@@ -256,7 +281,9 @@ crashes %>%
        y = "Count (log10 Scale)")
 ```
 
-###Frequency of Crashes by Vision Obstruction
+### Frequency of Crashes by Vision Obstruction
+
+The highest frequency of crashes occured when there was was no vision obstruction. 
 
 ```{r}
 crashes %>% 
@@ -273,7 +300,9 @@ crashes %>%
        y = "Count (log10 Scale)")
 ```
 
-###Frequency of Crashes by Contributing Circumstance 1
+### Frequency of Crashes by Contributing Circumstance 1
+
+The highest frequency of crashes had no contributing circumstances indicated. 
 
 ```{r}
 crashes %>% 
@@ -290,7 +319,9 @@ crashes %>%
        y = "Count (log10 Scale)")
 ```
 
-###Frequency of Crashes by Contributing Circumstance 2
+### Frequency of Crashes by Contributing Circumstance 2
+
+The highest frequency of crashes had inattention as a contributing circumstance 2. 
 
 ```{r}
 crashes %>% 
@@ -310,7 +341,9 @@ crashes %>%
        y = "Count (log10 Scale)")
 ```
 
-###Frequency of Crashes by Contributing Circumstance 3
+### Frequency of Crashes by Contributing Circumstance 3
+
+The higest frequency of crashes had inattention as a contributing circumstance 3. 
 
 ```{r}
 crashes %>% 
