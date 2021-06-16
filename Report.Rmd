@@ -124,13 +124,12 @@ The range of drivers' ages is from about 16 to 100. The range of passengers' age
 
 ```{r}
 crashes %>% 
-  filter(PersonType == "Driver" | PersonType == "Passenger") %>% 
+  filter(PersonType == "Driver" | PersonType == "Passenger", Age != "", Age != "NA") %>% 
   ggplot() +
   geom_histogram(aes(x=Age), binwidth = 5, col="red", fill="darkgrey") +
   labs(x="Age", y="Frequency", title="Drivers' vs. Passengers' Age") +
   theme(legend.position = "top") +
   facet_wrap(~PersonType)
-  #Question how do you fix the warning (Removed 34418 rows containing non-finite values (stat_bin))
 ```
 
 ### Frequency of Crashes by Vehicle Seizure
