@@ -136,7 +136,7 @@ crashes %>%
   labs(title="Frequency of Crashes by Hour", x="Hour", y="Count")
 
 crashes %>% 
-  filter(PersonType == "Driver" | PersonType == "Passenger") %>% 
+  filter(PersonType == "Driver" | PersonType == "Passenger", Age != "", Age != "NA") %>% 
   ggplot() +
   geom_histogram(aes(x=Age), binwidth = 5, col="red", fill="darkgrey") +
   labs(x="Age", y="Frequency", title="Drivers' vs. Passengers' Age") +
@@ -303,10 +303,6 @@ crashes %>%
        x = "Contributing Circumstance 3",
        y = "Count (log10 Scale)")
 
-
-
-
-
 crashes %>% 
   filter(LocationRelationToRoad != "NA", LocationRelationToRoad != "Unknown") %>%
   count(LocationRelationToRoad) %>% 
@@ -447,33 +443,6 @@ crashes %>%
        x = "Road Classification",
        y = "Count (log10 Scale)")
 
-
-crashes %>% 
-  filter(RoadFeature != "NA", RoadFeature != "Unknown") %>%
-  count(RoadFeature) %>% 
-  mutate(logtrans = round(log10(n), digits = 2), 
-         RoadFeature= reorder(RoadFeature,logtrans)) %>% 
-  ggplot(aes(x=RoadFeature, y=logtrans, fill=RoadFeature)) +
-  geom_bar(stat = "identity", show.legend = FALSE) + 
-  geom_text(aes(label=logtrans),nudge_y=0.2) +
-  coord_flip() +
-  labs(title = "Feature's of the Road ",
-       x = "Road Feature",
-       y = "Count (log10 Scale)")
-
-
-crashes %>% 
-  filter(TrafficControlType != "NA", TrafficControlType != "Unknown") %>%
-  count(TrafficControlType) %>% 
-  mutate(logtrans = round(log10(n), digits = 2), 
-         TrafficControlType= reorder(TrafficControlType,logtrans)) %>% 
-  ggplot(aes(x=TrafficControlType, y=logtrans, fill=TrafficControlType)) +
-  geom_bar(stat = "identity", show.legend = FALSE) + 
-  geom_text(aes(label=logtrans),nudge_y=0.2) +
-  coord_flip() +
-  labs(title = "Traffic Control ",
-       x = "Traffic Control Type",
-       y = "Count (log10 Scale)")
 
 crashes %>% 
   filter(Crash_Date_Year != "Unknown", Crash_Date_Year != "2011") %>%
