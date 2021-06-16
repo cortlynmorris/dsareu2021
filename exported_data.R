@@ -612,3 +612,14 @@ crashes %>%
        x = "Number of Unknown Injuries",
        y = "Count (log10 Scale)")
 
+library(maps)
+crashes %>% 
+  filter(LocationLatitude != "0", LocationLongitude != "0",
+         LocationLatitude != "NA", LocationLatitude != "",
+         LocationLongitude != "NA", LocationLongitude != "") %>%
+  ggplot(aes(LocationLongitude, LocationLatitude)) +
+  borders('county', 'south carolina', fill = "light blue") +
+  geom_point(size=0.5, aes(col="k"), show.legend = F) +
+  coord_quickmap()
+
+
