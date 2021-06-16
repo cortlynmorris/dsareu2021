@@ -633,10 +633,3 @@ location_road_name_at_freq <- crashes %>%
 set.seed(102)
 location_road_name_at_freq %>%
   wordcloud2(shape = 'circle', backgroundColor = "black", minSize = 5)
-
-#Word cloud for location city
-location_city_freq <- crashes %>%
-  count(LocationCity)
-location_city_freq %>%
-  wordcloud2(shape = 'circle')
-##Question: This code comes up with a blank word cloud? 
