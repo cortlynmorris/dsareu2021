@@ -612,3 +612,31 @@ crashes %>%
        x = "Number of Unknown Injuries",
        y = "Count (log10 Scale)")
 
+###Visualizing text data using word clouds 
+
+#Installing and loading necessary packages 
+install.packages('wordcloud2')
+library(wordcloud2)
+
+#Word cloud for location road name on  
+location_road_name_on_freq <- crashes %>%
+  count(LocationRoadNameOn)
+
+set.seed(101)
+location_road_name_on_freq %>%
+  wordcloud2(shape = 'circle', backgroundColor = "black", minSize = 5)
+
+#Word cloud for location road name at 
+location_road_name_at_freq <- crashes %>%
+  count(LocationRoadNameAt)
+
+set.seed(102)
+location_road_name_at_freq %>%
+  wordcloud2(shape = 'circle', backgroundColor = "black", minSize = 5)
+
+#Word cloud for location city
+location_city_freq <- crashes %>%
+  count(LocationCity)
+location_city_freq %>%
+  wordcloud2(shape = 'circle')
+##Question: This code comes up with a blank word cloud? 
