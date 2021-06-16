@@ -457,13 +457,16 @@ crashes %>%
        y = "Count (log10 Scale)")
 
 crashes %>% 
-  filter(drivers != "NA", drivers != "") %>%
-  count(drivers) %>% 
-  mutate(logtrans = round(log10(n), digits = 2), 
-         drivers= reorder(drivers,logtrans)) %>% 
-  ggplot(aes(x=drivers, y=logtrans, fill=drivers)) +
+  filter(PersonType == "Driver") %>%
+  group_by(key_crash) %>%
+  count() %>% 
+  group_by(n) %>%
+  count() %>%
+  rename(Drivers = n, Frequency = nn) %>%
+  mutate(Drivers = reorder(Drivers, Frequency)) %>%
+  ggplot(aes(x=Drivers, y=Frequency, fill=Drivers)) +
   geom_bar(stat = "identity", show.legend = FALSE) + 
-  geom_text(aes(label=logtrans),nudge_y=0.2) +
+  geom_text(aes(label=Frequency),nudge_y=0.5) +
   coord_flip() +
   labs(title = "Number of Drivers per Crash",
        x = "Number of Drivers",
@@ -613,13 +616,16 @@ crashes %>%
        y = "Count (log10 Scale)")
 
 library(maps)
+
 crashes %>% 
   filter(LocationLatitude != "0", LocationLongitude != "0",
          LocationLatitude != "NA", LocationLatitude != "",
-         LocationLongitude != "NA", LocationLongitude != "") %>%
+         LocationLongitude != "NA", LocationLongitude != "",
+         LocationLatitude > 35.4, LocationLatitude < 36.2,
+         LocationLongitude < -78, LocationLongitude > -79) %>%
   ggplot(aes(LocationLongitude, LocationLatitude)) +
-  borders('county', 'south carolina', fill = "light blue") +
-  geom_point(size=0.5, aes(col="k"), show.legend = F) +
+  borders('county', 'north carolina', fill = "light blue") +
+  geom_point(size=0.5, col = 'black', show.legend = F) +
   coord_quickmap()
 
 
