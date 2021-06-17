@@ -325,6 +325,22 @@ crashes %>%
   geom_bar(position="dodge", stat="count") + 
   coord_flip()
 
+crashes %>%
+  filter(Injury != "NA", Injury != "Unknown", FirstHarmfulEvent != "NA", 
+         FirstHarmfulEvent != "NaN", FirstHarmfulEvent != "Unknown") %>%
+  group_by(Injury) %>%
+  ggplot(aes(fill=Injury, x=FirstHarmfulEvent)) + 
+  geom_bar(position="dodge", stat="count") + 
+  coord_flip()
+
+crashes %>%
+  filter(Injury != "NA", Injury != "Unknown", MostHarmfulEvent != "NA", 
+         MostHarmfulEvent != "NaN", MostHarmfulEvent != "Unknown") %>%
+  group_by(Injury) %>%
+  ggplot(aes(fill=Injury, x=MostHarmfulEvent)) + 
+  geom_bar(position="dodge", stat="count") + 
+  coord_flip()
+
 crashes %>% 
   filter(Protection != "NA", Protection != "Unable to determine") %>%
   count(Protection) %>% 
