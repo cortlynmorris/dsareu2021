@@ -355,6 +355,13 @@ crashes %>%
 ```
 
 ### Frequency of Crashes by Race
+According to census.gov...
+
+In the United States, 76.3 % of people are White, 13.4% of people are Black or African American, 18.5% are Hispanic or Latina, 0.2 are Native Hawaiian and Other Pacific Islander, 2.8% are two or more races, 5.9% are Asian, 1.3% are American Indian and Alaska Native, . 
+
+In North Carolina, 70.6 % of people are White, 22.2% of people are Black or African American, 9.8% are Hispanic or Latina, 0.1 are Native Hawaiian and Other Pacific Islander, 2.3% are two or more races, 3.2% are Asian, and 1.6% are American Indian and Alaska Native.
+
+In Wake County, North Carolina, 67.9 % of people are White, 21.0% of people are Black or African American, 10.4% are Hispanic or Latina, 0.1% are Native Hawaiian and Other Pacific Islander, 2.6% are two or more races, 7.7% are Asian, and 0.8% are American Indian and Alaska Native.
 
 ```{r}
 crashes %>% 
@@ -373,7 +380,7 @@ crashes %>%
 
 ### Frequency of Crashes by Injury
 
-THe highest frequency of crashes did not result in any injury. Following the highest frequency, the more serious the injury, the less crashes occured. 
+The highest frequency of crashes did not result in any injury. Following the highest frequency, the more serious the injury, the less crashes occured. 
 
 ```{r}
 crashes %>% 
