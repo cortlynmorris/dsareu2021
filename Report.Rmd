@@ -592,7 +592,8 @@ crashes %>%
 
 ```{r}
 crashes %>% 
-  filter(LocationDirectionFromRoad != "NA", LocationDirectionFromRoad != "Unknown") %>%
+  filter(LocationDirectionFromRoad != "NA", LocationDirectionFromRoad != "Unknown",
+         LocationDirectionFromRoad != "") %>%
   count(LocationDirectionFromRoad) %>% 
   mutate(logtrans = round(log10(n), digits = 2), 
          LocationDirectionFromRoad= reorder(LocationDirectionFromRoad,logtrans)) %>% 
@@ -677,7 +678,8 @@ crashes %>%
 
 ```{r}
 crashes %>% 
-  filter(RoadClassification != "NA", RoadClassification != "Unknown") %>%
+  filter(RoadClassification != "NA", RoadClassification != "Unknown", 
+         RoadClassification != "") %>%
   count(RoadClassification) %>% 
   mutate(logtrans = round(log10(n), digits = 2), 
          RoadClassification= reorder(RoadClassification,logtrans)) %>% 
