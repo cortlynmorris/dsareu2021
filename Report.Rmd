@@ -254,6 +254,7 @@ crashes %>%
 ### Frequency of Crashes by Airbag Deployed
 
 The highest frequency of crashes occured where the airbags were not deployed. It is interesting to note that the second highest frequency of crashes occured where the car(s) did not have airbags to begin with. 
+Airbags did not deploy during most crashes, therefore many accidents logged were minor. 
 
 ```{r}
 crashes %>% 
