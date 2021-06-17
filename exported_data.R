@@ -491,7 +491,7 @@ crashes %>%
 
 
 crashes %>% 
-  filter(RoadClassification != "NA", RoadClassification != "Unknown") %>%
+  filter(RoadClassification != "NA", RoadClassification != "NaN") %>%
   count(RoadClassification) %>% 
   mutate(logtrans = round(log10(n), digits = 2), 
          RoadClassification= reorder(RoadClassification,logtrans)) %>% 
