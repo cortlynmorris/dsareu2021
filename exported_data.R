@@ -704,6 +704,8 @@ install.packages('wordcloud2')
 library(wordcloud2)
 
 #Word cloud for location road name on  
+devtools::install_github("gaospecial/wordcloud2")
+
 location_road_name_on_freq <- crashes %>%
   count(LocationRoadNameOn)
 
@@ -712,6 +714,8 @@ location_road_name_on_freq %>%
   wordcloud2(shape = 'circle', backgroundColor = "black", minSize = 5)
 
 #Word cloud for location road name at 
+devtools::install_github("gaospecial/wordcloud2")
+
 location_road_name_at_freq <- crashes %>%
   count(LocationRoadNameAt)
 
