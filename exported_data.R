@@ -741,6 +741,11 @@ crashes %>%
 
 library(maps)
 
+#Can we use this code to help only map wake county?
+nc_counties <- map_data("county", "north carolina") %>% 
+  select(lon = long, lat, group, id = subregion)
+head(nc_counties)
+
 crashes %>% 
   filter(LocationLatitude != "0", LocationLongitude != "0",
          LocationLatitude != "NA", LocationLatitude != "",
@@ -751,7 +756,6 @@ crashes %>%
   borders('county', 'north carolina', fill = "light blue") +
   geom_point(size=0.5, col = 'black', show.legend = F) +
   coord_quickmap()
-
 
 ###Visualizing text data using word clouds 
 
