@@ -418,22 +418,12 @@ crashes %>%
        x = "Location Ramp Indicator",
        y = "Count (log10 Scale)")
 
-
-crashes %>% 
+crashes %>%
   filter(LocationFeetFromRoad != "NA", LocationFeetFromRoad != "Unknown", 
          LocationFeetFromRoad != "") %>%
-  count(LocationFeetFromRoad) %>% 
-  mutate(logtrans = round(log10(n), digits = 2), 
-         LocationFeetFromRoad= reorder(LocationFeetFromRoad,logtrans)) %>% 
-  ggplot(aes(x=LocationFeetFromRoad, y=logtrans, fill=LocationFeetFromRoad)) +
-  geom_bar(stat = "identity", show.legend = FALSE) + 
-  geom_text(aes(label=logtrans),nudge_y=0.2) +
-  coord_flip() +
-  labs(title = "Crash Distance from Road",
-       x = "Location Feet From Road",
-       y = "Count (log10 Scale)")
-
-
+  ggplot() +
+  geom_histogram(aes(x=LocationFeetFromRoad), binwidth = 100, col="red", fill="darkgrey") +
+  labs(title="Histogram for Location Feet From Road")
 
 crashes %>% 
   filter(LocationDirectionFromRoad != "NA", LocationDirectionFromRoad != "Unknown",
