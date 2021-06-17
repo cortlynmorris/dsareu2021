@@ -109,6 +109,14 @@ crashes %>%
        x = "Alcohol Result Type",
        y = "Count (log10 Scale)")
 
+crashes %>%
+  filter(AlcoholResultType != "NA", AlcoholResultType != "Unknown", 
+         Crash_Date_DOW != "NA", Crash_Date_DOW != "NaN", Crash_Date_DOW != "") %>%
+  group_by(AlcoholResultType) %>%
+  ggplot(aes(fill=AlcoholResultType, x=Crash_Date_DOW)) + 
+  geom_bar(position="dodge", stat="count") + 
+  coord_flip()
+
 crashes %>% 
   filter(AlcoholResultType != "NA", AlcoholResultType != "", 
          AlcoholResultType != "NaN", AlcoholResultType != 
