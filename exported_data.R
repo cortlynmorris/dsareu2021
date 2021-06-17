@@ -663,4 +663,28 @@ location_road_name_at_freq <- crashes %>%
 set.seed(102)
 location_road_name_at_freq %>%
   wordcloud2(shape = 'circle', backgroundColor = "black", minSize = 5)
->>>>>>> 7094983f34a80478cd7f488b36a8390435ee5f17
+
+#Time series plot
+crashes_ts = crashes %>%
+  separate(crash_date, 
+           into = c("Date", "Hour"), sep = 11) %>%
+  group_by(Date) %>%
+  summarize(count = length(unique(key_crash)))
+
+crashes_ts %>%
+  filter(as.Date(Date) >= "2015/01/01") %>%
+  ggplot(aes(x = as.Date(Date), y = count)) + 
+  geom_line() + 
+  scale_x_date(date_labels = "%m-%Y", date_breaks = "6 month") + 
+  theme(axis.text.x = element_text(angle = 90))
+
+#Crash Date Hour Shift Plot
+crashes %>%
+  filter(Crash_Date_Hour != "NA", Crash_Date_Hour != "") %>%
+  mutate(shift = case_when(
+    Crash_Date_Hour >= 6 & Crash_Date_Hour < 14 ~ "Shift 1",
+    Crash_Date_Hour >= 14 & Crash_Date_Hour < 22 ~ "Shift 2",
+    TRUE ~ "Shift 3")) %>%
+  ggplot() +
+  geom_bar(aes(x=shift, fill = shift)) +
+  labs(title="Frequency of Crashes by Shift", x="Shift", y="Count")
