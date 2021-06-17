@@ -90,7 +90,7 @@ crashes %>%
 
 crashes %>% 
   filter(AlcoholResultType != "NA", AlcoholResultType != "", 
-         AlcoholResultType != "NaN") %>%
+         AlcoholResultType != "NaN", AlcoholResultType != "Contaminated sample/unusable") %>%
   count(AlcoholResultType) %>% 
   mutate(logtrans = round(log10(n), digits = 2),
          AlcoholResultType = reorder(AlcoholResultType,logtrans)) %>% 
@@ -101,7 +101,22 @@ crashes %>%
   labs(title = "Frequency of Crashes by Alcohol Result Type",
        x = "Alcohol Result Type",
        y = "Count (log10 Scale)")
-# Question: Remove pending/unknown? Create second graph without the two remove unusable
+
+crashes %>% 
+  filter(AlcoholResultType != "NA", AlcoholResultType != "", 
+         AlcoholResultType != "NaN", AlcoholResultType != 
+           "Contaminated sample/unusable", AlcoholResultType != "Pending",
+         AlcoholResultType != "Unknown") %>%
+  count(AlcoholResultType) %>% 
+  mutate(logtrans = round(log10(n), digits = 2),
+         AlcoholResultType = reorder(AlcoholResultType,logtrans)) %>% 
+  ggplot(aes(x=AlcoholResultType, y=logtrans, fill=AlcoholResultType)) +
+  geom_bar(stat = "identity", show.legend = FALSE) +
+  coord_flip() + 
+  geom_text(aes(label=logtrans),nudge_y=0.5) +
+  labs(title = "Frequency of Crashes by Alcohol Result Type",
+       x = "Alcohol Result Type",
+       y = "Count (log10 Scale)")
 
 crashes %>% 
   filter(Crash_Date_DOW != "NA") %>%
@@ -144,7 +159,6 @@ crashes %>%
   geom_bar(aes(x=shift, fill = shift)) +
   labs(title="Frequency of Crashes by Shift", x="Shift", y="Count")
 
-crashes$Crash_Date_Hour >= 6 | crashes$Crash_Date_Hour < 14
 
 crashes %>% 
   filter(PersonType == "Driver" | PersonType == "Passenger", Age != "", Age != "NA") %>% 
