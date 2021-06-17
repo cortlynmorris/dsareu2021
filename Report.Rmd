@@ -20,6 +20,7 @@ library(dslabs)
 library(ggrepel)
 library(ggthemes)
 library(maps)
+library(scales)
 ```
 
 ### Setting working directory.
@@ -29,7 +30,7 @@ library(maps)
 ```
 
 ### Reading and merging the data.
-
+This code is for a Mac, if using Windows, read.csv becomes read_csv
 ```{r}
 persons <- read.csv(file="Persons_Involved_in_Crashes.csv")
 glimpse(persons)
@@ -39,6 +40,8 @@ glimpse(locations)
 
 crashes <- persons %>% left_join(locations, by="key_crash")
 ```
+
+
 
 ## Exploratory data analysis using log transformed data.
 
@@ -292,34 +295,34 @@ There does not seem to be a significant difference between frequency of crashes 
 
 ```{r}
 crashes %>% 
-  filter(Gender != "NA", Gender != "Unknown") %>%
+  filter(Gender != "NA", Gender != "Unknown", Gender != "") %>%
   count(Gender) %>% 
-  mutate(logtrans = round(log10(n), digits = 2), 
-         Gender = reorder(Gender,logtrans)) %>% 
-  ggplot(aes(x=Gender, y=logtrans, fill=Gender)) +
+  mutate(Percent = round(n/sum(n),2), 
+         Gender = reorder(Gender,Percent)) %>% 
+  ggplot(aes(x=Gender, y=Percent, fill=Gender)) +
   geom_bar(stat = "identity", show.legend = FALSE) + 
-  geom_text(aes(label=logtrans),nudge_y=0.2) +
+  geom_text(aes(label= percent(Percent)),nudge_y=0.2) +
   coord_flip() +
   labs(title = "Frequency of Crashes by Gender",
        x = "Gender",
-       y = "Count (log10 Scale)")
+       y = "Percent")
 ```
 
 ### Frequency of Crashes by Race
 
 ```{r}
 crashes %>% 
-  filter(Race != "NA", Race != "Unknown") %>%
+  filter(Race != "NA", Race != "Unknown", Race != "") %>%
   count(Race) %>% 
-  mutate(logtrans = round(log10(n), digits = 2), 
-         Race = reorder(Race,logtrans)) %>% 
-  ggplot(aes(x=Race, y=logtrans, fill=Race)) +
+  mutate(Percent = round(n/sum(n),2), 
+         Race = reorder(Race,Percent)) %>% 
+  ggplot(aes(x=Race, y=Percent, fill=Race)) +
   geom_bar(stat = "identity", show.legend = FALSE) + 
-  geom_text(aes(label=logtrans),nudge_y=0.2) +
+  geom_text(aes(label=percent(Percent)), nudge_y = 0.05) +
   coord_flip() +
   labs(title = "Frequency of Crashes by Race",
        x = "Race",
-       y = "Count (log10 Scale)")
+       y = "Percent")
 ```
 
 ### Frequency of Crashes by Injury
@@ -340,6 +343,62 @@ crashes %>%
        x = "Injury",
        y = "Count (log10 Scale)")
 ```
+
+### Frequency of Injuries by Person Type
+
+```{r}
+# Finding the counts of each injury by person type
+crashes %>% 
+  filter(Injury != "NA", Injury != "Unknown", Injury != "", 
+         PersonType == "Driver") %>%
+  count(Injury)
+
+crashes %>% 
+  filter(Injury != "NA", Injury != "Unknown", Injury != "", 
+         PersonType == "Passenger") %>%
+  count(Injury)
+
+crashes %>% 
+  filter(Injury != "NA", Injury != "Unknown", Injury != "", 
+         PersonType == "Pedestrian") %>%
+  count(Injury)
+
+crashes %>% 
+  filter(Injury != "NA", Injury != "Unknown", Injury != "", 
+         PersonType == "Pedalcyclist") %>%
+  count(Injury)
+
+crashes %>% 
+  filter(Injury != "NA", Injury != "Unknown", Injury != "", 
+         PersonType == "Other*") %>%
+  count(Injury)
+
+#Creating a dataset using injury type, person type, and counts
+persontype2 <- c(rep("Driver" , 5) , rep("Passenger" , 5) , rep("Pedestrian" , 5) ,
+                 rep("Pedalcyclist" , 5) , rep("Other" , 5) )
+
+injury2 <- rep(c("Type A" , "Type B" , "Type C", "Killed", "No Injury") , 5)
+
+value <- c(851, 7295, 22020, 105, 227811, 232, 2307, 9163, 31, 72373, 183, 596, 554,
+           62, 154, 19, 168, 123, 3, 68, 10, 48, 34, 1, 141)
+
+data <- data.frame(persontype2,injury2,value)
+```
+
+```{r}
+#Bar plot
+data %>%
+  mutate(
+         injury2 = reorder(injury2, -value),
+         persontype2 = factor(persontype2,
+                              levels = c("Driver", "Passenger", "Pedestrian", 
+                                         "Pedalcyclist", "Other"))) %>%
+  ggplot(aes(fill=injury2, y=value, x=persontype2)) +
+  geom_bar(position="dodge", stat="identity") +
+  geom_text(aes(label=value), nudge_x = -0.35) +
+  coord_flip()
+```
+
 
 ### Frequency of Crashes by Protection
 
@@ -866,9 +925,6 @@ crashes %>%
   coord_quickmap()
 ```
 
-
-<<<<<<< HEAD
-=======
 ### Histogram for Drivers' Ages
 
 ```{r}
@@ -879,18 +935,12 @@ crashes %>%
   labs(title="Histogram for Drivers' Ages", x="Age", y="Frequency")
 ```
 
-
->>>>>>> 7e5f37f3c632b16ac5201996e4f2a19f0599c47e
 ## Visualizing text data using word clouds 
 
 ### Installing and loading necessary packages 
 
 ```{r}
-<<<<<<< HEAD
 install.packages('wordcloud2')
-=======
-#install.packages('wordcloud2')
->>>>>>> 7e5f37f3c632b16ac5201996e4f2a19f0599c47e
 library(wordcloud2)
 ```
 
@@ -899,15 +949,11 @@ library(wordcloud2)
 ```{r}
 location_road_name_on_freq <- crashes %>%
   count(LocationRoadNameOn)
-<<<<<<< HEAD
 
-=======
->>>>>>> 7e5f37f3c632b16ac5201996e4f2a19f0599c47e
 set.seed(101)
 location_road_name_on_freq %>%
   wordcloud2(shape = 'circle', backgroundColor = "black", minSize = 5)
 ```
-<<<<<<< HEAD
 
 ### Word cloud for location road name at
 
@@ -920,5 +966,3 @@ location_road_name_at_freq %>%
   wordcloud2(shape = 'circle', backgroundColor = "black", minSize = 5)
 ```
 
-=======
->>>>>>> 7e5f37f3c632b16ac5201996e4f2a19f0599c47e
