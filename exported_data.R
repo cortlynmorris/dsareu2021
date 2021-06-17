@@ -166,7 +166,6 @@ crashes %>%
   geom_bar(aes(x=shift, fill = shift)) +
   labs(title="Frequency of Crashes by Shift", x="Shift", y="Count")
 
-
 crashes %>% 
   filter(PersonType == "Driver" | PersonType == "Passenger", Age != "", Age != "NA") %>% 
   ggplot() +
@@ -292,6 +291,22 @@ crashes %>%
   labs(title = "Frequency of Crashes by Injury",
        x = "Injury",
        y = "Count (log10 Scale)")
+
+# create a dataset
+specie <- c(rep("sorgho" , 3) , rep("poacee" , 3) , rep("banana" , 3) , rep("triticum" , 3) )
+condition <- rep(c("normal" , "stress" , "Nitrogen") , 4)
+value <- abs(rnorm(12 , 0 , 15))
+data <- data.frame(specie,condition,value)
+
+# Grouped
+crashes %>%
+  filter(Injury != "NA", Injury != "Unknown", TrafficControlType != "NA", 
+         TrafficControlType != "NaN") %>%
+  group_by(Injury) %>%
+  ggplot(aes(fill=Injury, x=TrafficControlType)) + 
+  geom_bar(position="dodge", stat="count") + 
+  coord_flip()
+###Question: How to transform this to log/proportion 
 
 crashes %>% 
   filter(Protection != "NA", Protection != "Unable to determine") %>%
