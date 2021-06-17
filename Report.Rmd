@@ -19,6 +19,7 @@ library(dplyr)
 library(dslabs)
 library(ggrepel)
 library(ggthemes)
+library(maps)
 ```
 
 ### Setting working directory.
@@ -849,6 +850,22 @@ crashes %>%
        x = "Number of Unknown Injuries",
        y = "Count (log10 Scale)")
 ```
+
+### Map of Crash Locations
+
+```{r}
+crashes %>% 
+  filter(LocationLatitude != "0", LocationLongitude != "0",
+         LocationLatitude != "NA", LocationLatitude != "",
+         LocationLongitude != "NA", LocationLongitude != "",
+         LocationLatitude > 35.4, LocationLatitude < 36.2,
+         LocationLongitude < -78, LocationLongitude > -79) %>%
+  ggplot(aes(LocationLongitude, LocationLatitude)) +
+  borders('county', 'north carolina', fill = "light blue") +
+  geom_point(size=0.5, col = 'black', show.legend = F) +
+  coord_quickmap()
+```
+
 
 <<<<<<< HEAD
 =======
