@@ -406,7 +406,8 @@ crashes %>%
 
 
 crashes %>% 
-  filter(LocationFeetFromRoad != "NA", LocationFeetFromRoad != "Unknown") %>%
+  filter(LocationFeetFromRoad != "NA", LocationFeetFromRoad != "Unknown", 
+         LocationFeetFromRoad != "") %>%
   count(LocationFeetFromRoad) %>% 
   mutate(logtrans = round(log10(n), digits = 2), 
          LocationFeetFromRoad= reorder(LocationFeetFromRoad,logtrans)) %>% 
@@ -421,7 +422,8 @@ crashes %>%
 
 
 crashes %>% 
-  filter(LocationDirectionFromRoad != "NA", LocationDirectionFromRoad != "Unknown") %>%
+  filter(LocationDirectionFromRoad != "NA", LocationDirectionFromRoad != "Unknown",
+         LocationDirectionFromRoad != "") %>%
   count(LocationDirectionFromRoad) %>% 
   mutate(logtrans = round(log10(n), digits = 2), 
          LocationDirectionFromRoad= reorder(LocationDirectionFromRoad,logtrans)) %>% 
@@ -491,7 +493,8 @@ crashes %>%
 
 
 crashes %>% 
-  filter(RoadClassification != "NA", RoadClassification != "Unknown") %>%
+  filter(RoadClassification != "NA", RoadClassification != "Unknown",
+         RoadClassification != "NaN", RoadClassification != "") %>%
   count(RoadClassification) %>% 
   mutate(logtrans = round(log10(n), digits = 2), 
          RoadClassification= reorder(RoadClassification,logtrans)) %>% 
