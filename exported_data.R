@@ -173,7 +173,7 @@ crashes %>%
   geom_histogram(aes(x=Age), binwidth = 5, col="red", fill="darkgrey") +
   labs(x="Age", y="Frequency", title="Drivers' vs. Passengers' Age") +
   theme(legend.position = "top") +
-  facet_wrap(~PersonType)
+  facet_wrap(~PersonType, dir = "v")
 
 crashes %>% 
   filter(PersonType == "Driver" | PersonType == "Passenger", 
