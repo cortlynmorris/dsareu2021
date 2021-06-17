@@ -101,7 +101,7 @@ crashes %>%
   labs(title = "Frequency of Crashes by Alcohol Result Type",
        x = "Alcohol Result Type",
        y = "Count (log10 Scale)")
-# Question: Remove pending/unknown?
+# Question: Remove pending/unknown? Create second graph without the two remove unusable
 
 crashes %>% 
   filter(Crash_Date_DOW != "NA") %>%
@@ -134,6 +134,17 @@ crashes %>%
   ggplot() +
   geom_bar(aes(Crash_Date_Hour)) +
   labs(title="Frequency of Crashes by Hour", x="Hour", y="Count")
+
+crashes %>%
+  filter(Crash_Date_Hour != "NA", Crash_Date_Hour != "") %>%
+  mutate(shift = ifelse(
+    Crash_Date_Hour >= 6 & Crash_Date_Hour < 14, "Shift 1", 
+    ifelse(Crash_Date_Hour >= 14 & Crash_Date_Hour < 22, "Shift 2", "Shift 3"))) %>%
+  ggplot() +
+  geom_bar(aes(x=shift, fill = shift)) +
+  labs(title="Frequency of Crashes by Shift", x="Shift", y="Count")
+
+crashes$Crash_Date_Hour >= 6 | crashes$Crash_Date_Hour < 14
 
 crashes %>% 
   filter(PersonType == "Driver" | PersonType == "Passenger", Age != "", Age != "NA") %>% 
@@ -447,14 +458,13 @@ crashes %>%
 crashes %>% 
   filter(Crash_Date_Year != "Unknown", Crash_Date_Year != "2011") %>%
   count(Crash_Date_Year) %>% 
-  mutate(logtrans = round(log10(n), digits = 4)) %>% 
-  ggplot(aes(x=Crash_Date_Year, y=logtrans, fill=Crash_Date_Year)) +
+  ggplot(aes(Crash_Date_Year, fill=Crash_Date_Year)) +
   geom_bar(stat = "identity", show.legend = FALSE) +
-  geom_text(aes(label=logtrans),nudge_y=0.5) + 
-  geom_abline(intercept = log10(387995/6.5), slope = 0, lty="dashed", color="darkgrey") +
+  geom_text(aes(label=total),nudge_y=0.5) + 
+  geom_abline(intercept = 387995/(77/12), slope = 0, lty="dashed", color="darkgrey") +
   labs(title = "Frequency of Crashes by Year", 
        x = "Year", 
-       y = "Count (log10 Scale)")
+       y = "Count")
 
 crashes %>% 
   filter(PersonType == "Driver") %>%
