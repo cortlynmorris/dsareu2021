@@ -950,6 +950,8 @@ library(wordcloud2)
 ### Word Cloud for Location Road Name On  
 
 ```{r}
+devtools::install_github("gaospecial/wordcloud2")
+
 location_road_name_on_freq <- crashes %>%
   count(LocationRoadNameOn)
 
@@ -961,6 +963,8 @@ location_road_name_on_freq %>%
 ### Word cloud for location road name at
 
 ```{r}
+devtools::install_github("gaospecial/wordcloud2")
+
 location_road_name_at_freq <- crashes %>%
   count(LocationRoadNameAt)
 
