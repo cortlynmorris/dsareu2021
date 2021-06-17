@@ -10,6 +10,11 @@ glimpse(locations)
 
 crashes <- persons %>% left_join(locations, by="key_crash")
 
+library(readr)
+persons <- read_csv("~/NCAT REU/Mostafa/Data/Persons_Involved_in_Crashes.csv")
+
+locations <- read_csv("~/NCAT REU/Mostafa/Data/Reported_Crash_Locations.csv")
+
 library(ggplot2)
 library(dplyr)
 library(dslabs)
@@ -167,6 +172,15 @@ crashes %>%
   ggplot() +
   geom_histogram(aes(x=Age), binwidth = 5, col="red", fill="darkgrey") +
   labs(x="Age", y="Frequency", title="Drivers' vs. Passengers' Age") +
+  theme(legend.position = "top") +
+  facet_wrap(~PersonType)
+
+crashes %>% 
+  filter(PersonType == "Driver" | PersonType == "Passenger", 
+         Gender != "NA", Gender != "Unknown") %>% 
+  ggplot() +
+  geom_bar(aes(x=Gender), col="red", fill="darkgrey") +
+  labs(x="Gender", y="Frequency", title="Drivers' vs. Passengers' Gender") +
   theme(legend.position = "top") +
   facet_wrap(~PersonType)
 
