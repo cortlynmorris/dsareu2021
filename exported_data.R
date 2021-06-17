@@ -292,13 +292,6 @@ crashes %>%
        x = "Injury",
        y = "Count (log10 Scale)")
 
-# create a dataset
-specie <- c(rep("sorgho" , 3) , rep("poacee" , 3) , rep("banana" , 3) , rep("triticum" , 3) )
-condition <- rep(c("normal" , "stress" , "Nitrogen") , 4)
-value <- abs(rnorm(12 , 0 , 15))
-data <- data.frame(specie,condition,value)
-
-# Grouped
 crashes %>%
   filter(Injury != "NA", Injury != "Unknown", TrafficControlType != "NA", 
          TrafficControlType != "NaN") %>%
@@ -307,6 +300,30 @@ crashes %>%
   geom_bar(position="dodge", stat="count") + 
   coord_flip()
 ###Question: How to transform this to log/proportion 
+
+crashes %>%
+  filter(Injury != "NA", Injury != "Unknown", VehicleType != "NA", 
+         VehicleType != "NaN") %>%
+  group_by(Injury) %>%
+  ggplot(aes(fill=Injury, x=VehicleType)) + 
+  geom_bar(position="dodge", stat="count") + 
+  coord_flip()
+
+crashes %>%
+  filter(Injury != "NA", Injury != "Unknown", Protection != "NA", 
+         Protection != "NaN") %>%
+  group_by(Injury) %>%
+  ggplot(aes(fill=Injury, x=Protection)) + 
+  geom_bar(position="dodge", stat="count") + 
+  coord_flip()
+
+crashes %>%
+  filter(Injury != "NA", Injury != "Unknown", VisionObstruction != "NA", 
+         VisionObstruction != "NaN") %>%
+  group_by(Injury) %>%
+  ggplot(aes(fill=Injury, x=VisionObstruction)) + 
+  geom_bar(position="dodge", stat="count") + 
+  coord_flip()
 
 crashes %>% 
   filter(Protection != "NA", Protection != "Unable to determine") %>%
