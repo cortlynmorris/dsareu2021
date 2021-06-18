@@ -39,9 +39,14 @@ locations <- read.csv(file="Reported_Crash_Locations.csv")
 glimpse(locations)
 
 crashes <- persons %>% left_join(locations, by="key_crash")
+
+# library(readr)
+# persons <- read_csv("~/NCAT REU/Mostafa/Data/Persons_Involved_in_Crashes.csv")
+# 
+# locations <- read_csv("~/NCAT REU/Mostafa/Data/Reported_Crash_Locations.csv")
+# 
+# crashes <- persons %>% left_join(locations, by="key_crash")
 ```
-
-
 
 ## Exploratory data analysis using log transformed data.
 
@@ -83,6 +88,24 @@ crashes %>%
        y = "Count (log10 Scale)")
 ```
 
+### Frequency of Crashes by Weather Condition and if Weather Contributed to Crash
+
+```{r}
+crashes %>% 
+  filter(WeatherCondition1 != "NA", WeatherContributedToCrash == "Yes") %>%
+  count(WeatherCondition1) %>% 
+  mutate(logtrans = round(log10(n), digits = 2),
+         WeatherCondition1 = reorder(WeatherCondition1,logtrans)) %>% 
+  ggplot(aes(x=WeatherCondition1, y=logtrans, fill=WeatherCondition1)) +
+  geom_bar(stat = "identity", show.legend = FALSE) +
+  coord_flip() + 
+  geom_text(aes(label=logtrans),nudge_y=0.5) +
+  labs(title = 
+  "Frequency of Crashes by Weather Condition and if Weather Contributed to Crash",
+       x = "Weather Condition",
+       y = "Count (log10 Scale)")
+```
+
 ### Frequency of crashes by traffic control type.
 
 The highest frequency of crashes occur when there is no traffic control present. Without a control present, drivers may be less confident in their actions. 
@@ -120,6 +143,16 @@ crashes %>%
   labs(title = "Frequency of Crashes by Road Feature",
        x = "Road Feature",
        y = "Count (log10 Sclae)")
+```
+
+### Histogram for Drivers' Ages 
+
+```{r}
+crashes %>%
+  filter(PersonType == "Driver", Age != "NA", Age != "NaN", Age != "") %>%
+  ggplot() +
+  geom_histogram(aes(x=Age), binwidth = 5, col="red", fill="darkgrey") +
+  labs(title="Histogram for Drivers' Ages", x="Age", y="Frequency")
 ```
 
 ### Frequency of Crashes by Alcohol Result Type (including Unknown and Pending results)
@@ -234,6 +267,18 @@ crashes %>%
   facet_wrap(~PersonType)
 ```
 
+### Frequency of Crashes by Drivers' v. Passengers' Gender
+```{r}
+crashes %>% 
+  filter(PersonType == "Driver" | PersonType == "Passenger", 
+         Gender != "NA", Gender != "Unknown") %>% 
+  ggplot() +
+  geom_bar(aes(x=Gender), col="red", fill="darkgrey") +
+  labs(x="Gender", y="Frequency", title="Drivers' vs. Passengers' Gender") +
+  theme(legend.position = "top") +
+  facet_wrap(~PersonType)
+```
+
 ### Frequency of Crashes by Vehicle Seizure
 
 About half as many vehicles were seized compared to vehicles not seized. 
@@ -254,6 +299,7 @@ crashes %>%
 ### Frequency of Crashes by Airbag Deployed
 
 The highest frequency of crashes occured where the airbags were not deployed. It is interesting to note that the second highest frequency of crashes occured where the car(s) did not have airbags to begin with. 
+Airbags did not deploy during most crashes, therefore many accidents logged were minor. 
 
 ```{r}
 crashes %>% 
@@ -309,6 +355,13 @@ crashes %>%
 ```
 
 ### Frequency of Crashes by Race
+According to census.gov...
+
+In the United States, 76.3 % of people are White, 13.4% of people are Black or African American, 18.5% are Hispanic or Latina, 0.2 are Native Hawaiian and Other Pacific Islander, 2.8% are two or more races, 5.9% are Asian, 1.3% are American Indian and Alaska Native, . 
+
+In North Carolina, 70.6 % of people are White, 22.2% of people are Black or African American, 9.8% are Hispanic or Latina, 0.1 are Native Hawaiian and Other Pacific Islander, 2.3% are two or more races, 3.2% are Asian, and 1.6% are American Indian and Alaska Native.
+
+In Wake County, North Carolina, 67.9 % of people are White, 21.0% of people are Black or African American, 10.4% are Hispanic or Latina, 0.1% are Native Hawaiian and Other Pacific Islander, 2.6% are two or more races, 7.7% are Asian, and 0.8% are American Indian and Alaska Native.
 
 ```{r}
 crashes %>% 
@@ -327,7 +380,7 @@ crashes %>%
 
 ### Frequency of Crashes by Injury
 
-THe highest frequency of crashes did not result in any injury. Following the highest frequency, the more serious the injury, the less crashes occured. 
+The highest frequency of crashes did not result in any injury. Following the highest frequency, the more serious the injury, the less crashes occured. 
 
 ```{r}
 crashes %>% 
@@ -571,21 +624,15 @@ crashes %>%
        y = "Count (log10 Scale)")
 ```
 
-### Frequency of Crashes by Location Feet From Road 
+### Histogram of Crash Location Feet From Road 
 
 ```{r}
-crashes %>% 
-  filter(LocationFeetFromRoad != "NA", LocationFeetFromRoad != "Unknown") %>%
-  count(LocationFeetFromRoad) %>% 
-  mutate(logtrans = round(log10(n), digits = 2), 
-         LocationFeetFromRoad= reorder(LocationFeetFromRoad,logtrans)) %>% 
-  ggplot(aes(x=LocationFeetFromRoad, y=logtrans, fill=LocationFeetFromRoad)) +
-  geom_bar(stat = "identity", show.legend = FALSE) + 
-  geom_text(aes(label=logtrans),nudge_y=0.2) +
-  coord_flip() +
-  labs(title = "Crash Distance from Road",
-       x = "Location Feet From Road",
-       y = "Count (log10 Scale)")
+crashes %>%
+  filter(LocationFeetFromRoad != "NA", LocationFeetFromRoad != "Unknown", 
+         LocationFeetFromRoad != "") %>%
+  ggplot() +
+  geom_histogram(aes(x=LocationFeetFromRoad), binwidth = 100, col="red", fill="darkgrey") +
+  labs(title="Histogram for Location Feet From Road")
 ```
 
 ### Frequency of Crashes by Location Direction From Road
@@ -711,6 +758,7 @@ crashes %>%
 ### Frequency of Crashes by Drivers
 
 ```{r}
+#Old code
 crashes %>% 
   filter(drivers != "NA", drivers != "") %>%
   count(drivers) %>% 
@@ -728,6 +776,7 @@ crashes %>%
 ### Frequency of Crashes by Passengers
 
 ```{r}
+#old code
 crashes %>% 
   filter(passengers != "NA", passengers != "") %>%
   count(passengers) %>% 
@@ -927,28 +976,19 @@ crashes %>%
   coord_quickmap()
 ```
 
-### Histogram for Drivers' Ages
-
-```{r}
-crashes %>%
-  filter(PersonType == "Driver", Age != "NA", Age != "NaN", Age != "") %>%
-  ggplot() +
-  geom_histogram(aes(x=Age), binwidth = 5, col="red", fill="darkgrey") +
-  labs(title="Histogram for Drivers' Ages", x="Age", y="Frequency")
-```
-
 ## Visualizing text data using word clouds 
 
 ### Installing and loading necessary packages 
 
 ```{r}
-install.packages('wordcloud2')
+#install.packages('wordcloud2')
 library(wordcloud2)
 ```
 
 ### Word Cloud for Location Road Name On  
 
 ```{r}
+devtools::install_github("gaospecial/wordcloud2")
 location_road_name_on_freq <- crashes %>%
   count(LocationRoadNameOn)
 
@@ -960,6 +1000,7 @@ location_road_name_on_freq %>%
 ### Word cloud for location road name at
 
 ```{r}
+devtools::install_github("gaospecial/wordcloud2")
 location_road_name_at_freq <- crashes %>%
   count(LocationRoadNameAt)
 

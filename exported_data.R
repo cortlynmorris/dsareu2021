@@ -10,6 +10,11 @@ glimpse(locations)
 
 crashes <- persons %>% left_join(locations, by="key_crash")
 
+library(readr)
+persons <- read_csv("~/NCAT REU/Mostafa/Data/Persons_Involved_in_Crashes.csv")
+
+locations <- read_csv("~/NCAT REU/Mostafa/Data/Reported_Crash_Locations.csv")
+
 library(ggplot2)
 library(dplyr)
 library(dslabs)
@@ -104,6 +109,14 @@ crashes %>%
        x = "Alcohol Result Type",
        y = "Count (log10 Scale)")
 
+crashes %>%
+  filter(AlcoholResultType != "NA", AlcoholResultType != "Unknown", 
+         Crash_Date_DOW != "NA", Crash_Date_DOW != "NaN", Crash_Date_DOW != "") %>%
+  group_by(AlcoholResultType) %>%
+  ggplot(aes(fill=AlcoholResultType, x=Crash_Date_DOW)) + 
+  geom_bar(position="dodge", stat="count") + 
+  coord_flip()
+
 crashes %>% 
   filter(AlcoholResultType != "NA", AlcoholResultType != "", 
          AlcoholResultType != "NaN", AlcoholResultType != 
@@ -161,12 +174,20 @@ crashes %>%
   geom_bar(aes(x=shift, fill = shift)) +
   labs(title="Frequency of Crashes by Shift", x="Shift", y="Count")
 
-
 crashes %>% 
   filter(PersonType == "Driver" | PersonType == "Passenger", Age != "", Age != "NA") %>% 
   ggplot() +
   geom_histogram(aes(x=Age), binwidth = 5, col="red", fill="darkgrey") +
   labs(x="Age", y="Frequency", title="Drivers' vs. Passengers' Age") +
+  theme(legend.position = "top") +
+  facet_wrap(~PersonType, dir = "v")
+
+crashes %>% 
+  filter(PersonType == "Driver" | PersonType == "Passenger", 
+         Gender != "NA", Gender != "Unknown") %>% 
+  ggplot() +
+  geom_bar(aes(x=Gender), col="red", fill="darkgrey") +
+  labs(x="Gender", y="Frequency", title="Drivers' vs. Passengers' Gender") +
   theme(legend.position = "top") +
   facet_wrap(~PersonType)
 
@@ -278,6 +299,55 @@ crashes %>%
   labs(title = "Frequency of Crashes by Injury",
        x = "Injury",
        y = "Count (log10 Scale)")
+
+#Injury and other variables (should they be stack or grouped bar charts?)
+crashes %>%
+  filter(Injury != "NA", Injury != "Unknown", TrafficControlType != "NA", 
+         TrafficControlType != "NaN") %>%
+  group_by(Injury) %>%
+  ggplot(aes(fill=Injury, x=TrafficControlType)) + 
+  geom_bar(position="stack", stat="count") + 
+  coord_flip()
+
+crashes %>%
+  filter(Injury != "NA", Injury != "Unknown", VehicleType != "NA", 
+         VehicleType != "NaN") %>%
+  group_by(Injury) %>%
+  ggplot(aes(fill=Injury, x=VehicleType)) + 
+  geom_bar(position="stack", stat="count") + 
+  coord_flip()
+
+crashes %>%
+  filter(Injury != "NA", Injury != "Unknown", Protection != "NA", 
+         Protection != "NaN") %>%
+  group_by(Injury) %>%
+  ggplot(aes(fill=Injury, x=Protection)) + 
+  geom_bar(position="stack", stat="count") + 
+  coord_flip()
+
+crashes %>%
+  filter(Injury != "NA", Injury != "Unknown", VisionObstruction != "NA", 
+         VisionObstruction != "NaN") %>%
+  group_by(Injury) %>%
+  ggplot(aes(fill=Injury, x=VisionObstruction)) + 
+  geom_bar(position="stack", stat="count") + 
+  coord_flip()
+
+crashes %>%
+  filter(Injury != "NA", Injury != "Unknown", FirstHarmfulEvent != "NA", 
+         FirstHarmfulEvent != "NaN", FirstHarmfulEvent != "Unknown") %>%
+  group_by(Injury) %>%
+  ggplot(aes(fill=Injury, x=FirstHarmfulEvent)) + 
+  geom_bar(position="stack", stat="count") + 
+  coord_flip()
+
+crashes %>%
+  filter(Injury != "NA", Injury != "Unknown", MostHarmfulEvent != "NA", 
+         MostHarmfulEvent != "NaN", MostHarmfulEvent != "Unknown") %>%
+  group_by(Injury) %>%
+  ggplot(aes(fill=Injury, x=MostHarmfulEvent)) + 
+  geom_bar(position="stack", stat="count") + 
+  coord_flip()
 
 crashes %>% 
   filter(Protection != "NA", Protection != "Unable to determine") %>%
@@ -404,22 +474,12 @@ crashes %>%
        x = "Location Ramp Indicator",
        y = "Count (log10 Scale)")
 
-
-crashes %>% 
+crashes %>%
   filter(LocationFeetFromRoad != "NA", LocationFeetFromRoad != "Unknown", 
          LocationFeetFromRoad != "") %>%
-  count(LocationFeetFromRoad) %>% 
-  mutate(logtrans = round(log10(n), digits = 2), 
-         LocationFeetFromRoad= reorder(LocationFeetFromRoad,logtrans)) %>% 
-  ggplot(aes(x=LocationFeetFromRoad, y=logtrans, fill=LocationFeetFromRoad)) +
-  geom_bar(stat = "identity", show.legend = FALSE) + 
-  geom_text(aes(label=logtrans),nudge_y=0.2) +
-  coord_flip() +
-  labs(title = "Crash Distance from Road",
-       x = "Location Feet From Road",
-       y = "Count (log10 Scale)")
-
-
+  ggplot() +
+  geom_histogram(aes(x=LocationFeetFromRoad), binwidth = 100, col="red", fill="darkgrey") +
+  labs(title="Histogram for Location Feet From Road")
 
 crashes %>% 
   filter(LocationDirectionFromRoad != "NA", LocationDirectionFromRoad != "Unknown",
@@ -682,6 +742,11 @@ crashes %>%
 
 library(maps)
 
+#Can we use this code to help only map wake county?
+nc_counties <- map_data("county", "north carolina") %>% 
+  select(lon = long, lat, group, id = subregion)
+head(nc_counties)
+
 crashes %>% 
   filter(LocationLatitude != "0", LocationLongitude != "0",
          LocationLatitude != "NA", LocationLatitude != "",
@@ -693,7 +758,6 @@ crashes %>%
   geom_point(size=0.5, col = 'black', show.legend = F) +
   coord_quickmap()
 
-
 ###Visualizing text data using word clouds 
 
 #Installing and loading necessary packages 
@@ -701,6 +765,8 @@ install.packages('wordcloud2')
 library(wordcloud2)
 
 #Word cloud for location road name on  
+devtools::install_github("gaospecial/wordcloud2")
+
 location_road_name_on_freq <- crashes %>%
   count(LocationRoadNameOn)
 
@@ -709,6 +775,8 @@ location_road_name_on_freq %>%
   wordcloud2(shape = 'circle', backgroundColor = "black", minSize = 5)
 
 #Word cloud for location road name at 
+devtools::install_github("gaospecial/wordcloud2")
+
 location_road_name_at_freq <- crashes %>%
   count(LocationRoadNameAt)
 
