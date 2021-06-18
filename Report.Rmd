@@ -1224,6 +1224,8 @@ crashes %>%
        y = "Count")
 ```
 
+## Visualizing data using maps 
+
 ### Map of Crash Locations
 
 ```{r}
@@ -1274,3 +1276,21 @@ location_road_name_at_freq %>%
   wordcloud2(shape = 'circle', backgroundColor = "black", minSize = 5)
 ```
 
+## Visualizing data using time series plots
+
+### Time Series Plot for Frequency of Crashes Everyday (from January 2015 to May 2021)
+
+```{r}
+crashes_ts = crashes %>%
+  separate(crash_date, 
+           into = c("Date", "Hour"), sep = 11) %>%
+  group_by(Date) %>%
+  summarize(count = length(unique(key_crash)))
+
+crashes_ts %>%
+  filter(as.Date(Date) >= "2015/01/01") %>%
+  ggplot(aes(x = as.Date(Date), y = count)) + 
+  geom_line() + 
+  scale_x_date(date_labels = "%m-%Y", date_breaks = "6 month") + 
+  theme(axis.text.x = element_text(angle = 90))
+```
