@@ -119,7 +119,10 @@ crashes %>%
   group_by(AlcoholResultType) %>%
   ggplot(aes(fill=AlcoholResultType, x=Crash_Date_DOW)) + 
   geom_bar(position="fill", stat="count") + 
-  coord_flip()
+  coord_flip() + 
+  labs(title = "Crash Frequency by Alcohol Result Type and Crash Date DOW",
+       x = "Crash Date DOW",
+       y = "Count")
 
 crashes %>% 
   filter(AlcoholResultType != "NA", AlcoholResultType != "", 
@@ -235,11 +238,11 @@ crashes %>%
 crashes %>% 
   filter(Gender != "NA", Gender != "Unknown", Gender != "") %>%
   count(Gender) %>% 
-  mutate(Percent = round(n/sum(n),2), 
+  mutate(Percent = round(n/sum(n)*100,2), 
          Gender = reorder(Gender,Percent)) %>% 
   ggplot(aes(x=Gender, y=Percent, fill=Gender)) +
   geom_bar(stat = "identity", show.legend = FALSE) + 
-  geom_text(aes(label= percent(Percent)),nudge_y=0.2) +
+  geom_text(aes(label=Percent),nudge_y=0.2) +
   coord_flip() +
   labs(title = "Frequency of Crashes by Gender",
        x = "Gender",
@@ -249,69 +252,86 @@ crashes %>%
 crashes %>% 
   filter(Race != "NA", Race != "Unknown", Race != "") %>%
   count(Race) %>% 
-  mutate(Percent = round(n/sum(n),2), 
+  mutate(Percent = round(n/sum(n)*100,2), 
          Race = reorder(Race,Percent)) %>% 
   ggplot(aes(x=Race, y=Percent, fill=Race)) +
   geom_bar(stat = "identity", show.legend = FALSE) + 
-  geom_text(aes(label=percent(Percent)), nudge_y = 0.05) +
+  geom_text(aes(label=Percent), nudge_y = 0.05) +
   coord_flip() +
   labs(title = "Frequency of Crashes by Race",
        x = "Race",
        y = "Percent")
 
-crashes %>% 
-  filter(Injury != "NA", Injury != "Unknown", Injury != "", PersonType == "Driver") %>%
-  count(Injury)
-crashes %>% 
-  filter(Injury != "NA", Injury != "Unknown", Injury != "", PersonType == "Passenger") %>%
-  count(Injury)
-crashes %>% 
-  filter(Injury != "NA", Injury != "Unknown", Injury != "", PersonType == "Pedestrian") %>%
-  count(Injury)
-crashes %>% 
-  filter(Injury != "NA", Injury != "Unknown", Injury != "", PersonType == "Pedalcyclist") %>%
-  count(Injury)
-crashes %>% 
-  filter(Injury != "NA", Injury != "Unknown", Injury != "", PersonType == "Other*") %>%
-  count(Injury)
-persontype2 <- c(rep("Driver" , 5) , rep("Passenger" , 5) , rep("Pedestrian" , 5) ,
-                 rep("Pedalcyclist" , 5) , rep("Other" , 5) )
-injury2 <- rep(c("Type A" , "Type B" , "Type C", "Killed", "No Injury") , 5)
-value <- c(851, 7295, 22020, 105, 227811, 232, 2307, 9163, 31, 72373, 183, 596, 554,
-           62, 154, 19, 168, 123, 3, 68, 10, 48, 34, 1, 141)
-data <- data.frame(persontype2,injury2,value)
+#old code 
+# crashes %>% 
+#   filter(Injury != "NA", Injury != "Unknown", Injury != "", PersonType == "Driver") %>%
+#   count(Injury)
+# crashes %>% 
+#   filter(Injury != "NA", Injury != "Unknown", Injury != "", PersonType == "Passenger") %>%
+#   count(Injury)
+# crashes %>% 
+#   filter(Injury != "NA", Injury != "Unknown", Injury != "", PersonType == "Pedestrian") %>%
+#   count(Injury)
+# crashes %>% 
+#   filter(Injury != "NA", Injury != "Unknown", Injury != "", PersonType == "Pedalcyclist") %>%
+#   count(Injury)
+# crashes %>% 
+#   filter(Injury != "NA", Injury != "Unknown", Injury != "", PersonType == "Other*") %>%
+#   count(Injury)
+# persontype2 <- c(rep("Driver" , 5) , rep("Passenger" , 5) , rep("Pedestrian" , 5) ,
+#                  rep("Pedalcyclist" , 5) , rep("Other" , 5) )
+# injury2 <- rep(c("Type A" , "Type B" , "Type C", "Killed", "No Injury") , 5)
+# value <- c(851, 7295, 22020, 105, 227811, 232, 2307, 9163, 31, 72373, 183, 596, 554,
+#            62, 154, 19, 168, 123, 3, 68, 10, 48, 34, 1, 141)
+# data <- data.frame(persontype2,injury2,value)
+# 
+# data %>%
+#   mutate(
+#          injury2 = reorder(injury2, -value),
+#          persontype2 = factor(persontype2,
+#                               levels = c("Driver", "Passenger", "Pedestrian", 
+#                                          "Pedalcyclist", "Other"))) %>%
+#   ggplot(aes(fill=injury2, y=value, x=persontype2)) +
+#   geom_bar(position="dodge", stat="identity") +
+#   geom_text(aes(label=value), nudge_x = -0.35) +
+#   coord_flip()
 
-data %>%
-  mutate(
-         injury2 = reorder(injury2, -value),
-         persontype2 = factor(persontype2,
-                              levels = c("Driver", "Passenger", "Pedestrian", 
-                                         "Pedalcyclist", "Other"))) %>%
-  ggplot(aes(fill=injury2, y=value, x=persontype2)) +
-  geom_bar(position="dodge", stat="identity") +
-  geom_text(aes(label=value), nudge_x = -0.35) +
-  coord_flip()
-
+#Basic injury frequency plot 
 crashes %>% 
   filter(Injury != "NA", Injury != "Unknown", Injury != "") %>%
-  count(PersonType) %>% 
+  count(Injury) %>% 
   mutate(logtrans = round(log10(n), digits = 2)) %>% 
-  ggplot(aes(x=PersonType, y=logtrans, fill=Injury)) +
-  geom_bar(position="dodge", stat = "identity", show.legend = FALSE) + 
+  ggplot(aes(x=Injury, y=logtrans, fill=Injury)) +
+  geom_bar(stat = "identity", show.legend = FALSE) + 
   geom_text(aes(label=logtrans),nudge_y=0.2) +
   coord_flip() +
   labs(title = "Frequency of Crashes by Injury",
        x = "Injury",
        y = "Count (log10 Scale)")
 
-#Injury and other variables (should they be stack/grouped/fill bar charts?)
+#Injury with other variables in percent stacked (fill) plots 
+#new code 
+crashes %>%
+  filter(Injury != "NA", Injury != "Unknown", PersonType != "NA", 
+        PersonType != "NaN") %>%
+  group_by(Injury) %>%
+  ggplot(aes(fill=Injury, x=PersonType)) + 
+  geom_bar(position="fill", stat="count") + 
+  coord_flip() + 
+  labs(title = "Crash Frequency by Injury and Person Type",
+       x = "Person Type",
+       y = "Count")
+
 crashes %>%
   filter(Injury != "NA", Injury != "Unknown", TrafficControlType != "NA", 
          TrafficControlType != "NaN") %>%
   group_by(Injury) %>%
   ggplot(aes(fill=Injury, x=TrafficControlType)) + 
   geom_bar(position="fill", stat="count") + 
-  coord_flip()
+  coord_flip() +
+  labs(title = "Crash Frequency by Injury and Traffic Control Type",
+       x = "Traffic Control Type",
+       y = "Count")
 
 crashes %>%
   filter(Injury != "NA", Injury != "Unknown", VehicleType != "NA", 
@@ -319,7 +339,10 @@ crashes %>%
   group_by(Injury) %>%
   ggplot(aes(fill=Injury, x=VehicleType)) + 
   geom_bar(position="fill", stat="count") + 
-  coord_flip()
+  coord_flip() + 
+  labs(title = "Crash Frequency by Injury and Vehicle Type",
+       x = "Vehicle Type",
+       y = "Count")
 
 crashes %>%
   filter(Injury != "NA", Injury != "Unknown", Protection != "NA", 
@@ -327,7 +350,10 @@ crashes %>%
   group_by(Injury) %>%
   ggplot(aes(fill=Injury, x=Protection)) + 
   geom_bar(position="fill", stat="count") + 
-  coord_flip()
+  coord_flip() + 
+  labs(title = "Crash Frequency by Injury and Protection",
+       x = "Protection",
+       y = "Count")
 
 crashes %>%
   filter(Injury != "NA", Injury != "Unknown", VisionObstruction != "NA", 
@@ -335,7 +361,10 @@ crashes %>%
   group_by(Injury) %>%
   ggplot(aes(fill=Injury, x=VisionObstruction)) + 
   geom_bar(position="fill", stat="count") + 
-  coord_flip()
+  coord_flip() + 
+  labs(title = "Crash Frequency by Injury and Vision Obstruction",
+       x = "Vision Obstruction",
+       y = "Count")
 
 crashes %>%
   filter(Injury != "NA", Injury != "Unknown", FirstHarmfulEvent != "NA", 
@@ -343,7 +372,10 @@ crashes %>%
   group_by(Injury) %>%
   ggplot(aes(fill=Injury, x=FirstHarmfulEvent)) + 
   geom_bar(position="fill", stat="count") + 
-  coord_flip()
+  coord_flip() + 
+  labs(title = "Crash Frequency by Injury and First Harmful Event",
+       x = "First Harmful Event",
+       y = "Count")
 
 crashes %>%
   filter(Injury != "NA", Injury != "Unknown", MostHarmfulEvent != "NA", 
@@ -351,7 +383,10 @@ crashes %>%
   group_by(Injury) %>%
   ggplot(aes(fill=Injury, x=MostHarmfulEvent)) + 
   geom_bar(position="fill", stat="count") + 
-  coord_flip()
+  coord_flip() + 
+  labs(title = "Crash Frequency by Injury and Most Harmful Event",
+       x = "Most Harmful Event",
+       y = "Count")
 
 crashes %>% 
   filter(Protection != "NA", Protection != "Unable to determine") %>%
