@@ -32,6 +32,7 @@ library(scales)
 ### Reading and merging the data.
 This code is for a Mac, if using Windows, read.csv becomes read_csv
 ```{r}
+setwd("/Users/cmorris/Desktop/dsreu2021/rstudiodirectory/ResearchProject")
 persons <- read.csv(file="Persons_Involved_in_Crashes.csv")
 glimpse(persons)
 
@@ -744,15 +745,13 @@ crashes %>%
 ```{r}
 crashes %>% 
   filter(Crash_Date_Year != "Unknown", Crash_Date_Year != "2011") %>%
-  count(Crash_Date_Year) %>% 
-  mutate(logtrans = round(log10(n), digits = 4)) %>% 
-  ggplot(aes(x=Crash_Date_Year, y=logtrans, fill=Crash_Date_Year)) +
-  geom_bar(stat = "identity", show.legend = FALSE) +
-  geom_text(aes(label=logtrans),nudge_y=0.5) + 
-  geom_abline(intercept = log10(387995/6.5), slope = 0, lty="dashed", color="darkgrey") +
+  ggplot(aes(Crash_Date_Year, fill=Crash_Date_Year)) +
+  geom_bar(aes(Crash_Date_Year, fill = Crash_Date_Year), show.legend = FALSE) +
+  geom_text(stat="count", aes(x=Crash_Date_Year, label=..count..), vjust=-0.25) + 
+  geom_abline(intercept = 387995/(77/12), slope = 0, lty="dashed") +
   labs(title = "Frequency of Crashes by Year", 
        x = "Year", 
-       y = "Count (log10 Scale)")
+       y = "Count")
 ```
 
 ### Number of Drivers per Crash
