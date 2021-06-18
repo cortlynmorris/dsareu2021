@@ -389,6 +389,20 @@ crashes %>%
        y = "Count (log10 Scale)")
 
 crashes %>% 
+  filter(VisionObstruction != "NA", VisionObstruction != "Unknown", 
+         VisionObstruction != "", WeatherContributedToCrash == "Yes") %>%
+  count(VisionObstruction) %>% 
+  mutate(logtrans = round(log10(n), digits = 2), 
+         VisionObstruction = reorder(VisionObstruction,logtrans)) %>% 
+  ggplot(aes(x=VisionObstruction, y=logtrans, fill=VisionObstruction)) +
+  geom_bar(stat = "identity", show.legend = FALSE) + 
+  geom_text(aes(label=logtrans),nudge_y=0.2) +
+  coord_flip() +
+  labs(title = "Frequency of Crashes by Vision Obstruction",
+       x = "Vision Obstruction",
+       y = "Count (log10 Scale)")
+
+crashes %>% 
   filter(ContributingCircumstance1 != "NA", ContributingCircumstance1 != "Unknown") %>%
   count(ContributingCircumstance1) %>% 
   mutate(logtrans = round(log10(n), digits = 2), 
@@ -569,14 +583,14 @@ crashes %>%
 
 crashes %>% 
   filter(Crash_Date_Year != "Unknown", Crash_Date_Year != "2011") %>%
-  count(Crash_Date_Year) %>% 
   ggplot(aes(Crash_Date_Year, fill=Crash_Date_Year)) +
-  geom_bar(stat = "identity", show.legend = FALSE) +
-  geom_text(aes(label=total),nudge_y=0.5) + 
-  geom_abline(intercept = 387995/(77/12), slope = 0, lty="dashed", color="darkgrey") +
+  geom_bar(aes(Crash_Date_Year, fill = Crash_Date_Year), show.legend = FALSE) +
+  geom_text(stat="count", aes(x=Crash_Date_Year, label=..count..), vjust=-0.25) + 
+  geom_abline(intercept = 387995/(77/12), slope = 0, lty="dashed") +
   labs(title = "Frequency of Crashes by Year", 
        x = "Year", 
        y = "Count")
+
 
 crashes %>% 
   filter(PersonType == "Driver") %>%
@@ -599,147 +613,180 @@ crashes %>%
   group_by(key_crash) %>%
   count() %>% 
   group_by(n) %>%
-  mutate(logtrans = round(log10(n), digits = 2), 
-         passengers= reorder(passengers,logtrans)) %>% 
-  ggplot(aes(x=passengers, y=logtrans, fill=passengers)) +
+  count() %>%
+  rename(Passengers = n, Frequency = nn) %>%
+  mutate(Passengers = reorder(Passengers,Frequency)) %>% 
+  ggplot(aes(x=Passengers, y=Frequency, fill=Passengers)) +
   geom_bar(stat = "identity", show.legend = FALSE) + 
-  geom_text(aes(label=logtrans),nudge_y=0.2) +
+  geom_text(aes(label=Frequency),nudge_y=0.5) +
   coord_flip() +
   labs(title = "Number of Passengers per Crash",
        x = "Number of Passengers",
-       y = "Count (log10 Scale)")
+       y = "Count")
 
 crashes %>% 
-  filter(pedestrians != "NA", pedestrians != "") %>%
-  count(pedestrians) %>% 
-  mutate(logtrans = round(log10(n), digits = 2), 
-         pedestrians= reorder(pedestrians,logtrans)) %>% 
-  ggplot(aes(x=pedestrians, y=logtrans, fill=pedestrians)) +
+  filter(PersonType == "Pedestrian") %>%
+  group_by(key_crash) %>%
+  count() %>% 
+  group_by(n) %>%
+  count() %>% 
+  rename(Pedestrians = n, Frequency = nn) %>%
+  mutate(Pedestrians = reorder(Pedestrians,Frequency)) %>% 
+  ggplot(aes(x=Pedestrians, y=Frequency, fill=Pedestrians)) +
   geom_bar(stat = "identity", show.legend = FALSE) + 
-  geom_text(aes(label=logtrans),nudge_y=0.2) +
+  geom_text(aes(label=Frequency),nudge_y=0.5) +
   coord_flip() +
   labs(title = "Number of Pedestrians per Crash",
        x = "Number of Pedestrians",
-       y = "Count (log10 Scale)")
+       y = "Count")
 
 crashes %>% 
-  filter(pedalcyclists != "NA", pedalcyclists != "") %>%
-  count(pedalcyclists) %>% 
-  mutate(logtrans = round(log10(n), digits = 2), 
-         pedalcyclists= reorder(pedalcyclists,logtrans)) %>% 
-  ggplot(aes(x=pedalcyclists, y=logtrans, fill=pedalcyclists)) +
+  filter(PersonType == "Pedalcyclist") %>%
+  group_by(key_crash) %>%
+  count() %>% 
+  group_by(n) %>%
+  count() %>%
+  rename(Pedalcyclists = n, Frequency = nn) %>%
+  mutate(Pedalcyclists = reorder(Pedalcyclists,Frequency)) %>% 
+  ggplot(aes(x=Pedalcyclists, y=Frequency, fill=Pedalcyclists)) +
   geom_bar(stat = "identity", show.legend = FALSE) + 
-  geom_text(aes(label=logtrans),nudge_y=0.2) +
+  geom_text(aes(label=Frequency),nudge_y=0.5) +
   coord_flip() +
   labs(title = "Number of Pedalcyclists per Crash",
        x = "Number of Pedalcyclists",
-       y = "Count (log10 Scale)")
+       y = "Count")
 
 crashes %>% 
-  filter(other_person_type != "NA", other_person_type != "") %>%
-  count(other_person_type) %>% 
-  mutate(logtrans = round(log10(n), digits = 2), 
-         other_person_type= reorder(other_person_type,logtrans)) %>% 
-  ggplot(aes(x=other_person_type, y=logtrans, fill=other_person_type)) +
+  filter(PersonType == "Other*") %>%
+  group_by(key_crash) %>%
+  count() %>% 
+  group_by(n) %>%
+  count() %>%
+  rename(Other = n, Frequency = nn) %>%
+  mutate(Other = reorder(Other,Frequency)) %>% 
+  ggplot(aes(x=Other, y=Frequency, fill=Other)) +
   geom_bar(stat = "identity", show.legend = FALSE) + 
-  geom_text(aes(label=logtrans),nudge_y=0.2) +
+  geom_text(aes(label=Frequency),nudge_y=0.5) +
   coord_flip() +
   labs(title = "Number of Others per Crash",
        x = "Number of Others",
-       y = "Count (log10 Scale)")
+       y = "Count")
 
 crashes %>% 
-  filter(unknown_person_type != "NA", unknown_person_type != "") %>%
-  count(unknown_person_type) %>% 
-  mutate(logtrans = round(log10(n), digits = 2), 
-         unknown_person_type= reorder(unknown_person_type,logtrans)) %>% 
-  ggplot(aes(x=unknown_person_type, y=logtrans, fill=unknown_person_type)) +
+  filter(PersonType == "Unknown") %>%
+  group_by(key_crash) %>%
+  count() %>% 
+  group_by(n) %>%
+  count() %>%
+  rename(Unknown = n, Frequency = nn) %>%
+  mutate(Unknown = reorder(Unknown,Frequency)) %>% 
+  ggplot(aes(x=Unknown, y=Frequency, fill=Unknown)) +
   geom_bar(stat = "identity", show.legend = FALSE) + 
-  geom_text(aes(label=logtrans),nudge_y=0.2) +
+  geom_text(aes(label=Frequency),nudge_y=0.5) +
   coord_flip() +
   labs(title = "Number of Unknown per Crash",
        x = "Number of Unknown",
-       y = "Count (log10 Scale)")
+       y = "Count")
 
 crashes %>% 
-  filter(killed != "NA", killed != "") %>%
-  count(killed) %>% 
-  mutate(logtrans = round(log10(n), digits = 2), 
-         killed= reorder(killed,logtrans)) %>% 
-  ggplot(aes(x=killed, y=logtrans, fill=killed)) +
+  filter(Injury == "Killed") %>%
+  group_by(key_crash) %>%
+  count() %>% 
+  group_by(n) %>%
+  count() %>%
+  rename(Killed = n, Frequency = nn) %>%
+  mutate(Killed = reorder(Killed, Frequency)) %>%
+  ggplot(aes(x=Killed, y=Frequency, fill=Killed)) +
   geom_bar(stat = "identity", show.legend = FALSE) + 
-  geom_text(aes(label=logtrans),nudge_y=0.2) +
+  geom_text(aes(label=Frequency),nudge_y = 0.5) +
   coord_flip() +
   labs(title = "Number Killed per Crash",
        x = "Number Killed",
-       y = "Count (log10 Scale)")
+       y = "Count")
 
 crashes %>% 
-  filter(type_a_injury != "NA", type_a_injury != "") %>%
-  count(type_a_injury) %>% 
-  mutate(logtrans = round(log10(n), digits = 2), 
-         type_a_injury= reorder(type_a_injury,logtrans)) %>% 
-  ggplot(aes(x=type_a_injury, y=logtrans, fill=type_a_injury)) +
+  filter(Injury == "A type injury (disabling)") %>%
+  group_by(key_crash) %>%
+  count() %>% 
+  group_by(n) %>%
+  count() %>%
+  rename(TypeA = n, Frequency = nn) %>%
+  mutate(TypeA = reorder(TypeA, Frequency)) %>%
+  ggplot(aes(x=TypeA, y=Frequency, fill=TypeA)) +
   geom_bar(stat = "identity", show.legend = FALSE) + 
-  geom_text(aes(label=logtrans),nudge_y=0.2) +
+  geom_text(aes(label=Frequency),nudge_y = 0.5) +
   coord_flip() +
   labs(title = "Number of Type A Injuries per Crash",
        x = "Number of Type A Injuries",
-       y = "Count (log10 Scale)")
+       y = "Count")
 
 crashes %>% 
-  filter(type_b_injury != "NA", type_b_injury != "") %>%
-  count(type_b_injury) %>% 
-  mutate(logtrans = round(log10(n), digits = 2), 
-         type_b_injury= reorder(type_b_injury,logtrans)) %>% 
-  ggplot(aes(x=type_b_injury, y=logtrans, fill=type_b_injury)) +
+  filter(Injury == "B type injury (evident)") %>%
+  group_by(key_crash) %>%
+  count() %>% 
+  group_by(n) %>%
+  count() %>%
+  rename(TypeB = n, Frequency = nn) %>%
+  mutate(TypeB = reorder(TypeB, Frequency)) %>%
+  ggplot(aes(x=TypeB, y=Frequency, fill=TypeB)) +
   geom_bar(stat = "identity", show.legend = FALSE) + 
-  geom_text(aes(label=logtrans),nudge_y=0.2) +
+  geom_text(aes(label=Frequency),nudge_y = 0.5) +
   coord_flip() +
   labs(title = "Number of Type B Injuries per Crash",
        x = "Number of Type B Injuries",
-       y = "Count (log10 Scale)")
+       y = "Count")
 
 crashes %>% 
-  filter(type_c_injury != "NA", type_c_injury != "") %>%
-  count(type_c_injury) %>% 
-  mutate(logtrans = round(log10(n), digits = 2), 
-         type_c_injury= reorder(type_c_injury,logtrans)) %>% 
-  ggplot(aes(x=type_c_injury, y=logtrans, fill=type_c_injury)) +
+  filter(Injury == "C type injury (possible)") %>%
+  group_by(key_crash) %>%
+  count() %>% 
+  group_by(n) %>%
+  count() %>%
+  rename(TypeC = n, Frequency = nn) %>%
+  mutate(TypeC = reorder(TypeC, Frequency)) %>%
+  ggplot(aes(x=TypeC, y=Frequency, fill=TypeC)) +
   geom_bar(stat = "identity", show.legend = FALSE) + 
-  geom_text(aes(label=logtrans),nudge_y=0.2) +
+  geom_text(aes(label=Frequency),nudge_y = 0.5) +
   coord_flip() +
   labs(title = "Number of Type C Injuries per Crash",
        x = "Number of Type C Injuries",
-       y = "Count (log10 Scale)")
+       y = "Count")
 
 crashes %>% 
-  filter(no_injury != "NA", no_injury != "") %>%
-  count(no_injury) %>% 
-  mutate(logtrans = round(log10(n), digits = 2), 
-         no_injury= reorder(no_injury,logtrans)) %>% 
-  ggplot(aes(x=no_injury, y=logtrans, fill=no_injury)) +
+  filter(Injury == "No injury") %>%
+  group_by(key_crash) %>%
+  count() %>% 
+  group_by(n) %>%
+  count() %>%
+  rename(NoInjury = n, Frequency = nn) %>%
+  mutate(NoInjury = reorder(NoInjury, Frequency)) %>%
+  ggplot(aes(x=NoInjury, y=Frequency, fill=NoInjury)) +
   geom_bar(stat = "identity", show.legend = FALSE) + 
-  geom_text(aes(label=logtrans),nudge_y=0.2) +
+  geom_text(aes(label=Frequency),nudge_y = 0.5) +
   coord_flip() +
-  labs(title = "Number of Non-Injured per Crash",
-       x = "Number of Non-Injured",
-       y = "Count (log10 Scale)")
+  labs(title = "Number of People with No Injuries per Crash",
+       x = "Number of People with No Injuries",
+       y = "Count")
 
 crashes %>% 
-  filter(injury_unknown != "NA", injury_unknown != "") %>%
-  count(injury_unknown) %>% 
-  mutate(logtrans = round(log10(n), digits = 2), 
-         injury_unknown= reorder(injury_unknown,logtrans)) %>% 
-  ggplot(aes(x=injury_unknown, y=logtrans, fill=injury_unknown)) +
+  filter(Injury == "Unknown") %>%
+  group_by(key_crash) %>%
+  count() %>% 
+  group_by(n) %>%
+  count() %>%
+  rename(Unknown = n, Frequency = nn) %>%
+  mutate(Unknown = reorder(Unknown, Frequency)) %>%
+  ggplot(aes(x=Unknown, y=Frequency, fill=Unknown)) +
   geom_bar(stat = "identity", show.legend = FALSE) + 
-  geom_text(aes(label=logtrans),nudge_y=0.2) +
+  geom_text(aes(label=Frequency),nudge_y = 0.5) +
   coord_flip() +
   labs(title = "Number of Unknown Injuries per Crash",
        x = "Number of Unknown Injuries",
-       y = "Count (log10 Scale)")
+       y = "Count")
 
 library(maps)
+install.packages("sf")
+library(sf)
 
 #Can we use this code to help only map wake county?
 nc_counties <- map_data("county", "north carolina") %>% 
