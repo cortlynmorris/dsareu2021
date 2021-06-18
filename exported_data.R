@@ -8,7 +8,7 @@ library(ggthemes)
 library(maps)
 library(scales)
 
-# Mac code for reading in files
+# Mac code for reading in files (Cortlyn)
 setwd("/Users/cmorris/Desktop/dsreu2021/rstudiodirectory/ResearchProject")
 
 persons <- read.csv(file="Persons_Involved_in_Crashes.csv")
@@ -19,7 +19,7 @@ glimpse(locations)
 
 crashes <- persons %>% left_join(locations, by="key_crash")
 
-# Windows code for reading in files
+# Windows code for reading in files (Kelly)
 library(readr)
 persons <- read_csv("~/NCAT REU/Mostafa/Data/Persons_Involved_in_Crashes.csv")
 
@@ -91,7 +91,7 @@ crashes %>%
   geom_text(aes(label=logtrans),nudge_y=0.5) +
   labs(title = "Frequency of Crashes by Road Feature",
        x = "Road Feature",
-       y = "Count (log10 Sclae)")
+       y = "Count (log10 Scale)")
 
 crashes %>%
   filter(PersonType == "Driver", Age != "NA", Age != "NaN", Age != "") %>%
