@@ -1,5 +1,14 @@
 library(reshape2)
 library(tidyverse)
+library(ggplot2)
+library(dplyr)
+library(dslabs)
+library(ggrepel)
+library(ggthemes)
+library(maps)
+library(scales)
+
+# Mac code for reading in files
 setwd("/Users/cmorris/Desktop/dsreu2021/rstudiodirectory/ResearchProject")
 
 persons <- read.csv(file="Persons_Involved_in_Crashes.csv")
@@ -10,18 +19,13 @@ glimpse(locations)
 
 crashes <- persons %>% left_join(locations, by="key_crash")
 
+# Windows code for reading in files
 library(readr)
 persons <- read_csv("~/NCAT REU/Mostafa/Data/Persons_Involved_in_Crashes.csv")
 
 locations <- read_csv("~/NCAT REU/Mostafa/Data/Reported_Crash_Locations.csv")
 
-library(ggplot2)
-library(dplyr)
-library(dslabs)
-library(ggrepel)
-library(ggthemes)
-library(maps)
-library(scales)
+# Beginning of data alanysis
 
 crashes %>% 
   filter(VehicleType != "Unknown", VehicleType != "") %>%
