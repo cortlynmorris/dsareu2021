@@ -32,7 +32,7 @@ library(scales)
 ### Reading and merging the data.
 This code is for a Mac, if using Windows, read.csv becomes read_csv
 ```{r}
-#Code for Cortlyn's computer
+#Code for Cortlyn's computer (Mac)
 persons <- read.csv(file="Persons_Involved_in_Crashes.csv")
 glimpse(persons)
 
@@ -41,7 +41,7 @@ glimpse(locations)
 
 crashes <- persons %>% left_join(locations, by="key_crash")
 
-#Code for Kelly's computer 
+#Code for Kelly's computer (Windows)
 # library(readr)
 # persons <- read_csv("~/NCAT REU/Mostafa/Data/Persons_Involved_in_Crashes.csv")
 # 
@@ -174,6 +174,21 @@ crashes %>%
   labs(title = "Frequency of Crashes by Alcohol Result Type",
        x = "Alcohol Result Type",
        y = "Count (log10 Scale)")
+```
+
+### Frequency of Crashes by Alcohol Result Type and Crash Date DOW 
+
+```{r}
+crashes %>%
+  filter(AlcoholResultType != "NA", AlcoholResultType != "Unknown", 
+         Crash_Date_DOW != "NA", Crash_Date_DOW != "NaN", Crash_Date_DOW != "") %>%
+  group_by(AlcoholResultType) %>%
+  ggplot(aes(fill=AlcoholResultType, x=Crash_Date_DOW)) + 
+  geom_bar(position="fill", stat="count") + 
+  coord_flip() + 
+  labs(title = "Crash Frequency by Alcohol Result Type and Crash Date DOW",
+       x = "Crash Date DOW",
+       y = "Count")
 ```
 
 ### Frequency of Crashes by Alcohol Result Type (excluding Unknown and Pending results)
@@ -455,6 +470,22 @@ data %>%
   coord_flip()
 ```
 
+### Frequency of Crashes by Injuries and Contributing Circumstance 
+
+```{r}
+crashes %>%
+  filter(Injury != "NA", Injury != "Unknown", ContributingCircumstance1 != "NA", 
+         ContributingCircumstance1 != "NaN", 
+         ContributingCircumstance1 != "Unable to determine", 
+         ContributingCircumstance1 != "Unknown") %>%
+  group_by(Injury) %>%
+  ggplot(aes(fill=Injury, x=ContributingCircumstance1)) + 
+  geom_bar(position="fill", stat="count") + 
+  coord_flip() + 
+  labs(title = "Crash Frequency by Injury and Contributing Circumstance",
+       x = "Contributing Circumstance",
+       y = "Count")
+```
 
 ### Frequency of Crashes by Injuries and Person Type 
 
@@ -471,7 +502,84 @@ crashes %>%
        y = "Count")
 ```
 
-### Frequency of by Injury and Traffic Control Type
+### Frequency of Crashes by Injury and Ejection 
+
+```{r}
+crashes %>%
+  filter(Injury != "NA", Injury != "Unknown", Ejection != "NA", 
+         Ejection != "NaN", Ejection != "Unknown") %>%
+  group_by(Injury) %>%
+  ggplot(aes(fill=Injury, x=Ejection)) + 
+  geom_bar(position="fill", stat="count") + 
+  coord_flip() + 
+  labs(title = "Crash Frequency by Injury and Ejection",
+       x = "Ejection",
+       y = "Count")
+```
+
+### Frequency of Crashes by Injury and Road Feature 
+
+```{r}
+crashes %>%
+  filter(Injury != "NA", Injury != "Unknown", RoadFeature != "NA", 
+         RoadFeature != "NaN", RoadFeature != "") %>%
+  group_by(Injury) %>%
+  ggplot(aes(fill=Injury, x=RoadFeature)) + 
+  geom_bar(position="fill", stat="count") + 
+  coord_flip() + 
+  labs(title = "Crash Frequency by Injury and Road Feature",
+       x = "Road Feature",
+       y = "Count")
+```
+
+### Frequency of Crashes by Injury and Road Classification 
+
+```{r}
+crashes %>%
+  filter(Injury != "NA", Injury != "Unknown", RoadClassification != "NA", 
+         RoadClassification != "NaN", RoadClassification != "") %>%
+  group_by(Injury) %>%
+  ggplot(aes(fill=Injury, x=RoadClassification)) + 
+  geom_bar(position="fill", stat="count") + 
+  coord_flip() + 
+  labs(title = "Crash Frequency by Injury and Road Classification",
+       x = "Road Classification",
+       y = "Count")
+```
+
+### Frequency of Crashes by Injury and Weather Condition 
+
+```{r}
+crashes %>%
+  filter(Injury != "NA", Injury != "Unknown", WeatherCondition1 != "NA", 
+         WeatherCondition1 != "NaN") %>%
+  group_by(Injury) %>%
+  ggplot(aes(fill=Injury, x=WeatherCondition1)) + 
+  geom_bar(position="fill", stat="count") + 
+  coord_flip() + 
+  labs(title = "Crash Frequency by Injury and Weather Condition",
+       x = "Weather Condition",
+       y = "Count")
+```
+
+### Frequency of Crashes by Injury and Alcohol Result Type 
+
+```{r}
+crashes %>%
+  filter(Injury != "NA", Injury != "Unknown", AlcoholResultType != "NA", 
+         AlcoholResultType != "NaN", AlcoholResultType != "Unknown",
+         AlcoholResultType != "Contaminated sample/unusable", 
+         AlcoholResultType != "Pending") %>%
+  group_by(Injury) %>%
+  ggplot(aes(fill=Injury, x=AlcoholResultType)) + 
+  geom_bar(position="fill", stat="count") + 
+  coord_flip() + 
+  labs(title = "Crash Frequency by Injury and Alcohol Result Type",
+       x = "Alcohol Result Type",
+       y = "Count")
+```
+
+### Frequency of Crashes by Injury and Traffic Control Type
 
 ```{r}
 crashes %>%
@@ -528,6 +636,21 @@ crashes %>%
   coord_flip() + 
   labs(title = "Crash Frequency by Injury and Vision Obstruction",
        x = "Vision Obstruction",
+       y = "Count")
+```
+
+### Frequency of Crashes by Injury and Airbag Deployed 
+
+```{r}
+crashes %>%
+  filter(Injury != "NA", Injury != "Unknown", AirbagDeployed != "NA", 
+         AirbagDeployed != "NaN", AirbagDeployed != "Unknown") %>%
+  group_by(Injury) %>%
+  ggplot(aes(fill=Injury, x=AirbagDeployed)) + 
+  geom_bar(position="fill", stat="count") + 
+  coord_flip() + 
+  labs(title = "Crash Frequency by Injury and Airbag Deployed",
+       x = "Airbag Deployed",
        y = "Count")
 ```
 
