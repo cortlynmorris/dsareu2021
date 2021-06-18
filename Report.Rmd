@@ -32,20 +32,20 @@ library(scales)
 ### Reading and merging the data.
 This code is for a Mac, if using Windows, read.csv becomes read_csv
 ```{r}
-persons <- read.csv(file="Persons_Involved_in_Crashes.csv")
-glimpse(persons)
-
-locations <- read.csv(file="Reported_Crash_Locations.csv")
-glimpse(locations)
-
-crashes <- persons %>% left_join(locations, by="key_crash")
-
-# library(readr)
-# persons <- read_csv("~/NCAT REU/Mostafa/Data/Persons_Involved_in_Crashes.csv")
+# persons <- read.csv(file="Persons_Involved_in_Crashes.csv")
+# glimpse(persons)
 # 
-# locations <- read_csv("~/NCAT REU/Mostafa/Data/Reported_Crash_Locations.csv")
+# locations <- read.csv(file="Reported_Crash_Locations.csv")
+# glimpse(locations)
 # 
 # crashes <- persons %>% left_join(locations, by="key_crash")
+
+library(readr)
+persons <- read_csv("~/NCAT REU/Mostafa/Data/Persons_Involved_in_Crashes.csv")
+
+locations <- read_csv("~/NCAT REU/Mostafa/Data/Reported_Crash_Locations.csv")
+
+crashes <- persons %>% left_join(locations, by="key_crash")
 ```
 
 ## Exploratory data analysis using log transformed data.
