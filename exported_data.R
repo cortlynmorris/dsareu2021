@@ -587,10 +587,11 @@ crashes %>%
 
 crashes %>% 
   filter(Crash_Date_Year != "Unknown", Crash_Date_Year != "2011") %>%
-  ggplot(aes(Crash_Date_Year, fill=Crash_Date_Year)) +
-  geom_bar(aes(Crash_Date_Year, fill = Crash_Date_Year), show.legend = FALSE) +
+  ggplot(aes(Crash_Date_Year, fill=as.factor(Crash_Date_Year))) +
+  geom_bar(show.legend = FALSE) +
   geom_text(stat="count", aes(x=Crash_Date_Year, label=..count..), vjust=-0.25) + 
   geom_abline(intercept = 387995/(77/12), slope = 0, lty="dashed") +
+  scale_x_continuous(breaks=2015:2021) +
   labs(title = "Frequency of Crashes by Year", 
        x = "Year", 
        y = "Count")
