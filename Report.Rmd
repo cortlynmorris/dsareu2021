@@ -400,7 +400,7 @@ crashes %>%
        y = "Percent")
 ```
 
-### Frequency of Injuries by Person Type
+### Frequency of Injuries by Person Type (old code)
 
 ```{r}
 # Finding the counts of each injury by person type
@@ -455,6 +455,111 @@ data %>%
   coord_flip()
 ```
 
+
+### Frequency of Crashes by Injuries and Person Type 
+
+```{r}
+crashes %>%
+  filter(Injury != "NA", Injury != "Unknown", PersonType != "NA", 
+        PersonType != "NaN") %>%
+  group_by(Injury) %>%
+  ggplot(aes(fill=Injury, x=PersonType)) + 
+  geom_bar(position="fill", stat="count") + 
+  coord_flip() + 
+  labs(title = "Crash Frequency by Injury and Person Type",
+       x = "Person Type",
+       y = "Count")
+```
+
+### Frequency of by Injury and Traffic Control Type
+
+```{r}
+crashes %>%
+  filter(Injury != "NA", Injury != "Unknown", TrafficControlType != "NA", 
+         TrafficControlType != "NaN") %>%
+  group_by(Injury) %>%
+  ggplot(aes(fill=Injury, x=TrafficControlType)) + 
+  geom_bar(position="fill", stat="count") + 
+  coord_flip() +
+  labs(title = "Crash Frequency by Injury and Traffic Control Type",
+       x = "Traffic Control Type",
+       y = "Count")
+```
+
+### Frequency of Crashes by Injury and Vehicle Type
+
+```{r}
+crashes %>%
+  filter(Injury != "NA", Injury != "Unknown", VehicleType != "NA", 
+         VehicleType != "NaN") %>%
+  group_by(Injury) %>%
+  ggplot(aes(fill=Injury, x=VehicleType)) + 
+  geom_bar(position="fill", stat="count") + 
+  coord_flip() + 
+  labs(title = "Crash Frequency by Injury and Vehicle Type",
+       x = "Vehicle Type",
+       y = "Count")
+```
+
+### Frequency of Crashes by Injury and Protection
+
+```{r}
+crashes %>%
+  filter(Injury != "NA", Injury != "Unknown", Protection != "NA", 
+         Protection != "NaN") %>%
+  group_by(Injury) %>%
+  ggplot(aes(fill=Injury, x=Protection)) + 
+  geom_bar(position="fill", stat="count") + 
+  coord_flip() + 
+  labs(title = "Crash Frequency by Injury and Protection",
+       x = "Protection",
+       y = "Count")
+```
+
+### Frequency of Crashes by Injury and Vision Obstruction 
+
+```{r}
+crashes %>%
+  filter(Injury != "NA", Injury != "Unknown", VisionObstruction != "NA", 
+         VisionObstruction != "NaN") %>%
+  group_by(Injury) %>%
+  ggplot(aes(fill=Injury, x=VisionObstruction)) + 
+  geom_bar(position="fill", stat="count") + 
+  coord_flip() + 
+  labs(title = "Crash Frequency by Injury and Vision Obstruction",
+       x = "Vision Obstruction",
+       y = "Count")
+```
+
+### Frequency of Crashes by Injury and First Harmful Event
+
+```{r}
+crashes %>%
+  filter(Injury != "NA", Injury != "Unknown", FirstHarmfulEvent != "NA", 
+         FirstHarmfulEvent != "NaN", FirstHarmfulEvent != "Unknown") %>%
+  group_by(Injury) %>%
+  ggplot(aes(fill=Injury, x=FirstHarmfulEvent)) + 
+  geom_bar(position="fill", stat="count") + 
+  coord_flip() + 
+  labs(title = "Crash Frequency by Injury and First Harmful Event",
+       x = "First Harmful Event",
+       y = "Count")
+```
+
+### Frequency of Crashes by Injury and Most Harmful Event 
+
+```{r}
+crashes %>%
+  filter(Injury != "NA", Injury != "Unknown", MostHarmfulEvent != "NA", 
+         MostHarmfulEvent != "NaN", MostHarmfulEvent != "Unknown") %>%
+  group_by(Injury) %>%
+  ggplot(aes(fill=Injury, x=MostHarmfulEvent)) + 
+  geom_bar(position="fill", stat="count") + 
+  coord_flip() + 
+  labs(title = "Crash Frequency by Injury and Most Harmful Event",
+       x = "Most Harmful Event",
+       y = "Count")
+```
 
 ### Frequency of Crashes by Protection
 
