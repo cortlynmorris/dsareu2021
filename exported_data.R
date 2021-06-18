@@ -306,7 +306,7 @@ crashes %>%
          TrafficControlType != "NaN") %>%
   group_by(Injury) %>%
   ggplot(aes(fill=Injury, x=TrafficControlType)) + 
-  geom_bar(position="stack", stat="count") + 
+  geom_bar(position="fill", stat="count") + 
   coord_flip()
 
 crashes %>%
@@ -314,7 +314,7 @@ crashes %>%
          VehicleType != "NaN") %>%
   group_by(Injury) %>%
   ggplot(aes(fill=Injury, x=VehicleType)) + 
-  geom_bar(position="stack", stat="count") + 
+  geom_bar(position="fill", stat="count") + 
   coord_flip()
 
 crashes %>%
@@ -322,7 +322,7 @@ crashes %>%
          Protection != "NaN") %>%
   group_by(Injury) %>%
   ggplot(aes(fill=Injury, x=Protection)) + 
-  geom_bar(position="stack", stat="count") + 
+  geom_bar(position="fill", stat="count") + 
   coord_flip()
 
 crashes %>%
@@ -330,7 +330,7 @@ crashes %>%
          VisionObstruction != "NaN") %>%
   group_by(Injury) %>%
   ggplot(aes(fill=Injury, x=VisionObstruction)) + 
-  geom_bar(position="stack", stat="count") + 
+  geom_bar(position="fill", stat="count") + 
   coord_flip()
 
 crashes %>%
@@ -338,7 +338,7 @@ crashes %>%
          FirstHarmfulEvent != "NaN", FirstHarmfulEvent != "Unknown") %>%
   group_by(Injury) %>%
   ggplot(aes(fill=Injury, x=FirstHarmfulEvent)) + 
-  geom_bar(position="stack", stat="count") + 
+  geom_bar(position="fill", stat="count") + 
   coord_flip()
 
 crashes %>%
@@ -346,7 +346,7 @@ crashes %>%
          MostHarmfulEvent != "NaN", MostHarmfulEvent != "Unknown") %>%
   group_by(Injury) %>%
   ggplot(aes(fill=Injury, x=MostHarmfulEvent)) + 
-  geom_bar(position="stack", stat="count") + 
+  geom_bar(position="fill", stat="count") + 
   coord_flip()
 
 crashes %>% 
