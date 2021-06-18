@@ -309,6 +309,8 @@ crashes %>%
        x = "Injury",
        y = "Count (log10 Scale)")
 
+#Injury with other variables in percent stacked (fill) plots 
+#new code 
 crashes %>%
   filter(Injury != "NA", Injury != "Unknown", ContributingCircumstance1 != "NA", 
          ContributingCircumstance1 != "NaN", 
@@ -322,8 +324,6 @@ crashes %>%
        x = "Contributing Circumstance",
        y = "Count")
 
-#Injury with other variables in percent stacked (fill) plots 
-#new code 
 crashes %>%
   filter(Injury != "NA", Injury != "Unknown", PersonType != "NA", 
         PersonType != "NaN") %>%
