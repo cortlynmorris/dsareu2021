@@ -300,7 +300,7 @@ crashes %>%
        x = "Injury",
        y = "Count (log10 Scale)")
 
-#Injury and other variables (should they be stack or grouped bar charts?)
+#Injury and other variables (should they be stack/grouped/fill bar charts?)
 crashes %>%
   filter(Injury != "NA", Injury != "Unknown", TrafficControlType != "NA", 
          TrafficControlType != "NaN") %>%
