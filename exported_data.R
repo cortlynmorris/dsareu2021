@@ -509,14 +509,15 @@ crashes %>%
 
 crashes %>% 
   filter(Crash_Date_Year != "Unknown", Crash_Date_Year != "2011") %>%
-  count(Crash_Date_Year) %>% 
   ggplot(aes(Crash_Date_Year, fill=Crash_Date_Year)) +
-  geom_bar(stat = "identity", show.legend = FALSE) +
-  geom_text(aes(label=total),nudge_y=0.5) + 
-  geom_abline(intercept = 387995/(77/12), slope = 0, lty="dashed", color="darkgrey") +
+  geom_bar(aes(Crash_Date_Year, fill = Crash_Date_Year), show.legend = FALSE) +
+  geom_text(stat="count", aes(x=Crash_Date_Year, label=..count..), vjust=-0.25) + 
+  geom_abline(intercept = 387995/(77/12), slope = 0, lty="dashed") +
+  scale_x_discrete(breaks = c(2015, 2021)) +
   labs(title = "Frequency of Crashes by Year", 
        x = "Year", 
        y = "Count")
+
 
 crashes %>% 
   filter(PersonType == "Driver") %>%
