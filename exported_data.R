@@ -25,6 +25,8 @@ persons <- read_csv("~/NCAT REU/Mostafa/Data/Persons_Involved_in_Crashes.csv")
 
 locations <- read_csv("~/NCAT REU/Mostafa/Data/Reported_Crash_Locations.csv")
 
+crashes <- persons %>% left_join(locations, by="key_crash")
+
 # Beginning of data alanysis
 
 crashes %>% 
@@ -712,7 +714,6 @@ crashes %>%
        x = "Year", 
        y = "Count")
 
-
 crashes %>% 
   filter(PersonType == "Driver") %>%
   group_by(key_crash) %>%
@@ -905,15 +906,12 @@ crashes %>%
        x = "Number of Unknown Injuries",
        y = "Count")
 
+#Mapping crashes 
 library(maps)
-install.packages("sf")
+#install.packages("sf")
 library(sf)
 
-#Can we use this code to help only map wake county?
-nc_counties <- map_data("county", "north carolina") %>% 
-  select(lon = long, lat, group, id = subregion)
-head(nc_counties)
-
+#North Carolina Map 
 crashes %>% 
   filter(LocationLatitude != "0", LocationLongitude != "0",
          LocationLatitude != "NA", LocationLatitude != "",
@@ -924,6 +922,30 @@ crashes %>%
   borders('county', 'north carolina', fill = "light blue") +
   geom_point(size=0.5, col = 'black', show.legend = F) +
   coord_quickmap()
+
+#Wake county map 
+nc_counties <- map_data("county", "north carolina") %>%
+  select(lon = long, lat, group, id = subregion)
+head(nc_counties)
+
+wake_county <- nc_counties %>%
+  filter(nc_counties$id == "wake")
+
+wake_map <- wake_county %>% 
+  ggplot() +
+  geom_polygon(aes(lon, lat), color = "darkblue", fill = "lightblue")
+wake_map
+
+crashes_filter <- crashes %>%
+  filter(LocationLatitude != "0", LocationLongitude != "0",
+         LocationLatitude != "NA", LocationLatitude != "",
+         LocationLongitude != "NA", LocationLongitude != "",
+         LocationLatitude > 35.4, LocationLatitude < 36.2,
+         LocationLongitude < -78, LocationLongitude > -79)
+
+wake_map <- wake_map + 
+  geom_point(data = crashes_filter, aes(x=LocationLongitude, y= LocationLatitude, size = 0.2))
+wake_map
 
 ###Visualizing text data using word clouds 
 
@@ -940,7 +962,6 @@ location_road_name_on_freq <- crashes %>%
 set.seed(101)
 location_road_name_on_freq %>%
   wordcloud2(shape = 'circle', backgroundColor = "black", minSize = 5)
-
 #Word cloud for location road name at 
 devtools::install_github("gaospecial/wordcloud2")
 
