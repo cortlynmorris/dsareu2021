@@ -949,7 +949,7 @@ wake_map
 
 #Heat map (option 1) - need to zoom in 
 library(ggplot2)
-install.packages("ggmap")
+#install.packages("ggmap")
 library(ggmap)
 library(RColorBrewer)
 
