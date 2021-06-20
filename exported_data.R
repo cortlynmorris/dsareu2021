@@ -906,7 +906,7 @@ crashes %>%
        x = "Number of Unknown Injuries",
        y = "Count")
 
-#Mapping crashes 
+###Mapping crashes 
 library(maps)
 #install.packages("sf")
 library(sf)
@@ -947,6 +947,29 @@ wake_map <- wake_map +
   geom_point(data = crashes_filter, aes(x=LocationLongitude, y= LocationLatitude, size = 0.2))
 wake_map
 
+#Heat map (option 1) - need to zoom in 
+library(ggplot2)
+install.packages("ggmap")
+library(ggmap)
+library(RColorBrewer)
+
+map_bounds <- c(-78.98, 35.51, -78.24, 36.06)
+
+coords.map <- get_stamenmap(map_bounds, zoom = 10, maptype = "toner-lite")
+
+coords.map <- ggmap(coords.map, extent="panel", legend="none")
+coords.map <- coords.map + stat_density2d(data=crashes_filter,  
+                                          aes(x=LocationLongitude, 
+                                              y=LocationLatitude, 
+                                              fill=..level.., 
+                                              alpha=..level..), 
+                                          geom="polygon")
+coords.map <- coords.map +   scale_fill_gradientn(colours=rev(brewer.pal(7, "RdBu")))
+
+coords.map <- coords.map + theme_bw()
+
+coords.map
+
 ###Visualizing text data using word clouds 
 
 #Installing and loading necessary packages 
@@ -962,6 +985,7 @@ location_road_name_on_freq <- crashes %>%
 set.seed(101)
 location_road_name_on_freq %>%
   wordcloud2(shape = 'circle', backgroundColor = "black", minSize = 5)
+
 #Word cloud for location road name at 
 devtools::install_github("gaospecial/wordcloud2")
 
