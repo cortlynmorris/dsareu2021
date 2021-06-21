@@ -186,9 +186,9 @@ crashes %>%
   ggplot(aes(fill=AlcoholResultType, x=Crash_Date_DOW)) + 
   geom_bar(position="fill", stat="count") + 
   coord_flip() + 
-  labs(title = "Crash Frequency by Alcohol Result Type and Crash Date DOW",
+  labs(title = "Alcohol Result Type Frequency by Crash Date DOW",
        x = "Crash Date DOW",
-       y = "Count")
+       y = "Percentage")
 ```
 
 ### Frequency of Crashes by Alcohol Result Type (excluding Unknown and Pending results)
@@ -282,7 +282,7 @@ crashes %>%
   geom_histogram(aes(x=Age), binwidth = 5, col="red", fill="darkgrey") +
   labs(x="Age", y="Frequency", title="Drivers' vs. Passengers' Age") +
   theme(legend.position = "top") +
-  facet_wrap(~PersonType)
+  facet_wrap(~PersonType, dir = "v")
 ```
 
 ### Frequency of Crashes by Drivers' v. Passengers' Gender
@@ -470,7 +470,7 @@ data %>%
   coord_flip()
 ```
 
-### Frequency of Crashes by Injuries and Contributing Circumstance 
+### Frequency of Injuries by Contributing Circumstance 
 
 ```{r}
 crashes %>%
@@ -482,12 +482,12 @@ crashes %>%
   ggplot(aes(fill=Injury, x=ContributingCircumstance1)) + 
   geom_bar(position="fill", stat="count") + 
   coord_flip() + 
-  labs(title = "Crash Frequency by Injury and Contributing Circumstance",
+  labs(title = "Injury Frequency by Contributing Circumstance",
        x = "Contributing Circumstance",
-       y = "Count")
+       y = "Percentage")
 ```
 
-### Frequency of Crashes by Injuries and Person Type 
+### Frequency of Injuries by Person Type 
 
 ```{r}
 crashes %>%
@@ -497,12 +497,12 @@ crashes %>%
   ggplot(aes(fill=Injury, x=PersonType)) + 
   geom_bar(position="fill", stat="count") + 
   coord_flip() + 
-  labs(title = "Crash Frequency by Injury and Person Type",
+  labs(title = "Injury Frequency by Person Type",
        x = "Person Type",
-       y = "Count")
+       y = "Percentage")
 ```
 
-### Frequency of Crashes by Injury and Ejection 
+### Frequency of Injury by Ejection 
 
 ```{r}
 crashes %>%
@@ -512,12 +512,12 @@ crashes %>%
   ggplot(aes(fill=Injury, x=Ejection)) + 
   geom_bar(position="fill", stat="count") + 
   coord_flip() + 
-  labs(title = "Crash Frequency by Injury and Ejection",
+  labs(title = "Injury Frequency by Ejection",
        x = "Ejection",
-       y = "Count")
+       y = "Percentage")
 ```
 
-### Frequency of Crashes by Injury and Road Feature 
+### Frequency of Injury by Road Feature 
 
 ```{r}
 crashes %>%
@@ -527,12 +527,12 @@ crashes %>%
   ggplot(aes(fill=Injury, x=RoadFeature)) + 
   geom_bar(position="fill", stat="count") + 
   coord_flip() + 
-  labs(title = "Crash Frequency by Injury and Road Feature",
+  labs(title = "Injury Frequency by Road Feature",
        x = "Road Feature",
-       y = "Count")
+       y = "Percentage")
 ```
 
-### Frequency of Crashes by Injury and Road Classification 
+### Frequency of Injury by Road Classification 
 
 ```{r}
 crashes %>%
@@ -542,12 +542,12 @@ crashes %>%
   ggplot(aes(fill=Injury, x=RoadClassification)) + 
   geom_bar(position="fill", stat="count") + 
   coord_flip() + 
-  labs(title = "Crash Frequency by Injury and Road Classification",
+  labs(title = "Injury Frequency by Road Classification",
        x = "Road Classification",
-       y = "Count")
+       y = "Percentage")
 ```
 
-### Frequency of Crashes by Injury and Weather Condition 
+### Frequency of Injury by Weather Condition 
 
 ```{r}
 crashes %>%
@@ -557,12 +557,12 @@ crashes %>%
   ggplot(aes(fill=Injury, x=WeatherCondition1)) + 
   geom_bar(position="fill", stat="count") + 
   coord_flip() + 
-  labs(title = "Crash Frequency by Injury and Weather Condition",
+  labs(title = "Injury Frequency by Weather Condition",
        x = "Weather Condition",
-       y = "Count")
+       y = "Percentage")
 ```
 
-### Frequency of Crashes by Injury and Alcohol Result Type 
+### Frequency of Injury by Alcohol Result Type 
 
 ```{r}
 crashes %>%
@@ -574,12 +574,12 @@ crashes %>%
   ggplot(aes(fill=Injury, x=AlcoholResultType)) + 
   geom_bar(position="fill", stat="count") + 
   coord_flip() + 
-  labs(title = "Crash Frequency by Injury and Alcohol Result Type",
+  labs(title = "Injury Frequency by Alcohol Result Type",
        x = "Alcohol Result Type",
-       y = "Count")
+       y = "Percentage")
 ```
 
-### Frequency of Crashes by Injury and Traffic Control Type
+### Frequency of Injury by Traffic Control Type
 
 ```{r}
 crashes %>%
@@ -589,12 +589,12 @@ crashes %>%
   ggplot(aes(fill=Injury, x=TrafficControlType)) + 
   geom_bar(position="fill", stat="count") + 
   coord_flip() +
-  labs(title = "Crash Frequency by Injury and Traffic Control Type",
+  labs(title = "Injury Frequency by Traffic Control Type",
        x = "Traffic Control Type",
-       y = "Count")
+       y = "Percentage")
 ```
 
-### Frequency of Crashes by Injury and Vehicle Type
+### Frequency of Injury by Vehicle Type
 
 ```{r}
 crashes %>%
@@ -604,12 +604,12 @@ crashes %>%
   ggplot(aes(fill=Injury, x=VehicleType)) + 
   geom_bar(position="fill", stat="count") + 
   coord_flip() + 
-  labs(title = "Crash Frequency by Injury and Vehicle Type",
+  labs(title = "Injury Frequency by Vehicle Type",
        x = "Vehicle Type",
-       y = "Count")
+       y = "Percentage")
 ```
 
-### Frequency of Crashes by Injury and Protection
+### Frequency of Injury by Protection
 
 ```{r}
 crashes %>%
@@ -619,12 +619,12 @@ crashes %>%
   ggplot(aes(fill=Injury, x=Protection)) + 
   geom_bar(position="fill", stat="count") + 
   coord_flip() + 
-  labs(title = "Crash Frequency by Injury and Protection",
+  labs(title = "Injury Frequency by Protection",
        x = "Protection",
-       y = "Count")
+       y = "Percentage")
 ```
 
-### Frequency of Crashes by Injury and Vision Obstruction 
+### Frequency of Injury by Vision Obstruction 
 
 ```{r}
 crashes %>%
@@ -634,12 +634,12 @@ crashes %>%
   ggplot(aes(fill=Injury, x=VisionObstruction)) + 
   geom_bar(position="fill", stat="count") + 
   coord_flip() + 
-  labs(title = "Crash Frequency by Injury and Vision Obstruction",
+  labs(title = "Injury Frequncy by Vision Obstruction",
        x = "Vision Obstruction",
-       y = "Count")
+       y = "Percentage")
 ```
 
-### Frequency of Crashes by Injury and Airbag Deployed 
+### Frequency of Injury by Airbag Deployed 
 
 ```{r}
 crashes %>%
@@ -649,12 +649,12 @@ crashes %>%
   ggplot(aes(fill=Injury, x=AirbagDeployed)) + 
   geom_bar(position="fill", stat="count") + 
   coord_flip() + 
-  labs(title = "Crash Frequency by Injury and Airbag Deployed",
+  labs(title = "Injury Frequncy by Airbag Deployed",
        x = "Airbag Deployed",
-       y = "Count")
+       y = "Percentage")
 ```
 
-### Frequency of Crashes by Injury and First Harmful Event
+### Frequency of Injury by First Harmful Event
 
 ```{r}
 crashes %>%
@@ -664,12 +664,12 @@ crashes %>%
   ggplot(aes(fill=Injury, x=FirstHarmfulEvent)) + 
   geom_bar(position="fill", stat="count") + 
   coord_flip() + 
-  labs(title = "Crash Frequency by Injury and First Harmful Event",
+  labs(title = "Injury Frequency by First Harmful Event",
        x = "First Harmful Event",
-       y = "Count")
+       y = "Percentage")
 ```
 
-### Frequency of Crashes by Injury and Most Harmful Event 
+### Frequency of Injury by Most Harmful Event 
 
 ```{r}
 crashes %>%
@@ -679,9 +679,67 @@ crashes %>%
   ggplot(aes(fill=Injury, x=MostHarmfulEvent)) + 
   geom_bar(position="fill", stat="count") + 
   coord_flip() + 
-  labs(title = "Crash Frequency by Injury and Most Harmful Event",
+  labs(title = "Injury Frequency by Most Harmful Event",
        x = "Most Harmful Event",
-       y = "Count")
+       y = "Percentage")
+```
+
+### Frequency of Injury by Driver Age
+
+```{r}
+# Comparing Injury to Driver Age
+crashes %>%
+  filter(Injury != "NA", Injury != "Unknown", Injury != "", PersonType == "Driver", Age != "NA",
+         Age != "", Age != "Unknown", Age >= 5) %>%
+  group_by(Injury) %>%
+  mutate(shift = case_when(
+    Age >= 5 & Age < 15 ~ "5-14",
+    Age >= 15 & Age < 25 ~ "15-24",
+    Age >= 25 & Age < 35 ~ "25-34",
+    Age >= 35 & Age < 45 ~ "35-44",
+    Age >= 45 & Age < 55 ~ "45-54",
+    Age >= 55 & Age < 65 ~ "55-64",
+    Age >= 65 & Age < 75 ~ "65-74",
+    Age >= 75 & Age < 85 ~ "75-84",
+    Age >= 85 & Age < 95 ~ "85-94",
+    Age >= 95 & Age < 105 ~ "95-104",
+    Age >= 105 & Age < 115 ~ "105-114",
+    TRUE ~ "115-124")) %>%
+  ggplot(aes(fill=Injury, x=shift)) + 
+  geom_bar(position="fill", stat="count") + 
+  coord_flip() + 
+  labs(title = "Injury Frequency by Driver Age",
+       x = "Age",
+       y = "Percentage")
+```
+
+### Frequncy of Injury by Passenger Age
+
+```{r}
+crashes %>%
+  filter(Injury != "NA", Injury != "Unknown", Injury != "", PersonType == "Passenger", Age != "NA",
+         Age != "", Age != "Unknown") %>%
+  group_by(Injury) %>%
+  mutate(shift = case_when(
+    Age >= 0 & Age < 10 ~ "0-9",
+    Age >= 10 & Age < 20 ~ "10-19",
+    Age >= 20 & Age < 30 ~ "20-29",
+    Age >= 30 & Age < 40 ~ "30-39",
+    Age >= 40 & Age < 50 ~ "40-49",
+    Age >= 50 & Age < 60 ~ "50-59",
+    Age >= 60 & Age < 70 ~ "60-69",
+    Age >= 70 & Age < 80 ~ "70-79",
+    Age >= 80 & Age < 90 ~ "80-89",
+    Age >= 90 & Age < 100 ~ "90-99",
+    Age >= 100 & Age < 110 ~ "100-109",
+    Age >= 110 & Age < 120 ~ "110-119",
+    TRUE ~ "120-129")) %>%
+  ggplot(aes(fill=Injury, x=shift)) + 
+  geom_bar(position="fill", stat="count") + 
+  coord_flip() + 
+  labs(title = "Injury Frequency by Passenger Age",
+       x = "Age",
+       y = "Percentage")
 ```
 
 ### Frequency of Crashes by Protection
@@ -1227,7 +1285,7 @@ crashes %>%
 
 ## Visualizing data using maps 
 
-### Map of Crash Locations
+### Map of Crash Locations (North Carolina)
 
 ```{r}
 crashes %>% 
@@ -1240,6 +1298,80 @@ crashes %>%
   borders('county', 'north carolina', fill = "light blue") +
   geom_point(size=0.5, col = 'black', show.legend = F) +
   coord_quickmap()
+```
+
+### Map of Crash Locations (Wake County)
+
+#### Install necessaary packages
+
+```{r}
+library(maps)
+#install.packages("sf")
+library(sf)
+```
+
+#### Create map 
+
+```{r}
+nc_counties <- map_data("county", "north carolina") %>%
+  select(lon = long, lat, group, id = subregion)
+head(nc_counties)
+
+wake_county <- nc_counties %>%
+  filter(nc_counties$id == "wake")
+
+wake_map <- wake_county %>% 
+  ggplot() +
+  geom_polygon(aes(lon, lat), color = "darkblue", fill = "lightblue")
+wake_map
+
+crashes_filter <- crashes %>%
+  filter(LocationLatitude != "0", LocationLongitude != "0",
+         LocationLatitude != "NA", LocationLatitude != "",
+         LocationLongitude != "NA", LocationLongitude != "",
+         LocationLatitude > 35.4, LocationLatitude < 36.2,
+         LocationLongitude < -78, LocationLongitude > -79)
+
+wake_map <- wake_map + 
+  geom_point(data = crashes_filter, aes(x=LocationLongitude, y= LocationLatitude), colour = "blue", alpha = 1/10)
+wake_map
+```
+
+### Heat Map of Crash Locations (Wake County)
+
+#### Load necessary packages
+```{r}
+library(ggplot2)
+#install.packages("ggmap")
+library(ggmap)
+library(RColorBrewer)
+```
+
+#### Create map 
+```{r}
+crashes_filter <- crashes %>%
+  filter(LocationLatitude != "0", LocationLongitude != "0",
+         LocationLatitude != "NA", LocationLatitude != "",
+         LocationLongitude != "NA", LocationLongitude != "",
+         LocationLatitude > 35.4, LocationLatitude < 36.2,
+         LocationLongitude < -78, LocationLongitude > -79)
+
+map_bounds <- c(-78.98, 35.51, -78.24, 36.06) #coordinates of wake county
+
+coords.map <- get_stamenmap(map_bounds, zoom = 10, maptype = "toner-lite")
+
+coords.map <- ggmap(coords.map, extent="panel", legend="none")
+coords.map <- coords.map + stat_density2d(data=crashes_filter,  
+                                          aes(x=LocationLongitude, 
+                                              y=LocationLatitude, 
+                                              fill=..level.., 
+                                              alpha=..level..), 
+                                          geom="polygon")
+coords.map <- coords.map +   scale_fill_gradientn(colours=rev(brewer.pal(7, "RdBu")))
+
+coords.map <- coords.map + theme_bw()
+
+coords.map
 ```
 
 ## Visualizing text data using word clouds 
