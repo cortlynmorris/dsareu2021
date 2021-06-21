@@ -122,9 +122,9 @@ crashes %>%
   ggplot(aes(fill=AlcoholResultType, x=Crash_Date_DOW)) + 
   geom_bar(position="fill", stat="count") + 
   coord_flip() + 
-  labs(title = "Crash Frequency by Alcohol Result Type and Crash Date DOW",
+  labs(title = "Alcohol Result Type Frequency by Crash Date DOW",
        x = "Crash Date DOW",
-       y = "Count")
+       y = "Percentage")
 
 crashes %>% 
   filter(AlcoholResultType != "NA", AlcoholResultType != "", 
