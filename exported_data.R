@@ -949,7 +949,7 @@ wake_map <- wake_map +
              colour = "blue", alpha = 1/10)
 wake_map
 
-#Heat map (option 1) - need to zoom in 
+#Heat map (zoomed out)
 library(ggplot2)
 #install.packages("ggmap")
 library(ggmap)
@@ -967,6 +967,31 @@ coords.map <- coords.map + stat_density2d(data=crashes_filter,
                                               alpha=..level..), 
                                           geom="polygon")
 coords.map <- coords.map +   scale_fill_gradientn(colours=rev(brewer.pal(7, "RdBu")))
+
+coords.map <- coords.map + theme_bw()
+
+coords.map
+
+#Heat map (zoomed in) 
+crashes_filter <- crashes %>%
+  filter(LocationLatitude != "0", LocationLongitude != "0",
+         LocationLatitude != "NA", LocationLatitude != "",
+         LocationLongitude != "NA", LocationLongitude != "",
+         LocationLatitude > 35.4, LocationLatitude < 36.2,
+         LocationLongitude < -78, LocationLongitude > -79)
+
+map_bounds <- c(-78.8, 35.68, -78.5, 35.9) #coordinates of wake county
+
+coords.map <- get_stamenmap(map_bounds, zoom = 13, maptype = "toner-lite")
+
+coords.map <- ggmap(coords.map, extent="panel", legend="none")
+coords.map <- coords.map + stat_density2d(data=crashes_filter,  
+                                          aes(x=LocationLongitude, 
+                                              y=LocationLatitude, 
+                                              fill=..level.., 
+                                              alpha=..level..), 
+                                          geom="polygon")
+coords.map <- coords.map +   scale_fill_gradientn(colours=rev(brewer.pal(7, "Spectral")))
 
 coords.map <- coords.map + theme_bw()
 
