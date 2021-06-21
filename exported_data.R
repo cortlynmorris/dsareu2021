@@ -1020,3 +1020,92 @@ crashes %>%
   ggplot() +
   geom_bar(aes(x=shift, fill = shift)) +
   labs(title="Frequency of Crashes by Shift", x="Shift", y="Count")
+
+# Comparing Injury to Driver Age
+crashes %>%
+  filter(Injury != "NA", Injury != "Unknown", Injury != "", PersonType == "Driver", Age != "NA",
+         Age != "", Age != "Unknown", Age >= 5) %>%
+  group_by(Injury) %>%
+  mutate(shift = case_when(
+    Age >= 5 & Age < 15 ~ "5-14",
+    Age >= 15 & Age < 25 ~ "15-24",
+    Age >= 25 & Age < 35 ~ "25-34",
+    Age >= 35 & Age < 45 ~ "35-44",
+    Age >= 45 & Age < 55 ~ "45-54",
+    Age >= 55 & Age < 65 ~ "55-64",
+    Age >= 65 & Age < 75 ~ "65-74",
+    Age >= 75 & Age < 85 ~ "75-84",
+    Age >= 85 & Age < 95 ~ "85-94",
+    Age >= 95 & Age < 105 ~ "95-104",
+    Age >= 105 & Age < 115 ~ "105-114",
+    TRUE ~ "115-124")) %>%
+  ggplot(aes(fill=Injury, x=shift)) + 
+  geom_bar(position="fill", stat="count") + 
+  coord_flip() + 
+  labs(title = "Injury Frequency by Driver Age",
+       x = "Age",
+       y = "Percentage")
+
+crashes %>%
+  filter(Injury != "NA", Injury != "Unknown", Injury != "", PersonType == "Passenger", Age != "NA",
+         Age != "", Age != "Unknown") %>%
+  group_by(Injury) %>%
+  mutate(shift = case_when(
+    Age >= 0 & Age < 10 ~ "0-9",
+    Age >= 10 & Age < 20 ~ "10-19",
+    Age >= 20 & Age < 30 ~ "20-29",
+    Age >= 30 & Age < 40 ~ "30-39",
+    Age >= 40 & Age < 50 ~ "40-49",
+    Age >= 50 & Age < 60 ~ "50-59",
+    Age >= 60 & Age < 70 ~ "60-69",
+    Age >= 70 & Age < 80 ~ "70-79",
+    Age >= 80 & Age < 90 ~ "80-89",
+    Age >= 90 & Age < 100 ~ "90-99",
+    Age >= 100 & Age < 110 ~ "100-109",
+    Age >= 110 & Age < 120 ~ "110-119",
+    TRUE ~ "120-129")) %>%
+  ggplot(aes(fill=Injury, x=shift)) + 
+  geom_bar(position="fill", stat="count") + 
+  coord_flip() + 
+  labs(title = "Injury Frequency by Passenger Age",
+       x = "Age",
+       y = "Percentage")
+
+# Forecasting Time Series
+install.packages("fpp2")
+library(fpp2)
+
+crashes_ts = crashes %>%
+  separate(crash_date, 
+           into = c("Date", "Hour"), sep = 11) %>%
+  group_by(Date) %>%
+  summarize(count = length(unique(key_crash)))
+
+crashes_ts %>%
+  filter(as.Date(Date) >= "2015/01/01") %>%
+  ggplot(aes(x = as.Date(Date), y = count)) + 
+  geom_line() + 
+  scale_x_date(date_labels = "%m-%Y", date_breaks = "6 month") + 
+  theme(axis.text.x = element_text(angle = 90))
+
+ts_crashes <- window(crashes_ts$Date, start=2015)
+fit.crashes <- tslm(ts_crashes ~ trend + season)
+fcast <- forecast(fit.crashes)
+autoplot(fcast) +
+  ggtitle("Forecasts of daily number of car crashes in Wake County, NC using regression") +
+  xlab("Year") + ylab("number of crashes per day")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
