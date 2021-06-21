@@ -322,9 +322,9 @@ crashes %>%
   ggplot(aes(fill=Injury, x=ContributingCircumstance1)) + 
   geom_bar(position="fill", stat="count") + 
   coord_flip() + 
-  labs(title = "Crash Frequency by Injury and Contributing Circumstance",
+  labs(title = "Injury Frequency by Contributing Circumstance",
        x = "Contributing Circumstance",
-       y = "Count")
+       y = "Percentage")
 
 crashes %>%
   filter(Injury != "NA", Injury != "Unknown", PersonType != "NA", 
@@ -333,9 +333,9 @@ crashes %>%
   ggplot(aes(fill=Injury, x=PersonType)) + 
   geom_bar(position="fill", stat="count") + 
   coord_flip() + 
-  labs(title = "Crash Frequency by Injury and Person Type",
+  labs(title = "Injury Frequency by Person Type",
        x = "Person Type",
-       y = "Count")
+       y = "Percentage")
 
 crashes %>%
   filter(Injury != "NA", Injury != "Unknown", Ejection != "NA", 
@@ -344,9 +344,9 @@ crashes %>%
   ggplot(aes(fill=Injury, x=Ejection)) + 
   geom_bar(position="fill", stat="count") + 
   coord_flip() + 
-  labs(title = "Crash Frequency by Injury and Ejection",
+  labs(title = "Injury Frequency by Ejection",
        x = "Ejection",
-       y = "Count")
+       y = "Percentage")
 
 crashes %>%
   filter(Injury != "NA", Injury != "Unknown", RoadFeature != "NA", 
@@ -355,9 +355,9 @@ crashes %>%
   ggplot(aes(fill=Injury, x=RoadFeature)) + 
   geom_bar(position="fill", stat="count") + 
   coord_flip() + 
-  labs(title = "Crash Frequency by Injury and Road Feature",
+  labs(title = "Injury Frequency by Road Feature",
        x = "Road Feature",
-       y = "Count")
+       y = "Percentage")
 
 crashes %>%
   filter(Injury != "NA", Injury != "Unknown", RoadClassification != "NA", 
@@ -366,9 +366,9 @@ crashes %>%
   ggplot(aes(fill=Injury, x=RoadClassification)) + 
   geom_bar(position="fill", stat="count") + 
   coord_flip() + 
-  labs(title = "Crash Frequency by Injury and Road Classification",
+  labs(title = "Injury Frequency by Road Classification",
        x = "Road Classification",
-       y = "Count")
+       y = "Percentage")
 
 crashes %>%
   filter(Injury != "NA", Injury != "Unknown", WeatherCondition1 != "NA", 
@@ -377,9 +377,9 @@ crashes %>%
   ggplot(aes(fill=Injury, x=WeatherCondition1)) + 
   geom_bar(position="fill", stat="count") + 
   coord_flip() + 
-  labs(title = "Crash Frequency by Injury and Weather Condition",
+  labs(title = "Injury Frequency by Weather Condition",
        x = "Weather Condition",
-       y = "Count")
+       y = "Percentage")
 
 crashes %>%
   filter(Injury != "NA", Injury != "Unknown", AlcoholResultType != "NA", 
@@ -390,9 +390,9 @@ crashes %>%
   ggplot(aes(fill=Injury, x=AlcoholResultType)) + 
   geom_bar(position="fill", stat="count") + 
   coord_flip() + 
-  labs(title = "Crash Frequency by Injury and Alcohol Result Type",
+  labs(title = "Injury Frequency by Alcohol Result Type",
        x = "Alcohol Result Type",
-       y = "Count")
+       y = "Percentage")
 
 crashes %>%
   filter(Injury != "NA", Injury != "Unknown", TrafficControlType != "NA", 
@@ -401,9 +401,9 @@ crashes %>%
   ggplot(aes(fill=Injury, x=TrafficControlType)) + 
   geom_bar(position="fill", stat="count") + 
   coord_flip() +
-  labs(title = "Crash Frequency by Injury and Traffic Control Type",
+  labs(title = "Injury Frequency by Traffic Control Type",
        x = "Traffic Control Type",
-       y = "Count")
+       y = "Percentage")
 
 crashes %>%
   filter(Injury != "NA", Injury != "Unknown", VehicleType != "NA", 
@@ -412,9 +412,9 @@ crashes %>%
   ggplot(aes(fill=Injury, x=VehicleType)) + 
   geom_bar(position="fill", stat="count") + 
   coord_flip() + 
-  labs(title = "Crash Frequency by Injury and Vehicle Type",
+  labs(title = "Injury Frequency by Vehicle Type",
        x = "Vehicle Type",
-       y = "Count")
+       y = "Percentage")
 
 crashes %>%
   filter(Injury != "NA", Injury != "Unknown", Protection != "NA", 
@@ -423,9 +423,9 @@ crashes %>%
   ggplot(aes(fill=Injury, x=Protection)) + 
   geom_bar(position="fill", stat="count") + 
   coord_flip() + 
-  labs(title = "Crash Frequency by Injury and Protection",
+  labs(title = "Injury Frequency by Protection",
        x = "Protection",
-       y = "Count")
+       y = "Percentage")
 
 crashes %>%
   filter(Injury != "NA", Injury != "Unknown", VisionObstruction != "NA", 
@@ -434,9 +434,9 @@ crashes %>%
   ggplot(aes(fill=Injury, x=VisionObstruction)) + 
   geom_bar(position="fill", stat="count") + 
   coord_flip() + 
-  labs(title = "Crash Frequency by Injury and Vision Obstruction",
+  labs(title = "Injury Frequency by Vision Obstruction",
        x = "Vision Obstruction",
-       y = "Count")
+       y = "Percentage")
 
 crashes %>%
   filter(Injury != "NA", Injury != "Unknown", AirbagDeployed != "NA", 
@@ -445,9 +445,9 @@ crashes %>%
   ggplot(aes(fill=Injury, x=AirbagDeployed)) + 
   geom_bar(position="fill", stat="count") + 
   coord_flip() + 
-  labs(title = "Crash Frequency by Injury and Airbag Deployed",
+  labs(title = "Injury Frequency by Airbag Deployed",
        x = "Airbag Deployed",
-       y = "Count")
+       y = "Percentage")
 
 crashes %>%
   filter(Injury != "NA", Injury != "Unknown", FirstHarmfulEvent != "NA", 
@@ -456,9 +456,9 @@ crashes %>%
   ggplot(aes(fill=Injury, x=FirstHarmfulEvent)) + 
   geom_bar(position="fill", stat="count") + 
   coord_flip() + 
-  labs(title = "Crash Frequency by Injury and First Harmful Event",
+  labs(title = "Injury Frequncy by First Harmful Event",
        x = "First Harmful Event",
-       y = "Count")
+       y = "Percentage")
 
 crashes %>%
   filter(Injury != "NA", Injury != "Unknown", MostHarmfulEvent != "NA", 
@@ -467,9 +467,9 @@ crashes %>%
   ggplot(aes(fill=Injury, x=MostHarmfulEvent)) + 
   geom_bar(position="fill", stat="count") + 
   coord_flip() + 
-  labs(title = "Crash Frequency by Injury and Most Harmful Event",
+  labs(title = "Injury Frequncy by Most Harmful Event",
        x = "Most Harmful Event",
-       y = "Count")
+       y = "Percentage")
 
 crashes %>% 
   filter(Protection != "NA", Protection != "Unable to determine") %>%
@@ -944,7 +944,9 @@ crashes_filter <- crashes %>%
          LocationLongitude < -78, LocationLongitude > -79)
 
 wake_map <- wake_map + 
-  geom_point(data = crashes_filter, aes(x=LocationLongitude, y= LocationLatitude, size = 0.2))
+  geom_point(data = crashes_filter, 
+             aes(x=LocationLongitude, y= LocationLatitude), 
+             colour = "blue", alpha = 1/10)
 wake_map
 
 #Heat map (option 1) - need to zoom in 
