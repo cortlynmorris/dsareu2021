@@ -1099,7 +1099,7 @@ crashes %>%
        y = "Percentage")
 
 # Forecasting Time Series
-install.packages("fpp2")
+#install.packages("fpp2")
 library(fpp2)
 
 crashes_ts = crashes %>%
@@ -1115,7 +1115,7 @@ crashes_ts %>%
   scale_x_date(date_labels = "%m-%Y", date_breaks = "6 month") + 
   theme(axis.text.x = element_text(angle = 90))
 
-ts_crashes <- window(crashes_ts$Date, start=2015)
+ts_crashes <- window(as.ts(crashes_ts$Date), start=2015)
 fit.crashes <- tslm(ts_crashes ~ trend + season)
 fcast <- forecast(fit.crashes)
 autoplot(fcast) +
@@ -1123,16 +1123,55 @@ autoplot(fcast) +
   xlab("Year") + ylab("number of crashes per day")
 
 
+ts_crashes2 <- window(as.ts(crashes_ts$Date), start=2015/01/01)
+fit <- HoltWinters(ts_crashes2, beta=FALSE, gamma=FALSE)
 
+crash_count <- crashes_ts %>%
+  group_by(Date)
 
+ts_crashes <- window(as.ts(crash_count), start=2015)
+fit.crashes <- tslm(ts_crashes ~ trend + season)
+fcast <- forecast(fit.crashes)
+autoplot(fcast) +
+  ggtitle("Forecasts of daily number of car crashes in Wake County, NC using regression") +
+  xlab("Year") + ylab("number of crashes per day")
 
+#Different attempt (does not work)
+#Loading necessary packages 
+library(forecast)
+library(fpp2)
+library(TTR)
 
+#Converting crashes_ts to a time series object 
+crashests <- as.ts(crashes_ts)
 
+#Least squares estimation
+fit.crashes <- tslm(count ~ Date, data=crashests)
+summary(fit.crashes)
 
+#Fitted values 
+autoplot(crashests[,'count'], series="Data") +
+  autolayer(fitted(fit.crashes), series="Fitted") +
+  xlab("Date") + ylab("") +
+  ggtitle("Number of Daily") +
+  guides(colour=guide_legend(title=" "))
 
+#Evaluating the regression model 
+checkresiduals(fit.crashes)
+##the acf looks like there is significant spike at multiple lags which may 
+##lead to an incorrect prediction 
 
+#Residual plots against fitted values
+cbind(Fitted = fitted(fit.crashes),
+      Residuals=residuals(fit.crashes)) %>%
+  as.data.frame() %>%
+  ggplot(aes(x=Fitted, y=Residuals)) + geom_point()
+##There does not seem to be a random scatter suggesting the errors are 
+##heteroscedastic which may mean that the variance of the residuals may not be
+##constant 
 
-
-
-
+#Seasonal dummy variables 
+fit.crashes2 <- tslm(count ~ trend + season, data=crashes_ts)
+##we need our data to be a time series object as well as having a dummy 
+##variable like season (Section 5.4) 
 
