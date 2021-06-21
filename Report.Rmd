@@ -33,22 +33,22 @@ library(scales)
 This code is for a Mac, if using Windows, read.csv becomes read_csv
 ```{r}
 #Code for Cortlyn's computer (Mac)
-persons <- read.csv(file="Persons_Involved_in_Crashes.csv")
-glimpse(persons)
-
-locations <- read.csv(file="Reported_Crash_Locations.csv")
-glimpse(locations)
-
-crashes <- persons %>% left_join(locations, by="key_crash")
-
-#Code for Kelly's computer (Windows)
-# library(readr)
-# persons <- read_csv("~/NCAT REU/Mostafa/Data/Persons_Involved_in_Crashes.csv")
+# persons <- read.csv(file="Persons_Involved_in_Crashes.csv")
+# glimpse(persons)
 # 
-# locations <- read_csv("~/NCAT REU/Mostafa/Data/Reported_Crash_Locations.csv")
+# locations <- read.csv(file="Reported_Crash_Locations.csv")
 # glimpse(locations)
 # 
 # crashes <- persons %>% left_join(locations, by="key_crash")
+
+#Code for Kelly's computer (Windows)
+library(readr)
+persons <- read_csv("~/NCAT REU/Mostafa/Data/Persons_Involved_in_Crashes.csv")
+
+locations <- read_csv("~/NCAT REU/Mostafa/Data/Reported_Crash_Locations.csv")
+glimpse(locations)
+
+crashes <- persons %>% left_join(locations, by="key_crash")
 ```
 
 ## Exploratory data analysis 
