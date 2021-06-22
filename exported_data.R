@@ -984,14 +984,14 @@ map_bounds <- c(-78.8, 35.68, -78.5, 35.9) #coordinates of wake county
 
 coords.map <- get_stamenmap(map_bounds, zoom = 13, maptype = "toner-lite")
 
-coords.map <- ggmap(coords.map, extent="panel", legend="none")
+coords.map <- ggmap(coords.map, extent="panel")
 coords.map <- coords.map + stat_density2d(data=crashes_filter,  
                                           aes(x=LocationLongitude, 
                                               y=LocationLatitude, 
                                               fill=..level.., 
                                               alpha=..level..), 
                                           geom="polygon")
-coords.map <- coords.map +   scale_fill_gradientn(colours=rev(brewer.pal(7, "Spectral")))
+coords.map <- coords.map + scale_fill_gradientn(colours=rev(brewer.pal(7, "Spectral")))
 
 coords.map <- coords.map + theme_bw()
 
@@ -1041,9 +1041,9 @@ crashes_ts %>%
 crashes %>%
   filter(Crash_Date_Hour != "NA", Crash_Date_Hour != "") %>%
   mutate(shift = case_when(
-    Crash_Date_Hour >= 6 & Crash_Date_Hour < 14 ~ "Shift 1",
-    Crash_Date_Hour >= 14 & Crash_Date_Hour < 22 ~ "Shift 2",
-    TRUE ~ "Shift 3")) %>%
+    Crash_Date_Hour >= 6 & Crash_Date_Hour < 14 ~ "6:00 a.m. - 1:59 p.m.",
+    Crash_Date_Hour >= 14 & Crash_Date_Hour < 22 ~ "2:00 p.m. - 9:59 p.m.",
+    TRUE ~ "10:00 p.m. - 5:59 a.m.")) %>%
   ggplot() +
   geom_bar(aes(x=shift, fill = shift)) +
   labs(title="Frequency of Crashes by Shift", x="Shift", y="Count")
