@@ -92,6 +92,7 @@ crashes %>%
 ```
 
 ### Frequency of Crashes by Weather Condition and if Weather Contributed to Crash
+When looking at the weather conditions for only those crashesvwhere it was believed that weather was a contribution factor in the crash, we can see that rain jumps from third most frequent to first. This is not something unexpected because heavy rain conditions make driving much harder and can cause things such as hydroplaning to happen. Clear weather is now the second most common which is slightly surprising because clear weather is not typically associated with causing car crashes but since it is the most common weather type, we can better understand this conclusion. Although the order of which weather conditions are the most frequent when looking only at the crashes where the weather contributed, there is still the same number of weather types.
 
 ```{r}
 crashes %>% 
@@ -149,6 +150,7 @@ crashes %>%
 ```
 
 ### Histogram for Drivers' Ages 
+We were surprised to see that the ages of drivers had such a wide range with the maximum age of a driver being 120 years old. 
 
 ```{r}
 crashes %>%
