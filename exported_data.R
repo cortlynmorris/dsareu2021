@@ -1044,8 +1044,11 @@ crashes %>%
     Crash_Date_Hour >= 6 & Crash_Date_Hour < 14 ~ "6:00 a.m. - 1:59 p.m.",
     Crash_Date_Hour >= 14 & Crash_Date_Hour < 22 ~ "2:00 p.m. - 9:59 p.m.",
     TRUE ~ "10:00 p.m. - 5:59 a.m.")) %>%
+  mutate(shift = factor(shift, levels = c("6:00 a.m. - 1:59 p.m.", 
+                                          "2:00 p.m. - 9:59 p.m.", 
+                                          "10:00 p.m. - 5:59 a.m."))) %>%
   ggplot() +
-  geom_bar(aes(x=shift, fill = shift)) +
+  geom_bar(aes(x=shift, fill = shift), show.legend = F) +
   labs(title="Frequency of Crashes by Shift", x="Shift", y="Count")
 
 # Comparing Injury to Driver Age
