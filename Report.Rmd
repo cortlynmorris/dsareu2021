@@ -895,6 +895,8 @@ crashes %>%
 
 ### Frequency of Crashes by Location Relation to Road 
 
+Most of the crashes on the roadway. This means it includes accidents on highways, streets, and where there is a lot of traffic. 
+
 ```{r}
 crashes %>% 
   filter(LocationRelationToRoad != "NA", LocationRelationToRoad != "Unknown") %>%
@@ -911,6 +913,8 @@ crashes %>%
 ```
 
 ### Frequency of Crashes by Location In Near Indicator
+
+.....
 
 ```{r}
 crashes %>% 
@@ -929,6 +933,8 @@ crashes %>%
 
 ### Frequency of Crashes by Location Ramp Indicator 
 
+.....
+
 ```{r}
 crashes %>% 
   filter(LocationRampIndicator != "NA", LocationRampIndicator != "Unknown") %>%
@@ -946,6 +952,8 @@ crashes %>%
 
 ### Histogram of Crash Location Feet From Road 
 
+The data for the location of crashes from a road shows that most crashes happen at most popular roadways. These roadways tend to be the busiest roads. 
+
 ```{r}
 crashes %>%
   filter(LocationFeetFromRoad != "NA", LocationFeetFromRoad != "Unknown", 
@@ -956,6 +964,8 @@ crashes %>%
 ```
 
 ### Frequency of Crashes by Location Direction From Road
+
+Most direction of crashes were North, South, East, and West. This shows that there is no specific direction where crashes were most common. This data implies that there is the same amount of crashes in every direction of the road. 
 
 ```{r}
 crashes %>% 
@@ -975,6 +985,8 @@ crashes %>%
 
 ### Frequency of Crashes by Location From Indicator
 
+More crashes tend to occur from and indicator then from the indicator. This means that most common crashes are known to happen near busy streets/roads. 
+
 ```{r}
 crashes %>% 
   filter(LocationAtFromIndicator != "NA", LocationAtFromIndicator != "Unknown") %>%
@@ -991,6 +1003,8 @@ crashes %>%
 ```
 
 ### Frequency of Crashes by Location Direction to Road
+
+When it comes to the location direction of the crash to the road the data is like location direction of crashes from road. Most crashes happen North, South, East, and West. 
 
 ```{r}
 crashes %>% 
@@ -1009,6 +1023,8 @@ crashes %>%
 
 ### Frequency of Crashes by First Harmful Event
 
+The data shows us that the (First Harmful Crash Event) is from a rear end, slow or stop. This implies that some drivers might be driving under the speed limit or not paying attention to what is in front of them on the road. 
+
 ```{r}
 crashes %>% 
   filter(FirstHarmfulEvent != "NA", FirstHarmfulEvent != "Unknown") %>%
@@ -1026,6 +1042,8 @@ crashes %>%
 
 ### Frequency of Crashes by Most Harmful Event
 
+The most harmful event is also a rear end, slow or stop accident just like the fist harmful event. Side swiped accidents and hitting parked vehicles are also pretty common accidents. This informs us that drivers are not paying attention to the road and are being distracted. 
+
 ```{r}
 crashes %>% 
   filter(MostHarmfulEvent != "NA", MostHarmfulEvent != "Unknown") %>%
@@ -1042,6 +1060,8 @@ crashes %>%
 ```
 
 ### Frequency of Crashes by Road Classification
+
+Local streets are the most common places where there are accidents. This is because local streets tend to be busy. There is usually traffic in both directions. There are also many people walking around. This causes the driver to get distracted easily. 
 
 ```{r}
 crashes %>% 
