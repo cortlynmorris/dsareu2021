@@ -988,10 +988,10 @@ coords.map <- ggmap(coords.map, extent="panel")
 coords.map <- coords.map + stat_density2d(data=crashes_filter,  
                                           aes(x=LocationLongitude, 
                                               y=LocationLatitude, 
-                                              fill=..level.., 
-                                              alpha=..level..), 
+                                              fill=..level..), 
+                                          alpha = 0.2,
                                           geom="polygon")
-coords.map <- coords.map + scale_fill_gradientn(colours=rev(brewer.pal(7, "Spectral")))
+coords.map <- coords.map + scale_fill_gradientn(colours=rev(brewer.pal(7, "GnBu")))
 
 coords.map <- coords.map + theme_bw()
 
@@ -1080,7 +1080,7 @@ crashes %>%
   filter(Injury != "NA", Injury != "Unknown", Injury != "", PersonType == "Passenger", Age != "NA",
          Age != "", Age != "Unknown") %>%
   group_by(Injury) %>%
-  mutate(shift = case_when(
+  mutate(age = case_when(
     Age >= 0 & Age < 10 ~ "0-9",
     Age >= 10 & Age < 20 ~ "10-19",
     Age >= 20 & Age < 30 ~ "20-29",
@@ -1094,7 +1094,11 @@ crashes %>%
     Age >= 100 & Age < 110 ~ "100-109",
     Age >= 110 & Age < 120 ~ "110-119",
     TRUE ~ "120-129")) %>%
-  ggplot(aes(fill=Injury, x=shift)) + 
+  mutate(age = factor(age, levels = c("0-9", "10-19", "20-29", "30-39", "40-49", 
+                                      "50-59", "60-69", "70-79", "80-89", 
+                                      "90-99", "100-109", "110-119",
+                                      "120-129"))) %>%
+  ggplot(aes(fill=Injury, x=age)) + 
   geom_bar(position="fill", stat="count") + 
   coord_flip() + 
   labs(title = "Injury Frequency by Passenger Age",
