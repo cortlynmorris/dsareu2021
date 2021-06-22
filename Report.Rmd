@@ -286,6 +286,9 @@ crashes %>%
 ```
 
 ### Frequency of Crashes by Drivers' v. Passengers' Gender
+
+There are slighlty more male drivers in Wake County getting in crashes than female drivers. Additionally, there are slightly more female passengers in Wake County car crashes than male passengers. 
+
 ```{r}
 crashes %>% 
   filter(PersonType == "Driver" | PersonType == "Passenger", 
@@ -353,9 +356,9 @@ crashes %>%
        y = "Count (log10 Scale)")
 ```
 
-### Frequency of Crashes by Gender
+### Frequency of Crashes by Gender 
 
-There does not seem to be a significant difference between frequency of crashes between males and females. 
+About 3 more percent of people that get in crashes are men than women. 
 
 ```{r}
 crashes %>% 
@@ -380,6 +383,8 @@ In the United States, 76.3 % of people are White, 13.4% of people are Black or A
 In North Carolina, 70.6 % of people are White, 22.2% of people are Black or African American, 9.8% are Hispanic or Latina, 0.1 are Native Hawaiian and Other Pacific Islander, 2.3% are two or more races, 3.2% are Asian, and 1.6% are American Indian and Alaska Native.
 
 In Wake County, North Carolina, 67.9 % of people are White, 21.0% of people are Black or African American, 10.4% are Hispanic or Latina, 0.1% are Native Hawaiian and Other Pacific Islander, 2.6% are two or more races, 7.7% are Asian, and 0.8% are American Indian and Alaska Native.
+
+This is interesting because, despite the percentage of Black people being less than a third of the percentage of White people, the percentage of Black people in car crashes is not far behind the percentage of White people in car crashes. 
 
 ```{r}
 crashes %>% 
@@ -489,10 +494,12 @@ crashes %>%
 
 ### Frequency of Injuries by Person Type 
 
+Pedestrians are most likely to die, followed by pedalcyclists most likely due to lack of protection and high exposure to the environment. Driver's are slightly less likely to be injured than passengers. 
+
 ```{r}
 crashes %>%
   filter(Injury != "NA", Injury != "Unknown", PersonType != "NA", 
-        PersonType != "NaN") %>%
+        PersonType != "NaN", PersonType != "Unknown") %>%
   group_by(Injury) %>%
   ggplot(aes(fill=Injury, x=PersonType)) + 
   geom_bar(position="fill", stat="count") + 
@@ -503,6 +510,8 @@ crashes %>%
 ```
 
 ### Frequency of Injury by Ejection 
+
+Total ejection leads to the most deaths and injuries, followed by partial ejection, and not being ejection leads to the least amount of injury. Ejection most likely leads to more severe injuries due to the car crash being significant enough to lead to ejection as well the injuries that occur from being ejected as well. 
 
 ```{r}
 crashes %>%
@@ -519,6 +528,8 @@ crashes %>%
 
 ### Frequency of Injury by Road Feature 
 
+Driveways tend to lead to the least amount of injuries probably due to the slow speed that people are going when in driveways. 
+
 ```{r}
 crashes %>%
   filter(Injury != "NA", Injury != "Unknown", RoadFeature != "NA", 
@@ -533,6 +544,8 @@ crashes %>%
 ```
 
 ### Frequency of Injury by Road Classification 
+
+Public vehicular areas and private roads/driveways lead to the least amount of injuries. This may be because these areas are minimally trafficked and are usually at slower speeds than other roads. 
 
 ```{r}
 crashes %>%
@@ -549,6 +562,8 @@ crashes %>%
 
 ### Frequency of Injury by Weather Condition 
 
+Rain and sleet, hail, freezing rain/drizzle leads to the most disabling type injuries. 
+
 ```{r}
 crashes %>%
   filter(Injury != "NA", Injury != "Unknown", WeatherCondition1 != "NA", 
@@ -563,6 +578,8 @@ crashes %>%
 ```
 
 ### Frequency of Injury by Alcohol Result Type 
+
+The most people are killed when there are no alcohol or other drugs. This is slightly surprising, however, it may be because when people are driving with drugs or alcohol in their system, they may attempt to be more cautious so that they do not get pulled over by police. 
 
 ```{r}
 crashes %>%
@@ -581,6 +598,8 @@ crashes %>%
 
 ### Frequency of Injury by Traffic Control Type
 
+Places where warning signs are post led to the post injuries including people killed. This may be because the signs are not taken as seriously and are less common to see, therefore, more people may disregard the warnings. Not many injuries occur near Railroad crossings. 
+
 ```{r}
 crashes %>%
   filter(Injury != "NA", Injury != "Unknown", TrafficControlType != "NA", 
@@ -596,10 +615,12 @@ crashes %>%
 
 ### Frequency of Injury by Vehicle Type
 
+Pedestrian were the most killed, followed by motorcycles and motor scooters. This makes sense because these people are more exposed to conditions as well as generally having less protection than people in enclosed vehicles. Large vehicles like buses, trucks, and military vehicles, had the leaast amount of injuries most likely due to their large size. 
+
 ```{r}
 crashes %>%
   filter(Injury != "NA", Injury != "Unknown", VehicleType != "NA", 
-         VehicleType != "NaN") %>%
+         VehicleType != "NaN", VehicleType != "Unknown", VehicleType != "") %>%
   group_by(Injury) %>%
   ggplot(aes(fill=Injury, x=VehicleType)) + 
   geom_bar(position="fill", stat="count") + 
@@ -611,10 +632,12 @@ crashes %>%
 
 ### Frequency of Injury by Protection
 
+The most injuries occurred when people were using reflective clothing, lighting, and a helmet as protection. This makes sense because people using this would most likely be pedestrians or bikers, both of which are more exposed to danger and to having more significant injuries. Shoulder belts, lap belts, and the combination between the two appear to help decrease the amount of injuries that occur. 
+
 ```{r}
 crashes %>%
   filter(Injury != "NA", Injury != "Unknown", Protection != "NA", 
-         Protection != "NaN") %>%
+         Protection != "NaN", Protection != "Unable to determine") %>%
   group_by(Injury) %>%
   ggplot(aes(fill=Injury, x=Protection)) + 
   geom_bar(position="fill", stat="count") + 
@@ -625,6 +648,8 @@ crashes %>%
 ```
 
 ### Frequency of Injury by Vision Obstruction 
+
+Signs and embankment led to the most people being killed. This may be because these are both stationary opaque objects that will continuously block people's views of the road and conditions. Also being blinded by other lights led to the most disabling injuries. 
 
 ```{r}
 crashes %>%
@@ -641,6 +666,8 @@ crashes %>%
 
 ### Frequency of Injury by Airbag Deployed 
 
+When airbags were not deployed, there was a smaller amount of injuries. This may be because the crashes were not significant enough to cause the airbags to deploy, therefore, if the crash is not significant enough to cause airbags to deploy, the people in the crash were less likely to be harmed. When there were no airbags, there was not many injuries. This may be because cars without airbags tend to be older cars which may mean they cannot go fast enough to lead to an extremely dangerous car crash. When both front and side airbags deploy, there are a significant amount of injuries including disabling injuries. This may be due to the crash being bad enough to deploy the airbags, therefore, if the crash is bad enough, the people are more likely to be injured. 
+
 ```{r}
 crashes %>%
   filter(Injury != "NA", Injury != "Unknown", AirbagDeployed != "NA", 
@@ -656,6 +683,8 @@ crashes %>%
 
 ### Frequency of Injury by First Harmful Event
 
+The first harmful event that led to the second most people killed and disabling injuries was with pedestrians. This would make sense because pedestrians often do not have protection from cars. Overturn/rollover harmful events had the most amount of injuries. Backing up had the least amount of injuries which would make sense because when backing a car up, people tend to be going a slower speed than if they were accelerating forward.
+
 ```{r}
 crashes %>%
   filter(Injury != "NA", Injury != "Unknown", FirstHarmfulEvent != "NA", 
@@ -670,6 +699,8 @@ crashes %>%
 ```
 
 ### Frequency of Injury by Most Harmful Event 
+
+The most harmful event that led to most people killed and disabling injuries was with pedestrians. This would make sense because pedestrians often do not have protection from cars. Overturn/rollover harmful events also had a significant amount of injuries. Backing up had the least amount of injuries which would make sense because when backing a car up, people tend to be going a slower speed than if they were accelerating forward. 
 
 ```{r}
 crashes %>%
@@ -782,7 +813,7 @@ crashes %>%
 
 ### Frequency of Crashes by Vision Obstruction
 
-The highest frequency of crashes occured when there was was no vision obstruction. 
+The highest frequency of crashes occured when there was was no vision obstruction. It is interesting to note, that "Blinded, sunlight" led to a significant amount of crashes. When looking at the variable Weather Condition, most of the time the Weather Condition was clear. The weather was clear, however, this may have led to the sun being brighter and more likely to cause a car crash due to vision obstruction. 
 
 ```{r}
 crashes %>% 
@@ -1312,6 +1343,8 @@ library(sf)
 
 #### Create map 
 
+From the map, we can see that many crashes occur near the center of Wake County. This makes sense because in the center of Wake County sits Raleigh, the capital of North Carolina. 
+
 ```{r}
 nc_counties <- map_data("county", "north carolina") %>%
   select(lon = long, lat, group, id = subregion)
@@ -1369,6 +1402,9 @@ coords.map
 ```
 
 #### Create map (zoomed-in version)
+
+From the Wake County heat map, we can see that crashes are much more likely to occur in the center of the city. We see that as more streets populate an area, more crashes occur. 
+
 ```{r}
 crashes_filter <- crashes %>%
   filter(LocationLatitude != "0", LocationLongitude != "0",
@@ -1410,6 +1446,8 @@ library(wordcloud2)
 
 ### Word Cloud for Location Road Name On  
 
+From the word cloud, we can see many crashes occur on 440, 40, and Capital Blvd. This makes sense because 440 and 40 are major interstates that connect to several major junctions and Capital Blvd is a main road in North Carolina as well. 
+
 ```{r}
 location_road_name_on_freq <- crashes %>%
   count(LocationRoadNameOn)
@@ -1420,6 +1458,8 @@ location_road_name_on_freq %>%
 ```
 
 ### Word cloud for location road name at
+
+From the word cloud, we can see that 440, Capital Blvd, 40, and Blue Ridge Rd frequently have crashes that are near by. This would make sense because most of these streets are highly trafficked and populated. 
 
 ```{r}
 location_road_name_at_freq <- crashes %>%
@@ -1433,6 +1473,10 @@ location_road_name_at_freq %>%
 ## Visualizing data using time series plots
 
 ### Time Series Plot for Frequency of Crashes Everyday (from January 2015 to May 2021)
+
+From the plot, we see that there are major spikes around March 2015, late October 2015, and December 2016. The two latter spikes may be related to the popular holidays, Halloween and Christmas. 
+
+From the time series plot, we can see that there is a significant drop in car crashes in March 2020. This can be explained by the stay-at-home-orders due to the COVID-19 pandemic. After the stay at home orders, the frequency of crashes seems to be slightly lower throughout May 2021. There will likely be an increase in the next few month due to stay-at-home-orders and COVID-19 regulations being lifted now that the vaccination is available. 
 
 ```{r}
 crashes_ts = crashes %>%
