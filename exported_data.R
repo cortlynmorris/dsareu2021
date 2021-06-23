@@ -1061,7 +1061,7 @@ crashes %>%
   geom_bar(aes(x=shift, fill = shift), show.legend = F) +
   labs(title="Frequency of Crashes by Shift", x="Shift", y="Count")
 
-# Comparing Injury to Driver Age
+#Injury Frequency by Driver Age
 crashes %>%
   filter(Injury != "NA", Injury != "Unknown", Injury != "", PersonType == "Driver", Age != "NA",
          Age != "", Age != "Unknown", Age >= 5) %>%
@@ -1089,11 +1089,10 @@ crashes %>%
        x = "Age",
        y = "Percentage")
 
-#just make regular bar plot (not group by injury), and put next to plot above
+#Frequency of Driver Age
 crashes %>%
-  filter(Injury != "NA", Injury != "Unknown", Injury != "", PersonType == "Driver", Age != "NA",
+  filter(PersonType == "Driver", Age != "NA",
          Age != "", Age != "Unknown", Age >= 5) %>%
-  group_by(Injury) %>%
   mutate(age = case_when(
     Age >= 5 & Age < 15 ~ "5-14",
     Age >= 15 & Age < 25 ~ "15-24",
@@ -1110,13 +1109,14 @@ crashes %>%
   mutate(age = factor(age, levels = c("5-14", "15-24", "25-34", "35-44", "45-54",
                                       "55-64", "65-74", "75-84", "85-94", 
                                       "95-104", "105-114", "115-124"))) %>%
-  ggplot(aes(fill=Injury, x=age)) + 
-  geom_bar() + 
-  coord_flip() + 
-  labs(title = "Injury Frequency by Driver Age",
+  ggplot(aes(fill=age, x=age)) + 
+  geom_bar(show.legend = FALSE) + 
+  labs(title = "Frequency of Driver Age",
        x = "Age",
-       y = "Percentage")
+       y = "Count") + 
+  theme(axis.text.x = element_text(angle = 90))
 
+#Injury Frequency by Passenger Age
 crashes %>%
   filter(Injury != "NA", Injury != "Unknown", Injury != "", PersonType == "Passenger", Age != "NA",
          Age != "", Age != "Unknown") %>%
@@ -1140,11 +1140,40 @@ crashes %>%
                                       "90-99", "100-109", "110-119",
                                       "120-129"))) %>%
   ggplot(aes(fill=Injury, x=age)) + 
-  geom_bar(position="fill", stat="count") + 
+  geom_bar() + 
   coord_flip() + 
   labs(title = "Injury Frequency by Passenger Age",
        x = "Age",
        y = "Percentage")
+
+#Frequency of Passenger Age
+crashes %>%
+  filter(PersonType == "Passenger", Age != "NA",
+         Age != "", Age != "Unknown") %>%
+  mutate(age = case_when(
+    Age >= 0 & Age < 10 ~ "0-9",
+    Age >= 10 & Age < 20 ~ "10-19",
+    Age >= 20 & Age < 30 ~ "20-29",
+    Age >= 30 & Age < 40 ~ "30-39",
+    Age >= 40 & Age < 50 ~ "40-49",
+    Age >= 50 & Age < 60 ~ "50-59",
+    Age >= 60 & Age < 70 ~ "60-69",
+    Age >= 70 & Age < 80 ~ "70-79",
+    Age >= 80 & Age < 90 ~ "80-89",
+    Age >= 90 & Age < 100 ~ "90-99",
+    Age >= 100 & Age < 110 ~ "100-109",
+    Age >= 110 & Age < 120 ~ "110-119",
+    TRUE ~ "120-129")) %>%
+  mutate(age = factor(age, levels = c("0-9", "10-19", "20-29", "30-39", "40-49", 
+                                      "50-59", "60-69", "70-79", "80-89", 
+                                      "90-99", "100-109", "110-119",
+                                      "120-129"))) %>%
+  ggplot(aes(fill=age, x=age)) + 
+  geom_bar(show.legend = FALSE) + 
+  labs(title = "Frequency of Passenger Age",
+       x = "Age",
+       y = "Percentage") + 
+  theme(axis.text.x = element_text(angle = 90))
 
 # Forecasting Time Series
 #install.packages("fpp2")
