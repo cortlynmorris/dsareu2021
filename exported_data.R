@@ -1279,20 +1279,214 @@ fit.crashes2 <- tslm(count ~ trend + season, data=crashes_ts)
 ##variable like season (Section 5.4) 
 
 
+##Statistical Analyses - ANOVA
 
+#Is there a significant difference between the amount of crashes on each DOW
 crashes_dow = crashes %>%
   separate(crash_date, 
            into = c("Date", "Hour"), sep = 11) %>%
   group_by(Date, Crash_Date_DOW) %>%
   summarize(count = length(unique(key_crash)))
 
-anova = aov(count ~ Crash_Date_DOW, data = crashes_dow)
-summary(anova)
+anova_dow = aov(count ~ Crash_Date_DOW, data = crashes_dow)
+summary(anova_dow)
 
-TukeyHSD(anova)
+TukeyHSD(anova_dow)
 
+#Is there a significant difference between the amount of crashes per each race 
+crashes_race = crashes %>%
+  separate(crash_date, 
+           into = c("Date", "Hour"), sep = 11) %>%
+  filter(Race != "Unknown", Race != "NA") %>%
+  group_by(Date, Race) %>%
+  summarize(count = length(key_crash))
 
+anova_race = aov(count ~ Race, data = crashes_race)
+summary(anova_race)
 
+TukeyHSD(anova_race)
 
+#Is there a significant difference between the amount of crashes per each gender
+crashes_gender= crashes %>%
+  separate(crash_date, 
+           into = c("Date", "Hour"), sep = 11) %>%
+  filter(Gender != "Unknown", Gender != "NA") %>%
+  group_by(Date, Gender) %>%
+  summarize(count = length(key_crash))
 
+anova_gender = aov(count ~ Gender, data = crashes_gender)
+summary(anova_gender)
+
+TukeyHSD(anova_gender)
+
+#Is there a significant difference between the amount of crashes per each Vision
+#Obstruction 
+crashes_vision= crashes %>%
+  separate(crash_date, 
+           into = c("Date", "Hour"), sep = 11) %>%
+  filter(VisionObstruction != "Unknown", VisionObstruction != "NA") %>%
+  group_by(Date, VisionObstruction) %>%
+  summarize(count = length(key_crash))
+
+anova_vision = aov(count ~ VisionObstruction, data = crashes_vision)
+summary(anova_vision)
+
+TukeyHSD(anova_vision)
+
+#Is there a significant difference between the amount of crashes per each 
+#vehicle type
+crashes_vehicle= crashes %>%
+  separate(crash_date, 
+           into = c("Date", "Hour"), sep = 11) %>%
+  filter(VehicleType != "Unknown", VehicleType != "NA", VehicleType != "") %>%
+  group_by(Date, VehicleType) %>%
+  summarize(count = length(key_crash))
+
+anova_vehicle = aov(count ~ VehicleType, data = crashes_vehicle)
+summary(anova_vehicle)
+
+TukeyHSD(anova_vehicle)
+
+#Is there a significant difference between the amount of crashes per each 
+#Weather Condition
+crashes_weather= crashes %>%
+  separate(crash_date, 
+           into = c("Date", "Hour"), sep = 11) %>%
+  filter(WeatherCondition1 != "Unknown", WeatherCondition1 != "NA") %>%
+  group_by(Date, WeatherCondition1) %>%
+  summarize(count = length(key_crash))
+
+anova_weather = aov(count ~ WeatherCondition1, data = crashes_weather)
+summary(anova_weather)
+
+TukeyHSD(anova_weather)
+
+#Is there a significant difference between the amount of crashes per each 
+#traffic control type
+crashes_traffic= crashes %>%
+  separate(crash_date, 
+           into = c("Date", "Hour"), sep = 11) %>%
+  filter(TrafficControlType != "Unknown", TrafficControlType != "NA") %>%
+  group_by(Date, TrafficControlType) %>%
+  summarize(count = length(key_crash))
+
+anova_traffic = aov(count ~ TrafficControlType, data = crashes_traffic)
+summary(anova_traffic)
+
+TukeyHSD(anova_traffic)
+
+#Is there a significant difference between the amount of crashes per each 
+#road feature
+crashes_roadfeat = crashes %>%
+  separate(crash_date, 
+           into = c("Date", "Hour"), sep = 11) %>%
+  filter(RoadFeature != "Unknown", RoadFeature != "NA", RoadFeature != "NaN") %>%
+  group_by(Date, RoadFeature) %>%
+  summarize(count = length(key_crash))
+
+anova_roadfeat = aov(count ~ RoadFeature, data = crashes_roadfeat)
+summary(anova_roadfeat)
+
+TukeyHSD(anova_roadfeat)
+
+#Is there a significant difference between the amount of crashes per each 
+#alcohol result type
+crashes_alcohol= crashes %>%
+  separate(crash_date, 
+           into = c("Date", "Hour"), sep = 11) %>%
+  filter(AlcoholResultType != "Unknown", AlcoholResultType != "NA") %>%
+  group_by(Date, AlcoholResultType) %>%
+  summarize(count = length(key_crash))
+
+anova_alcohol = aov(count ~ AlcoholResultType, data = crashes_alcohol)
+summary(anova_alcohol)
+
+TukeyHSD(anova_alcohol)
+
+#Is there a significant difference between the amount of crashes per each 
+#month
+crashes_month = crashes %>%
+  separate(crash_date, 
+           into = c("Date", "Hour"), sep = 11) %>%
+  filter(Crash_Date_Month != "Unknown", Crash_Date_Month != "NA") %>%
+  group_by(Date, Crash_Date_Month) %>%
+  summarize(count = length(key_crash))
+
+anova_month = aov(count ~ Crash_Date_Month, data = crashes_month)
+summary(anova_month)
+
+TukeyHSD(anova_month)
+
+#Is there a significant difference between the amount of crashes per each 
+#airbag deploy
+crashes_airbag = crashes %>%
+  separate(crash_date, 
+           into = c("Date", "Hour"), sep = 11) %>%
+  filter(AirbagDeployed != "Unknown", AirbagDeployed != "NA") %>%
+  group_by(Date, AirbagDeployed) %>%
+  summarize(count = length(key_crash))
+
+anova_airbag = aov(count ~ AirbagDeployed, data = crashes_airbag)
+summary(anova_airbag)
+
+TukeyHSD(anova_airbag)
+
+#Is there a significant difference between the amount of crashes per each 
+#protection
+crashes_protection = crashes %>%
+  separate(crash_date, 
+           into = c("Date", "Hour"), sep = 11) %>%
+  filter(Protection != "Unknown", Protection != "NA", 
+         Protection != "Unable to determine") %>%
+  group_by(Date, Protection) %>%
+  summarize(count = length(key_crash))
+
+anova_protection = aov(count ~ Protection, data = crashes_protection)
+summary(anova_protection)
+
+TukeyHSD(anova_protection)
+
+#Is there a significant difference between the amount of crashes per each 
+#contributing circumstance
+crashes_contributing = crashes %>%
+  separate(crash_date, 
+           into = c("Date", "Hour"), sep = 11) %>%
+  filter(ContributingCircumstance1 != "Unknown", 
+         ContributingCircumstance1 != "NA") %>%
+  group_by(Date, ContributingCircumstance1) %>%
+  summarize(count = length(key_crash))
+
+anova_contributing = aov(count ~ ContributingCircumstance1, 
+                         data = crashes_contributing)
+summary(anova_contributing)
+
+TukeyHSD(anova_contributing)
+
+#Is there a significant difference between the amount of crashes per each 
+#first harmful event
+crashes_first_harm = crashes %>%
+  separate(crash_date, 
+           into = c("Date", "Hour"), sep = 11) %>%
+  filter(FirstHarmfulEvent != "Unknown", FirstHarmfulEvent != "NA") %>%
+  group_by(Date, FirstHarmfulEvent) %>%
+  summarize(count = length(key_crash))
+
+anova_first_harm = aov(count ~ FirstHarmfulEvent, data = crashes_first_harm)
+summary(anova_first_harm)
+
+TukeyHSD(anova_first_harm)
+
+#Is there a significant difference between the amount of crashes per each 
+#most harmful event
+crashes_most_harm = crashes %>%
+  separate(crash_date, 
+           into = c("Date", "Hour"), sep = 11) %>%
+  filter(MostHarmfulEvent != "Unknown", MostHarmfulEvent != "NA") %>%
+  group_by(Date, MostHarmfulEvent) %>%
+  summarize(count = length(key_crash))
+
+anova_most_harm = aov(count ~ MostHarmfulEvent, data = crashes_most_harm)
+summary(anova_most_harm)
+
+TukeyHSD(anova_most_harm)
 
