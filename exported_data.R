@@ -980,7 +980,7 @@ crashes_filter <- crashes %>%
          LocationLatitude > 35.4, LocationLatitude < 36.2,
          LocationLongitude < -78, LocationLongitude > -79)
 
-map_bounds <- c(-78.8, 35.68, -78.5, 35.9) #coordinates of wake county
+map_bounds <- c(-78.8, 35.72, -78.5, 35.9) #coordinates of wake county
 
 coords.map <- get_stamenmap(map_bounds, zoom = 13, maptype = "toner-lite")
 
@@ -989,9 +989,9 @@ coords.map <- coords.map + stat_density2d(data=crashes_filter,
                                           aes(x=LocationLongitude, 
                                               y=LocationLatitude, 
                                               fill=..level..), 
-                                          alpha = 0.2,
+                                          alpha = 0.3,
                                           geom="polygon")
-coords.map <- coords.map + scale_fill_gradientn(colours=rev(brewer.pal(7, "GnBu")))
+coords.map <- coords.map + scale_fill_gradientn(colours=rev(brewer.pal(7, "RdYlGn")))
 
 coords.map <- coords.map + theme_bw()
 
