@@ -33,23 +33,22 @@ library(scales)
 
 ```{r}
 #Code for Cortlyn's computer (Mac)
-setwd("/Users/cmorris/Desktop/dsreu2021/rstudiodirectory/ResearchProject")
-persons <- read.csv(file="Persons_Involved_in_Crashes.csv")
- glimpse(persons)
- 
- locations <- read.csv(file="Reported_Crash_Locations.csv")
- glimpse(locations)
- 
- crashes <- persons %>% left_join(locations, by="key_crash")
+# setwd("/Users/cmorris/Desktop/dsreu2021/rstudiodirectory/ResearchProject")
+# persons <- read.csv(file="Persons_Involved_in_Crashes.csv")
+# glimpse(persons)
+#  
+# locations <- read.csv(file="Reported_Crash_Locations.csv")
+# glimpse(locations)
+#  
+# crashes <- persons %>% left_join(locations, by="key_crash")
 
 #Code for Kelly's computer (Windows)
 #library(readr)
-#persons <- read_csv("~/NCAT REU/Mostafa/Data/Persons_Involved_in_Crashes.csv")
+persons <- read_csv("~/NCAT REU/Mostafa/Data/Persons_Involved_in_Crashes.csv")
+ 
+locations <- read_csv("~/NCAT REU/Mostafa/Data/Reported_Crash_Locations.csv")
 
-#locations <- read_csv("~/NCAT REU/Mostafa/Data/Reported_Crash_Locations.csv")
-#glimpse(locations)
-#
-#crashes <- persons %>% left_join(locations, by="key_crash")
+crashes <- persons %>% left_join(locations, by="key_crash")
 ```
 
 ## Exploratory data analysis 
@@ -265,11 +264,15 @@ crashes %>%
 ```{r}
 crashes %>%
   filter(Crash_Date_Hour != "NA", Crash_Date_Hour != "") %>%
-  mutate(shift = ifelse(
-    Crash_Date_Hour >= 6 & Crash_Date_Hour < 14, "Shift 1", 
-    ifelse(Crash_Date_Hour >= 14 & Crash_Date_Hour < 22, "Shift 2", "Shift 3"))) %>%
+  mutate(shift = case_when(
+    Crash_Date_Hour >= 6 & Crash_Date_Hour < 14 ~ "6:00 a.m. - 1:59 p.m.",
+    Crash_Date_Hour >= 14 & Crash_Date_Hour < 22 ~ "2:00 p.m. - 9:59 p.m.",
+    TRUE ~ "10:00 p.m. - 5:59 a.m.")) %>%
+  mutate(shift = factor(shift, levels = c("6:00 a.m. - 1:59 p.m.", 
+                                          "2:00 p.m. - 9:59 p.m.", 
+                                          "10:00 p.m. - 5:59 a.m."))) %>%
   ggplot() +
-  geom_bar(aes(x=shift, fill = shift)) +
+  geom_bar(aes(x=shift, fill = shift), show.legend = F) +
   labs(title="Frequency of Crashes by Shift", x="Shift", y="Count")
 ```
 
@@ -747,6 +750,35 @@ crashes %>%
        y = "Percentage")
 ```
 
+### Frequency of Driver Age 
+```{r}
+crashes %>%
+  filter(PersonType == "Driver", Age != "NA",
+         Age != "", Age != "Unknown", Age >= 5) %>%
+  mutate(age = case_when(
+    Age >= 5 & Age < 15 ~ "5-14",
+    Age >= 15 & Age < 25 ~ "15-24",
+    Age >= 25 & Age < 35 ~ "25-34",
+    Age >= 35 & Age < 45 ~ "35-44",
+    Age >= 45 & Age < 55 ~ "45-54",
+    Age >= 55 & Age < 65 ~ "55-64",
+    Age >= 65 & Age < 75 ~ "65-74",
+    Age >= 75 & Age < 85 ~ "75-84",
+    Age >= 85 & Age < 95 ~ "85-94",
+    Age >= 95 & Age < 105 ~ "95-104",
+    Age >= 105 & Age < 115 ~ "105-114",
+    TRUE ~ "115-124")) %>%
+  mutate(age = factor(age, levels = c("5-14", "15-24", "25-34", "35-44", "45-54",
+                                      "55-64", "65-74", "75-84", "85-94", 
+                                      "95-104", "105-114", "115-124"))) %>%
+  ggplot(aes(fill=age, x=age)) + 
+  geom_bar(show.legend = FALSE) + 
+  labs(title = "Frequency of Driver Age",
+       x = "Age",
+       y = "Count") + 
+  theme(axis.text.x = element_text(angle = 90))
+```
+
 ### Frequncy of Injury by Passenger Age
 
 ```{r}
@@ -774,6 +806,38 @@ crashes %>%
   labs(title = "Injury Frequency by Passenger Age",
        x = "Age",
        y = "Percentage")
+```
+
+### Frequency of Passenger Age 
+
+```{r}
+crashes %>%
+  filter(PersonType == "Passenger", Age != "NA",
+         Age != "", Age != "Unknown") %>%
+  mutate(age = case_when(
+    Age >= 0 & Age < 10 ~ "0-9",
+    Age >= 10 & Age < 20 ~ "10-19",
+    Age >= 20 & Age < 30 ~ "20-29",
+    Age >= 30 & Age < 40 ~ "30-39",
+    Age >= 40 & Age < 50 ~ "40-49",
+    Age >= 50 & Age < 60 ~ "50-59",
+    Age >= 60 & Age < 70 ~ "60-69",
+    Age >= 70 & Age < 80 ~ "70-79",
+    Age >= 80 & Age < 90 ~ "80-89",
+    Age >= 90 & Age < 100 ~ "90-99",
+    Age >= 100 & Age < 110 ~ "100-109",
+    Age >= 110 & Age < 120 ~ "110-119",
+    TRUE ~ "120-129")) %>%
+  mutate(age = factor(age, levels = c("0-9", "10-19", "20-29", "30-39", "40-49", 
+                                      "50-59", "60-69", "70-79", "80-89", 
+                                      "90-99", "100-109", "110-119",
+                                      "120-129"))) %>%
+  ggplot(aes(fill=age, x=age)) + 
+  geom_bar(show.legend = FALSE) + 
+  labs(title = "Frequency of Passenger Age",
+       x = "Age",
+       y = "Percentage") + 
+  theme(axis.text.x = element_text(angle = 90))
 ```
 
 ### Frequency of Crashes by Protection
@@ -1475,8 +1539,8 @@ coords.map <- ggmap(coords.map, extent="panel", legend="none")
 coords.map <- coords.map + stat_density2d(data=crashes_filter,  
                                           aes(x=LocationLongitude, 
                                               y=LocationLatitude, 
-                                              fill=..level.., 
-                                              alpha=..level..), 
+                                              fill=..level..),
+                                          alpha = 0.3, 
                                           geom="polygon")
 coords.map <- coords.map +   scale_fill_gradientn(colours=rev(brewer.pal(7, "RdBu")))
 
@@ -1497,22 +1561,40 @@ crashes_filter <- crashes %>%
          LocationLatitude > 35.4, LocationLatitude < 36.2,
          LocationLongitude < -78, LocationLongitude > -79)
 
-map_bounds <- c(-78.8, 35.68, -78.5, 35.9) #coordinates of wake county
+map_bounds <- c(-78.8, 35.72, -78.5, 35.9) #coordinates of wake county
 
 coords.map <- get_stamenmap(map_bounds, zoom = 13, maptype = "toner-lite")
 
-coords.map <- ggmap(coords.map, extent="panel", legend="none")
+coords.map <- ggmap(coords.map, extent="panel")
 coords.map <- coords.map + stat_density2d(data=crashes_filter,  
                                           aes(x=LocationLongitude, 
                                               y=LocationLatitude, 
-                                              fill=..level.., 
-                                              alpha=..level..), 
+                                              fill=..level..),
+                                          alpha=0.3, 
                                           geom="polygon")
-coords.map <- coords.map +   scale_fill_gradientn(colours=rev(brewer.pal(7, "Spectral")))
+
+coords.map <- coords.map + scale_fill_gradientn(colours=rev(brewer.pal(7, "RdYlGn")))
 
 coords.map <- coords.map + theme_bw()
 
 coords.map
+```
+
+## Interactive Heat Map of Crash Locations 
+
+### Loading necessary packages 
+```{r}
+library(plotly)
+```
+
+### Create map 
+
+```{r}
+ggplotly(coords.map) %>%
+  highlight(
+    "plotly_hover",
+    selected = attrs_selected(line = list(color = "black"))
+  )
 ```
 
 ## Visualizing text data using word clouds 
