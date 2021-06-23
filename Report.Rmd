@@ -1658,3 +1658,21 @@ crashes_ts %>%
   scale_x_date(date_labels = "%m-%Y", date_breaks = "6 month") + 
   theme(axis.text.x = element_text(angle = 90))
 ```
+
+### Time Series Plot for Frequency of Crashes Everyday Organized by Year (from January 2015 to May 2021)
+
+```{r}
+crashes_annual = crashes_ts %>%
+  separate(Date, 
+           into = c("Year", "Month"), sep = 4, remove = FALSE) %>%
+  select(-Month)
+
+crashes_annual %>%
+  filter(as.Date(Date) >= "2015/01/01") %>%
+  ggplot(aes(x = as.Date(Date), y = count)) + 
+  geom_line() + 
+  scale_x_date(date_labels = "%m-%Y", date_breaks = "1 month") + 
+  theme(axis.text.x = element_text(angle = 90)) +
+  facet_wrap(~Year, scales = "free_x")
+```
+
