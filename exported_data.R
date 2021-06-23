@@ -988,22 +988,18 @@ coords.map <- ggmap(coords.map, extent="panel")
 coords.map <- coords.map + stat_density2d(data=crashes_filter,  
                                           aes(x=LocationLongitude, 
                                               y=LocationLatitude, 
-<<<<<<< HEAD
                                               fill=..level..),
-                                          alpha=0.2, 
+                                          alpha=0.3, 
                                           geom="polygon")
-coords.map <- coords.map +   scale_fill_gradientn(colours=rev(brewer.pal(7, "Reds")))
-# look through diverging and sequential palettes to find the most clear graph
-=======
-                                              fill=..level..), 
-                                          alpha = 0.3,
-                                          geom="polygon")
+
 coords.map <- coords.map + scale_fill_gradientn(colours=rev(brewer.pal(7, "RdYlGn")))
->>>>>>> 7d9a900887dad58e94cf7f0d4eb0232333f0e720
 
 coords.map <- coords.map + theme_bw()
 
 coords.map
+
+#Interactive map of wake county crashes 
+
 
 ###Visualizing text data using word clouds 
 
