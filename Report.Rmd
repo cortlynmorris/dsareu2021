@@ -33,22 +33,23 @@ library(scales)
 
 ```{r}
 #Code for Cortlyn's computer (Mac)
-# persons <- read.csv(file="Persons_Involved_in_Crashes.csv")
-# glimpse(persons)
-# 
-# locations <- read.csv(file="Reported_Crash_Locations.csv")
-# glimpse(locations)
-# 
-# crashes <- persons %>% left_join(locations, by="key_crash")
+setwd("/Users/cmorris/Desktop/dsreu2021/rstudiodirectory/ResearchProject")
+persons <- read.csv(file="Persons_Involved_in_Crashes.csv")
+ glimpse(persons)
+ 
+ locations <- read.csv(file="Reported_Crash_Locations.csv")
+ glimpse(locations)
+ 
+ crashes <- persons %>% left_join(locations, by="key_crash")
 
 #Code for Kelly's computer (Windows)
-library(readr)
-persons <- read_csv("~/NCAT REU/Mostafa/Data/Persons_Involved_in_Crashes.csv")
+#library(readr)
+#persons <- read_csv("~/NCAT REU/Mostafa/Data/Persons_Involved_in_Crashes.csv")
 
-locations <- read_csv("~/NCAT REU/Mostafa/Data/Reported_Crash_Locations.csv")
-glimpse(locations)
-
-crashes <- persons %>% left_join(locations, by="key_crash")
+#locations <- read_csv("~/NCAT REU/Mostafa/Data/Reported_Crash_Locations.csv")
+#glimpse(locations)
+#
+#crashes <- persons %>% left_join(locations, by="key_crash")
 ```
 
 ## Exploratory data analysis 
