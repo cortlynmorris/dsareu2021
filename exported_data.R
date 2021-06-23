@@ -980,19 +980,26 @@ crashes_filter <- crashes %>%
          LocationLatitude > 35.4, LocationLatitude < 36.2,
          LocationLongitude < -78, LocationLongitude > -79)
 
-map_bounds <- c(-78.8, 35.68, -78.5, 35.9) #coordinates of wake county
+map_bounds <- c(-78.8, 35.72, -78.5, 35.9) #coordinates of wake county
 
 coords.map <- get_stamenmap(map_bounds, zoom = 13, maptype = "toner-lite")
 
-coords.map <- ggmap(coords.map, extent="panel", legend="none")
+coords.map <- ggmap(coords.map, extent="panel")
 coords.map <- coords.map + stat_density2d(data=crashes_filter,  
                                           aes(x=LocationLongitude, 
                                               y=LocationLatitude, 
+<<<<<<< HEAD
                                               fill=..level..),
                                           alpha=0.2, 
                                           geom="polygon")
 coords.map <- coords.map +   scale_fill_gradientn(colours=rev(brewer.pal(7, "Reds")))
 # look through diverging and sequential palettes to find the most clear graph
+=======
+                                              fill=..level..), 
+                                          alpha = 0.3,
+                                          geom="polygon")
+coords.map <- coords.map + scale_fill_gradientn(colours=rev(brewer.pal(7, "RdYlGn")))
+>>>>>>> 7d9a900887dad58e94cf7f0d4eb0232333f0e720
 
 coords.map <- coords.map + theme_bw()
 
@@ -1042,11 +1049,14 @@ crashes_ts %>%
 crashes %>%
   filter(Crash_Date_Hour != "NA", Crash_Date_Hour != "") %>%
   mutate(shift = case_when(
-    Crash_Date_Hour >= 6 & Crash_Date_Hour < 14 ~ "Shift 1",
-    Crash_Date_Hour >= 14 & Crash_Date_Hour < 22 ~ "Shift 2",
-    TRUE ~ "Shift 3")) %>%
+    Crash_Date_Hour >= 6 & Crash_Date_Hour < 14 ~ "6:00 a.m. - 1:59 p.m.",
+    Crash_Date_Hour >= 14 & Crash_Date_Hour < 22 ~ "2:00 p.m. - 9:59 p.m.",
+    TRUE ~ "10:00 p.m. - 5:59 a.m.")) %>%
+  mutate(shift = factor(shift, levels = c("6:00 a.m. - 1:59 p.m.", 
+                                          "2:00 p.m. - 9:59 p.m.", 
+                                          "10:00 p.m. - 5:59 a.m."))) %>%
   ggplot() +
-  geom_bar(aes(x=shift, fill = shift)) +
+  geom_bar(aes(x=shift, fill = shift), show.legend = F) +
   labs(title="Frequency of Crashes by Shift", x="Shift", y="Count")
 
 # Comparing Injury to Driver Age
@@ -1109,7 +1119,7 @@ crashes %>%
   filter(Injury != "NA", Injury != "Unknown", Injury != "", PersonType == "Passenger", Age != "NA",
          Age != "", Age != "Unknown") %>%
   group_by(Injury) %>%
-  mutate(shift = case_when(
+  mutate(age = case_when(
     Age >= 0 & Age < 10 ~ "0-9",
     Age >= 10 & Age < 20 ~ "10-19",
     Age >= 20 & Age < 30 ~ "20-29",
@@ -1123,7 +1133,11 @@ crashes %>%
     Age >= 100 & Age < 110 ~ "100-109",
     Age >= 110 & Age < 120 ~ "110-119",
     TRUE ~ "120-129")) %>%
-  ggplot(aes(fill=Injury, x=shift)) + 
+  mutate(age = factor(age, levels = c("0-9", "10-19", "20-29", "30-39", "40-49", 
+                                      "50-59", "60-69", "70-79", "80-89", 
+                                      "90-99", "100-109", "110-119",
+                                      "120-129"))) %>%
+  ggplot(aes(fill=Injury, x=age)) + 
   geom_bar(position="fill", stat="count") + 
   coord_flip() + 
   labs(title = "Injury Frequency by Passenger Age",
