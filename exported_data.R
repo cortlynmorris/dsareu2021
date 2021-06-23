@@ -999,7 +999,13 @@ coords.map <- coords.map + theme_bw()
 coords.map
 
 #Interactive map of wake county crashes 
+library(plotly)
 
+ggplotly(coords.map) %>%
+  highlight(
+    "plotly_hover",
+    selected = attrs_selected(line = list(color = "black"))
+  )
 
 ###Visualizing text data using word clouds 
 
