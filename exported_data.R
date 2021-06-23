@@ -988,10 +988,11 @@ coords.map <- ggmap(coords.map, extent="panel", legend="none")
 coords.map <- coords.map + stat_density2d(data=crashes_filter,  
                                           aes(x=LocationLongitude, 
                                               y=LocationLatitude, 
-                                              fill=..level.., 
-                                              alpha=..level..), 
+                                              fill=..level..),
+                                          alpha=0.2, 
                                           geom="polygon")
-coords.map <- coords.map +   scale_fill_gradientn(colours=rev(brewer.pal(7, "Spectral")))
+coords.map <- coords.map +   scale_fill_gradientn(colours=rev(brewer.pal(7, "Reds")))
+# look through diverging and sequential palettes to find the most clear graph
 
 coords.map <- coords.map + theme_bw()
 
@@ -1053,7 +1054,7 @@ crashes %>%
   filter(Injury != "NA", Injury != "Unknown", Injury != "", PersonType == "Driver", Age != "NA",
          Age != "", Age != "Unknown", Age >= 5) %>%
   group_by(Injury) %>%
-  mutate(shift = case_when(
+  mutate(age = case_when(
     Age >= 5 & Age < 15 ~ "5-14",
     Age >= 15 & Age < 25 ~ "15-24",
     Age >= 25 & Age < 35 ~ "25-34",
@@ -1066,8 +1067,39 @@ crashes %>%
     Age >= 95 & Age < 105 ~ "95-104",
     Age >= 105 & Age < 115 ~ "105-114",
     TRUE ~ "115-124")) %>%
-  ggplot(aes(fill=Injury, x=shift)) + 
+  mutate(age = factor(age, levels = c("5-14", "15-24", "25-34", "35-44", "45-54",
+                                      "55-64", "65-74", "75-84", "85-94", 
+                                      "95-104", "105-114", "115-124"))) %>%
+  ggplot(aes(fill=Injury, x=age)) + 
   geom_bar(position="fill", stat="count") + 
+  coord_flip() + 
+  labs(title = "Injury Frequency by Driver Age",
+       x = "Age",
+       y = "Percentage")
+
+#just make regular bar plot (not group by injury), and put next to plot above
+crashes %>%
+  filter(Injury != "NA", Injury != "Unknown", Injury != "", PersonType == "Driver", Age != "NA",
+         Age != "", Age != "Unknown", Age >= 5) %>%
+  group_by(Injury) %>%
+  mutate(age = case_when(
+    Age >= 5 & Age < 15 ~ "5-14",
+    Age >= 15 & Age < 25 ~ "15-24",
+    Age >= 25 & Age < 35 ~ "25-34",
+    Age >= 35 & Age < 45 ~ "35-44",
+    Age >= 45 & Age < 55 ~ "45-54",
+    Age >= 55 & Age < 65 ~ "55-64",
+    Age >= 65 & Age < 75 ~ "65-74",
+    Age >= 75 & Age < 85 ~ "75-84",
+    Age >= 85 & Age < 95 ~ "85-94",
+    Age >= 95 & Age < 105 ~ "95-104",
+    Age >= 105 & Age < 115 ~ "105-114",
+    TRUE ~ "115-124")) %>%
+  mutate(age = factor(age, levels = c("5-14", "15-24", "25-34", "35-44", "45-54",
+                                      "55-64", "65-74", "75-84", "85-94", 
+                                      "95-104", "105-114", "115-124"))) %>%
+  ggplot(aes(fill=Injury, x=age)) + 
+  geom_bar() + 
   coord_flip() + 
   labs(title = "Injury Frequency by Driver Age",
        x = "Age",
@@ -1103,10 +1135,16 @@ crashes %>%
 library(fpp2)
 
 crashes_ts = crashes %>%
+  filter(as.Date(crash_date) >= "2015/01/01" & as.Date(crash_date) <= "2021/05/31") %>%
   separate(crash_date, 
            into = c("Date", "Hour"), sep = 11) %>%
   group_by(Date) %>%
   summarize(count = length(unique(key_crash)))
+
+crashes_annual = crashes_ts %>%
+  separate(Date, 
+           into = c("Year", "Month"), sep = 4, remove = FALSE) %>%
+  select(-Month)
 
 crashes_ts %>%
   filter(as.Date(Date) >= "2015/01/01") %>%
@@ -1115,8 +1153,28 @@ crashes_ts %>%
   scale_x_date(date_labels = "%m-%Y", date_breaks = "6 month") + 
   theme(axis.text.x = element_text(angle = 90))
 
+crashes_annual %>%
+  filter(as.Date(Date) >= "2015/01/01") %>%
+  ggplot(aes(x = as.Date(Date), y = count)) + 
+  geom_line() + 
+  scale_x_date(date_labels = "%m-%Y", date_breaks = "1 month") + 
+  theme(axis.text.x = element_text(angle = 90)) +
+  facet_wrap(~Year, scales = "free_x")
+
+library(zoo)
+zoo(crashes_ts, seq(from = as.Date("2015-01-01"), to = as.Date("2021-05-31"), by = 1))
+
 ts_crashes <- window(as.ts(crashes_ts$Date), start=2015)
-fit.crashes <- tslm(ts_crashes ~ trend + season)
+
+ts_crashes <- ts(data = crashes_ts, start = 1, frequency = 365)
+
+fit1 <- HoltWinters(ts_crashes)
+
+fit1
+
+plot(forecast(fit1))
+
+fit.crashes <- tslm(ts_crashes ~ trend)
 fcast <- forecast(fit.crashes)
 autoplot(fcast) +
   ggtitle("Forecasts of daily number of car crashes in Wake County, NC using regression") +
@@ -1174,4 +1232,22 @@ cbind(Fitted = fitted(fit.crashes),
 fit.crashes2 <- tslm(count ~ trend + season, data=crashes_ts)
 ##we need our data to be a time series object as well as having a dummy 
 ##variable like season (Section 5.4) 
+
+
+
+crashes_dow = crashes %>%
+  separate(crash_date, 
+           into = c("Date", "Hour"), sep = 11) %>%
+  group_by(Date, Crash_Date_DOW) %>%
+  summarize(count = length(unique(key_crash)))
+
+anova = aov(count ~ Crash_Date_DOW, data = crashes_dow)
+summary(anova)
+
+TukeyHSD(anova)
+
+
+
+
+
 
