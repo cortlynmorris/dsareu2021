@@ -27,6 +27,15 @@ locations <- read_csv("~/NCAT REU/Mostafa/Data/Reported_Crash_Locations.csv")
 
 crashes <- persons %>% left_join(locations, by="key_crash")
 
+# Windows code for files (Ayan)
+persons <- read_csv("C:/Users/ayang/Desktop/Project FIles REU A&T/REU Research Project1/Persons_Involved_in_Crashes.csv")
+
+
+locations <- read_csv("C:/Users/ayang/Desktop/Project FIles REU A&T/REU Research Project1/Reported_Crash_Locations.csv")
+
+
+crashes <- persons %>% left_join(locations, by="key_crash")
+
 # Beginning of data alanysis
 
 crashes %>% 
