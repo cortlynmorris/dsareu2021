@@ -1250,12 +1250,13 @@ autoplot(fcast) +
   ggtitle("Forecasts of daily number of car crashes in Wake County, NC using regression") +
   xlab("Year") + ylab("number of crashes per day")
 
-#Different attempt (does not work)
+#Different attempt 
 #Loading necessary packages 
 library(forecast)
 library(fpp2)
 library(TTR)
 
+##Working with entire time series 
 #Converting crashes_ts to a time series object 
 crashests <- as.ts(crashes_ts)
 
@@ -1269,6 +1270,22 @@ autoplot(crashests[,'count'], series="Data") +
   xlab("Date") + ylab("") +
   ggtitle("Number of Daily") +
   guides(colour=guide_legend(title=" "))
+
+##Working with annual plots (don't think this works)
+#Converting crashes_annual to a time series object 
+crashests_annual <- as.ts(crashes_annual)
+
+#Least squares estimation 
+fit.crashes_annual <- tslm(count ~ Date + Year, data=crashests_annual)
+summary(fit.crashes_annual)
+
+#Fitted values 
+autoplot(crashests_annual[,'count'], series="Data") +
+  autolayer(fitted(fit.crashes_annual), series="Fitted") +
+  xlab("Year") + ylab("") +
+  ggtitle("Number of Daily") +
+  guides(colour=guide_legend(title=" ")) 
+
 
 #Evaluating the regression model 
 checkresiduals(fit.crashes)
