@@ -27,6 +27,15 @@ locations <- read_csv("~/NCAT REU/Mostafa/Data/Reported_Crash_Locations.csv")
 
 crashes <- persons %>% left_join(locations, by="key_crash")
 
+# Windows code for files (Ayan)
+persons <- read_csv("C:/Users/ayang/Desktop/Project FIles REU A&T/REU Research Project1/Persons_Involved_in_Crashes.csv")
+
+
+locations <- read_csv("C:/Users/ayang/Desktop/Project FIles REU A&T/REU Research Project1/Reported_Crash_Locations.csv")
+
+
+crashes <- persons %>% left_join(locations, by="key_crash")
+
 # Beginning of data alanysis
 
 crashes %>% 
@@ -1111,6 +1120,7 @@ crashes %>%
                                       "95-104", "105-114", "115-124"))) %>%
   ggplot(aes(fill=age, x=age)) + 
   geom_bar(show.legend = FALSE) + 
+  geom_text(stat="count", aes(x=age, label=..count..), vjust=-0.25) +
   labs(title = "Frequency of Driver Age",
        x = "Age",
        y = "Count") + 
@@ -1170,6 +1180,7 @@ crashes %>%
                                       "120-129"))) %>%
   ggplot(aes(fill=age, x=age)) + 
   geom_bar(show.legend = FALSE) + 
+  geom_text(stat="count", aes(x=age, label=..count..), vjust=-0.25) +
   labs(title = "Frequency of Passenger Age",
        x = "Age",
        y = "Percentage") + 
