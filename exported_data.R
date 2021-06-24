@@ -1490,3 +1490,25 @@ summary(anova_most_harm)
 
 TukeyHSD(anova_most_harm)
 
+##Statistical Analyses - t test
+
+#Is there a significant difference between the amount of crashes in rain v. 
+#no rain
+crashes_rain = crashes %>%
+  filter(WeatherCondition1 != "Unknown", WeatherCondition1 != "NA", 
+         WeatherCondition1 != "") %>%
+  mutate(WeatherCondition1 = case_when(
+    WeatherCondition1 == "Rain" ~ "Rain", 
+    TRUE ~ "Not Rain")) %>%
+  group_by(key_crash,WeatherCondition1) %>%
+  summarize(count = length(key_crash))
+
+crashes_rain <- mutate(crashes_rain, rain = WeatherCondition1 == "Rain")
+
+t.test(x=crashes_rain$rain)
+
+crashes_rain %>%
+  ggplot(aes(fill=WeatherCondition1, x=WeatherCondition1)) + 
+  geom_bar(show.legend = FALSE) + 
+  geom_text(stat="count", aes(x=WeatherCondition1, label=..count..), vjust=-0.25)
+  
