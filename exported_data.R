@@ -1302,7 +1302,7 @@ crashes_mts2 <- ts(as.vector(as.matrix(crashes_mts3)), start = c(2015, 1),
   
 crashes_ts %>%
   mutate(month = case_when(
-    Date >= 3))
+    Date >= 3))=
 
 ##Working with annual plots (don't think this works)
 #Converting crashes_annual to a time series object 
