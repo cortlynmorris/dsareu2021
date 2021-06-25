@@ -1258,7 +1258,8 @@ library(TTR)
 
 ##Working with entire time series 
 #Converting crashes_ts to a time series object 
-crashests <- as.ts(crashes_ts)
+crashests <- ts(crashes_ts$count, start = c(2015,1), end = c(2021,153),
+                frequency = 365)
 
 #Least squares estimation
 fit.crashes <- tslm(count ~ Date, data=crashests)
@@ -1270,6 +1271,38 @@ autoplot(crashests[,'count'], series="Data") +
   xlab("Date") + ylab("") +
   ggtitle("Number of Daily") +
   guides(colour=guide_legend(title=" "))
+
+install.packages("Mcomp")
+install.packages("smooth")
+library(Mcomp)
+library(smooth)
+sma(crashests)
+rownames(crashes_ts) = crashes_ts$Date
+
+crashes_mts = crashes %>%
+  filter(as.Date(crash_date) >= "2015/01/01" & as.Date(crash_date) <= "2021/05/31") %>%
+  separate(crash_date, 
+           into = c("Date", "Hour"), sep = 11) %>%
+  group_by(Date) %>%
+  summarize(count = length(unique(key_crash))) %>%
+  separate(Date, into = c("Year", "Month", "Day"), sep = "/") %>%
+  group_by(Year, Month) %>%
+  summarise(mcount = sum(count)) %>%
+  tidyr::spread(key=Month, value=mcount)
+
+crashes_mts = as.data.frame(crashes_mts)
+
+rownames(crashes_mts) = seq(2015, 2021)
+
+crashes_mts3 = crashes_mts %>%
+  select(02:13)
+
+crashes_mts2 <- ts(as.vector(as.matrix(crashes_mts3)), start = c(2015, 1), 
+                   end = c(2021,5), frequency = 12)
+  
+crashes_ts %>%
+  mutate(month = case_when(
+    Date >= 3))
 
 ##Working with annual plots (don't think this works)
 #Converting crashes_annual to a time series object 

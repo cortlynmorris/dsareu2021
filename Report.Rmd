@@ -55,6 +55,8 @@ crashes <- persons %>% left_join(locations, by="key_crash")
 
 ### Frequency of crashes by vehicle type
 
+#### Plot
+
 The highest frequency of crashes occur in a passenger car. However, this is not very surprising because passenger cars are relatively common. An interesting note is that sport utility vehicles have the second highest frequency of crashes, however, sport utility vehicles are not nearly as common of a car.
 
 ```{r}
@@ -110,7 +112,9 @@ crashes %>%
        y = "Count (log10 Scale)")
 ```
 
-### Frequency of crashes by traffic control type.
+### Frequency of crashes by traffic control type 
+
+#### Plot
 
 The highest frequency of crashes occur when there is no traffic control present. Without a control present, drivers may be less confident in their actions. 
 
@@ -129,8 +133,10 @@ crashes %>%
        x = "Traffic Control Type",
        y = "Count (log10 Scale)")
 ```
- 
-### Frequency of crashes by road feature.
+
+### Frequency of crashes by road feature
+
+#### Plot
 
 The highest frequency of crashes occur when there is no special road feature present. Without a road feature present, drivers may be less confident in their actions. 
 
@@ -160,7 +166,7 @@ crashes %>%
   labs(title="Histogram for Drivers' Ages", x="Age", y="Frequency")
 ```
 
-### Frequency of Crashes by Alcohol Result Type (including Unknown and Pending results)
+### Frequency of Crashes by Alcohol Result Type (including Unknown and Pending results) 
 
 ```{r}
 crashes %>% 
@@ -195,6 +201,8 @@ crashes %>%
 
 ### Frequency of Crashes by Alcohol Result Type (excluding Unknown and Pending results)
 
+#### Plot
+
 ```{r}
 crashes %>% 
   filter(AlcoholResultType != "NA", AlcoholResultType != "", 
@@ -215,6 +223,8 @@ crashes %>%
 
 ### Frequency of Crashes by Day of Week
 
+#### Plot
+
 ```{r}
 crashes %>% 
   filter(Crash_Date_DOW != "NA") %>%
@@ -228,7 +238,9 @@ crashes %>%
        y = "Count")
 ```
 
-### Frequency of Crashes by Month
+### Frequency of Crashes by Month 
+
+#### Plot
 
 ```{r}
 crashes %>% 
@@ -323,7 +335,9 @@ crashes %>%
        y = "Count (log10 Scale)")
 ```
 
-### Frequency of Crashes by Airbag Deployed
+### Frequency of Crashes by Airbag Deployed 
+
+#### Plot
 
 The highest frequency of crashes occured where the airbags were not deployed. It is interesting to note that the second highest frequency of crashes occured where the car(s) did not have airbags to begin with. 
 Airbags did not deploy during most crashes, therefore many accidents logged were minor. 
@@ -382,6 +396,9 @@ crashes %>%
 ```
 
 ### Frequency of Crashes by Race
+
+#### Plot
+
 According to census.gov...
 
 In the United States, 76.3 % of people are White, 13.4% of people are Black or African American, 18.5% are Hispanic or Latina, 0.2 are Native Hawaiian and Other Pacific Islander, 2.8% are two or more races, 5.9% are Asian, 1.3% are American Indian and Alaska Native, . 
@@ -566,7 +583,9 @@ crashes %>%
        y = "Percentage")
 ```
 
-### Frequency of Injury by Weather Condition 
+### Frequency of Injury by Weather Condition
+
+#### Plot
 
 Rain and sleet, hail, freezing rain/drizzle leads to the most disabling type injuries. 
 
@@ -581,6 +600,30 @@ crashes %>%
   labs(title = "Injury Frequency by Weather Condition",
        x = "Weather Condition",
        y = "Percentage")
+```
+
+### Frequency of Rain and Statistical Analyses
+
+```{r}
+crashes_rain = crashes %>%
+  filter(WeatherCondition1 != "Unknown", 
+         WeatherCondition1 != "NA", 
+         WeatherCondition1 != "") %>%
+  mutate(WeatherCondition1 = case_when(
+    WeatherCondition1 == "Rain" ~ "Rain", 
+    TRUE ~ "Not Rain")) %>%
+  group_by(key_crash,WeatherCondition1) %>%
+  summarize(count = length(key_crash))
+
+crashes_rain <- mutate(crashes_rain, 
+                       rain = WeatherCondition1 == "Rain")
+
+t.test(x=crashes_rain$rain)
+
+crashes_rain %>%
+  ggplot(aes(fill=WeatherCondition1, x=WeatherCondition1)) + 
+  geom_bar(show.legend = FALSE) + 
+  geom_text(stat="count", aes(x=WeatherCondition1, label=..count..), vjust=-0.25)
 ```
 
 ### Frequency of Injury by Alcohol Result Type 
@@ -842,6 +885,8 @@ crashes %>%
 
 ### Frequency of Crashes by Protection
 
+#### Plot
+
 The highest frequency of crashes occured when drivers and passengers wore a shoulder and lap belt protection which are common protections in more recent vehicles. However, the second highest frequency of crashes occured when drivers and passengers had used no protection. Could this be because the vehicles they were driving didn't provide protection or that the vehicles had protection, the people just chose not to use any. 
 
 ```{r}
@@ -878,7 +923,9 @@ crashes %>%
        y = "Count (log10 Scale)")
 ```
 
-### Frequency of Crashes by Vision Obstruction
+### Frequency of Crashes by Vision Obstruction 
+
+#### Plot
 
 The highest frequency of crashes occured when there was was no vision obstruction. It is interesting to note, that "Blinded, sunlight" led to a significant amount of crashes. When looking at the variable Weather Condition, most of the time the Weather Condition was clear. The weather was clear, however, this may have led to the sun being brighter and more likely to cause a car crash due to vision obstruction. 
 
@@ -897,7 +944,9 @@ crashes %>%
        y = "Count (log10 Scale)")
 ```
 
-### Frequency of Crashes by Contributing Circumstance 1
+### Frequency of Crashes by Contributing Circumstance 1 
+
+#### Plot
 
 The highest frequency of crashes had no contributing circumstances indicated. 
 
@@ -1088,7 +1137,9 @@ crashes %>%
        y = "Count (log10 Scale)")
 ```
 
-### Frequency of Crashes by First Harmful Event
+### Frequency of Crashes by First Harmful Event 
+
+#### Plot
 
 The data shows us that the (First Harmful Crash Event) is from a rear end, slow or stop. This implies that some drivers might be driving under the speed limit or not paying attention to what is in front of them on the road. 
 
@@ -1108,6 +1159,8 @@ crashes %>%
 ```
 
 ### Frequency of Crashes by Most Harmful Event
+
+#### Plot
 
 The most harmful event is also a rear end, slow or stop accident just like the fist harmful event. Side swiped accidents and hitting parked vehicles are also pretty common accidents. This informs us that drivers are not paying attention to the road and are being distracted. 
 
@@ -1657,6 +1710,35 @@ crashes_ts %>%
   geom_line() + 
   scale_x_date(date_labels = "%m-%Y", date_breaks = "6 month") + 
   theme(axis.text.x = element_text(angle = 90))
+```
+
+### Different Attempt of Time Series
+
+#### Loading necessary libraries
+
+```{r}
+library(forecast)
+library(fpp2)
+library(TTR)
+```
+
+#### Plotting
+
+```{r}
+#Converting crashes_ts to a time series object 
+crashests <- as.ts(crashes_ts)
+
+#Least squares estimation
+fit.crashes <- tslm(count ~ Date, data=crashests)
+summary(fit.crashes)
+
+#Fitted values 
+autoplot(crashests[,'count'], series="Data") +
+  autolayer(fitted(fit.crashes), series="Fitted") +
+  xlab("Date") + ylab("") +
+  ggtitle("Number of Daily") +
+  guides(colour=guide_legend(title=" "))
+
 ```
 
 ### Time Series Plot for Frequency of Crashes Everyday Organized by Year (from January 2015 to May 2021)
