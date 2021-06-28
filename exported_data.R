@@ -1297,9 +1297,16 @@ rownames(crashes_mts) = seq(2015, 2021)
 crashes_mts3 = crashes_mts %>%
   select(02:13)
 
-crashes_mts2 <- ts(as.vector(as.matrix(crashes_mts3)), start = c(2015, 1), 
-                   end = c(2021,5), frequency = 12)
-  
+crashes_mts2 <- ts(c(t(crashes_mts3)), frequency=12)
+
+
+crashes_mts4 <- window(crashes_mts2, start=c(1,01), end=c(7,05), frequency=12)
+fit.crashes <- tslm(crashes_mts4 ~ trend + season)
+fcast <- forecast::forecast(fit.crashes)
+autoplot(fcast) +
+  ggtitle("Forecasts of monthly car crashes using regression") +
+  xlab("Year") + ylab("Monthly Crashes")
+
 crashes_ts %>%
   mutate(month = case_when(
     Date >= 3))
