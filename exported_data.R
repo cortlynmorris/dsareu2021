@@ -1315,6 +1315,16 @@ rownames(crashes_mts) = seq(2015, 2021)
 crashes_mts3 = crashes_mts %>%
   select(02:13)
 
+crashes_mts2 <- ts(c(t(crashes_mts3)), frequency=12)
+
+crashes_mts4 <- window(crashes_mts2, start=c(1,01), end=c(7,05), frequency=12)
+fit.crashes <- tslm(crashes_mts4 ~ trend + season)
+fcast <- forecast::forecast(fit.crashes)
+autoplot(fcast) +
+  ggtitle("Forecasts of monthly car crashes using regression") +
+  xlab("Year") + ylab("Monthly Crashes")
+
+
 crashes_mts2 <- as.ts(crashes_mts3, start = c(2015, 1), 
                    end = c(2021,5), frequency = 12)
 
@@ -1330,6 +1340,7 @@ autoplot(crashests[,'count'], series="Data") +
   xlab("Date") + ylab("") +
   ggtitle("Number of Daily") +
   guides(colour=guide_legend(title=" "))
+>>>>>>> 92943b5943592011f135a324f7b99d9454d8eef5
 
 ##Working with annual plots (don't think this works)
 #Converting crashes_annual to a time series object 
