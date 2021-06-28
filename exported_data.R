@@ -999,11 +999,13 @@ coords.map <- coords.map + stat_density2d(data=crashes_filter,
                                               y=LocationLatitude, 
                                               fill=..level..),
                                           alpha=0.3, 
-                                          geom="polygon")
+                                          geom="polygon") 
 
 coords.map <- coords.map + scale_fill_gradientn(colours=rev(brewer.pal(7, "RdYlGn")))
 
-coords.map <- coords.map + theme_bw()
+coords.map <- coords.map + theme_bw() + 
+  ggtitle("Heat Map of Crash Locations") + 
+  xlab("Latitude") + ylab("Longitude")
 
 coords.map
 
@@ -1186,7 +1188,7 @@ crashes %>%
        y = "Percentage") + 
   theme(axis.text.x = element_text(angle = 90))
 
-# Forecasting Time Series
+#Regular Time Series Plots
 #install.packages("fpp2")
 library(fpp2)
 
@@ -1217,6 +1219,7 @@ crashes_annual %>%
   theme(axis.text.x = element_text(angle = 90)) +
   facet_wrap(~Year, scales = "free_x")
 
+#Forecasting attempt with Dr. Mostafa (does not work)
 library(zoo)
 zoo(crashes_ts, seq(from = as.Date("2015-01-01"), to = as.Date("2021-05-31"), by = 1))
 
@@ -1250,13 +1253,20 @@ autoplot(fcast) +
   ggtitle("Forecasts of daily number of car crashes in Wake County, NC using regression") +
   xlab("Year") + ylab("number of crashes per day")
 
-#Different attempt 
+#Different attempt at forecasting daily (THIS WORKS) 
 #Loading necessary packages 
 library(forecast)
 library(fpp2)
 library(TTR)
 
 ##Working with entire time series (THIS WORKS)
+crashes_ts = crashes %>%
+  filter(as.Date(crash_date) >= "2015/01/01" & as.Date(crash_date) <= "2021/05/31") %>%
+  separate(crash_date, 
+           into = c("Date", "Hour"), sep = 11) %>%
+  group_by(Date) %>%
+  summarize(count = length(unique(key_crash)))
+
 #Converting crashes_ts to a time series object 
 crashests2 <- ts(crashes_ts$count, start = c(2015,1), end = c(2021,153),
                 frequency = 365)
@@ -1265,17 +1275,17 @@ crashests2 <- ts(crashes_ts$count, start = c(2015,1), end = c(2021,153),
 crashests <- as.ts(crashes_ts)
 
 #Least squares estimation
-fit.crashes <- tslm(count ~ Date, data=crashests)
+fit.crashes2 <- tslm(count ~ Date, data=crashests)
 summary(fit.crashes)
 
-#Fitted values 
+#Fitted values (linear plot through ts)
 autoplot(crashests[,'count'], series="Data") +
-  autolayer(fitted(fit.crashes), series="Fitted") +
+  autolayer(fitted(fit.crashes2), series="Fitted") +
   xlab("Date") + ylab("") +
   ggtitle("Number of Daily") +
   guides(colour=guide_legend(title=" "))
 
-#Prediction with HoltWinters() and plotting
+#Prediction with HoltWinters() and plotting forecast
 m <- HoltWinters(crashests2)
 plot(fitted(m))
 plot(forecast(m, 210))
@@ -1287,9 +1297,63 @@ autoplot(fcast) +
 #Plotting the time series and forecast together
 crashests2 %>%
   stlf(lambda = 0, h = 210) %>%
-  autoplot()
+  autoplot() + 
+  ggtitle("Forecasts of Daily Car Crashes (With Pandemic Data) Using Regression") +
+  xlab("Year") + ylab("Daily Crashes")
 
-#Different attempt at forecasting 
+####Working with non COVID time series daily (THIS WORKS)
+#Regular non COVID time series daily 
+crashes_ts.noncovid = crashes %>%
+  filter(as.Date(crash_date) >= "2015/01/01" & as.Date(crash_date) <= "2020/03/01") %>%
+  separate(crash_date, 
+           into = c("Date", "Hour"), sep = 11) %>%
+  group_by(Date) %>%
+  summarize(count = length(unique(key_crash)))
+
+crashes_ts.noncovid %>%
+  filter(as.Date(Date) >= "2015/01/01") %>%
+  ggplot(aes(x = as.Date(Date), y = count)) + 
+  geom_line() + 
+  scale_x_date(date_labels = "%m-%Y", date_breaks = "6 month") + 
+  theme(axis.text.x = element_text(angle = 90))
+
+#Converting crashes_ts to a time series object 
+crashests.noncovid <- ts(crashes_ts.noncovid$count, start = c(2015,1), end = c(2020,59),
+                 frequency = 365)
+
+#Converting crashes_ts to a time series object 
+crashests.noncovid2 <- as.ts(crashes_ts.noncovid, start = c(2015,1), end = c(2020,59), 
+                            frequency = 365)
+
+#Least squares estimation
+fit.crashes.noncovid2 <- tslm(count ~ Date, data=crashests.noncovid2)
+summary(fit.crashes.noncovid2)
+
+#Fitted values (linear plot through ts)
+autoplot(crashests.noncovid2[,'count'], series="Data") +
+  autolayer(fitted(fit.crashes.noncovid2), series="Fitted") +
+  xlab("Date") + ylab("") +
+  ggtitle("Number of Daily") +
+  guides(colour=guide_legend(title=" "))
+
+#Prediction with HoltWinters() and plotting forecast
+noncovid <- HoltWinters(crashests.noncovid)
+plot(fitted(noncovid))
+plot(forecast(noncovid, 210)) 
+#does same as above line ^^
+fcast.noncovid <- forecast(noncovid, 210)
+autoplot(fcast.noncovid) +
+  ggtitle("Forecasts of car crashes using regression") +
+  xlab("Year") + ylab("Crashes")
+
+#Plotting the time series and forecast together
+crashests.noncovid %>%
+  stlf(lambda = 0, h = 700) %>%
+  autoplot() + 
+  ggtitle("Forecasts of Daily Car Crashes (Without Pandemic Data) Using Regression") +
+  xlab("Year") + ylab("Daily Crashes")
+
+##Different attempt at forecasting for monthly (THIS WORKS)
 install.packages("Mcomp")
 install.packages("smooth")
 library(Mcomp)
@@ -1297,6 +1361,7 @@ library(smooth)
 sma(crashests)
 rownames(crashes_ts) = crashes_ts$Date
 
+#Working with entire time series monthly (THIS Works)
 crashes_mts = crashes %>%
   filter(as.Date(crash_date) >= "2015/01/01" & as.Date(crash_date) <= "2021/05/31") %>%
   separate(crash_date, 
@@ -1321,61 +1386,37 @@ crashes_mts4 <- window(crashes_mts2, start=c(1,01), end=c(7,05), frequency=12)
 fit.crashes <- tslm(crashes_mts4 ~ trend + season)
 fcast <- forecast::forecast(fit.crashes)
 autoplot(fcast) +
-  ggtitle("Forecasts of monthly car crashes using regression") +
+  ggtitle("Forecasts of Monthly Car Crashes (With Pandemic Data) Using Regression") +
   xlab("Year") + ylab("Monthly Crashes")
 
+#Working with non COVID time series monthly (THIS Works)
+crashes_mts.noncovid = crashes %>%
+  filter(as.Date(crash_date) >= "2015/01/01" & as.Date(crash_date) <= "2020/02/29") %>%
+  separate(crash_date, 
+           into = c("Date", "Hour"), sep = 11) %>%
+  group_by(Date) %>%
+  summarize(count = length(unique(key_crash))) %>%
+  separate(Date, into = c("Year", "Month", "Day"), sep = "/") %>%
+  group_by(Year, Month) %>%
+  summarise(mcount = sum(count)) %>%
+  tidyr::spread(key=Month, value=mcount)
 
-crashes_mts2 <- as.ts(crashes_mts3, start = c(2015, 1), 
-                   end = c(2021,5), frequency = 12)
+crashes_mts.noncovid = as.data.frame(crashes_mts.noncovid)
 
-crashes_mts2.new <- as.ts(crashes_mts3)
+rownames(crashes_mts.noncovid) = seq(2015, 2020)
 
-#Least squares estimation
-fit.crashes.mts2 <- tslm(count ~ Date, data=crashes_mts2)
-summary(fit.crashes.mts2)
+crashes_mts3.noncovid = crashes_mts.noncovid %>%
+  select(02:13)
 
-#Fitted values 
-autoplot(crashests[,'count'], series="Data") +
-  autolayer(fitted(fit.crashes), series="Fitted") +
-  xlab("Date") + ylab("") +
-  ggtitle("Number of Daily") +
-  guides(colour=guide_legend(title=" "))
->>>>>>> 92943b5943592011f135a324f7b99d9454d8eef5
+crashes_mts2.noncovid <- ts(c(t(crashes_mts3.noncovid)), frequency=12)
 
-##Working with annual plots (don't think this works)
-#Converting crashes_annual to a time series object 
-crashests_annual <- as.ts(crashes_annual)
-
-#Least squares estimation 
-fit.crashes_annual <- tslm(count ~ Date + Year, data=crashests_annual)
-summary(fit.crashes_annual)
-
-#Fitted values 
-autoplot(crashests_annual[,'count'], series="Data") +
-  autolayer(fitted(fit.crashes_annual), series="Fitted") +
-  xlab("Year") + ylab("") +
-  ggtitle("Number of Daily") +
-  guides(colour=guide_legend(title=" ")) 
-
-#Evaluating the regression model 
-checkresiduals(fit.crashes)
-##the acf looks like there is significant spike at multiple lags which may 
-##lead to an incorrect prediction 
-
-#Residual plots against fitted values
-cbind(Fitted = fitted(fit.crashes),
-      Residuals=residuals(fit.crashes)) %>%
-  as.data.frame() %>%
-  ggplot(aes(x=Fitted, y=Residuals)) + geom_point()
-##There does not seem to be a random scatter suggesting the errors are 
-##heteroscedastic which may mean that the variance of the residuals may not be
-##constant 
-
-#Seasonal dummy variables 
-fit.crashes2 <- tslm(count ~ trend + season, data=crashes_ts)
-##we need our data to be a time series object as well as having a dummy 
-##variable like season (Section 5.4) 
-
+crashes_mts4.noncovid <- window(crashes_mts2.noncovid, start=c(1,01), 
+                                end=c(6,02), frequency=12)
+fit.crashes.noncovid <- tslm(crashes_mts4.noncovid ~ trend + season)
+fcast.noncovid <- forecast::forecast(fit.crashes.noncovid)
+autoplot(fcast.noncovid) +
+  ggtitle("Forecasts of Monthly Car Crashes Without Pandemic Using Regression") +
+  xlab("Year") + ylab("Monthly Crashes")
 
 ##Statistical Analyses - ANOVA
 
