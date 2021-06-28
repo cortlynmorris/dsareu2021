@@ -1358,8 +1358,6 @@ install.packages("Mcomp")
 install.packages("smooth")
 library(Mcomp)
 library(smooth)
-sma(crashests)
-rownames(crashes_ts) = crashes_ts$Date
 
 #Working with entire time series monthly (THIS Works)
 crashes_mts = crashes %>%

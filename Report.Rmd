@@ -44,19 +44,17 @@ library(scales)
 
 #Code for Kelly's computer (Windows)
 #library(readr)
-persons <- read_csv("~/NCAT REU/Mostafa/Data/Persons_Involved_in_Crashes.csv")
- 
-locations <- read_csv("~/NCAT REU/Mostafa/Data/Reported_Crash_Locations.csv")
-
-crashes <- persons %>% left_join(locations, by="key_crash")
+# persons <- read_csv("~/NCAT REU/Mostafa/Data/Persons_Involved_in_Crashes.csv")
+#  
+# locations <- read_csv("~/NCAT REU/Mostafa/Data/Reported_Crash_Locations.csv")
+# 
+# crashes <- persons %>% left_join(locations, by="key_crash")
 
 # Code for Ayan's computer (Window)
 #library(readr)
 persons <- read_csv("C:/Users/ayang/Desktop/Project FIles REU A&T/REU Research Project1/Persons_Involved_in_Crashes.csv")
 
-
 locations <- read_csv("C:/Users/ayang/Desktop/Project FIles REU A&T/REU Research Project1/Reported_Crash_Locations.csv")
-
 
 crashes <- persons %>% left_join(locations, by="key_crash")
 ```
@@ -1593,7 +1591,7 @@ library(RColorBrewer)
 
 #### Create map (zoomed-out version)
 
-```{r}
+```{r, message=FALSE}
 map_bounds <- c(-78.98, 35.51, -78.24, 36.06)
 
 coords.map <- get_stamenmap(map_bounds, zoom = 10, maptype = "toner-lite")
@@ -1616,7 +1614,7 @@ coords.map
 
 From the Wake County heat map, we can see that crashes are much more likely to occur in the center of the city. We see that as more streets populate an area, more crashes occur. 
 
-```{r}
+```{r, message=FALSE}
 crashes_filter <- crashes %>%
   filter(LocationLatitude != "0", LocationLongitude != "0",
          LocationLatitude != "NA", LocationLatitude != "",
@@ -1638,7 +1636,9 @@ coords.map <- coords.map + stat_density2d(data=crashes_filter,
 
 coords.map <- coords.map + scale_fill_gradientn(colours=rev(brewer.pal(7, "RdYlGn")))
 
-coords.map <- coords.map + theme_bw()
+coords.map <- coords.map + theme_bw() + 
+  ggtitle("Heat Map of Crash Locations") + 
+  xlab("Latitude") + ylab("Longitude")
 
 coords.map
 ```
@@ -1652,7 +1652,7 @@ library(plotly)
 
 ### Create map 
 
-```{r}
+```{r, message=FALSE}
 ggplotly(coords.map) %>%
   highlight(
     "plotly_hover",
@@ -1664,7 +1664,7 @@ ggplotly(coords.map) %>%
 
 ### Installing and loading necessary packages 
 
-```{r}
+```{r, message=FALSE}
 devtools::install_github("gaospecial/wordcloud2")
 ```
 
@@ -1699,9 +1699,9 @@ location_road_name_at_freq %>%
   wordcloud2(shape = 'circle', backgroundColor = "black", minSize = 5)
 ```
 
-## Visualizing data using time series plots
+## Visualizing Data Using Time Series Plots
 
-### Time Series Plot for Frequency of Crashes Everyday (from January 2015 to May 2021)
+### Time Series Plot for Frequency of Daily Crashes From January 2015 to May 2021 (With Pandemic Data)
 
 From the plot, we see that there are major spikes around March 2015, late October 2015, and December 2016. The two latter spikes may be related to the popular holidays, Halloween and Christmas. 
 
@@ -1722,11 +1722,29 @@ crashes_ts %>%
   theme(axis.text.x = element_text(angle = 90))
 ```
 
-### Different Attempt of Time Series
+### Time Series Plot for Frequency of Daily Crashes From January 2015 to May 2021 (Without Pandemic Data)
+
+```{r}
+crashes_ts.noncovid = crashes %>%
+  filter(as.Date(crash_date) >= "2015/01/01" & as.Date(crash_date) <= "2020/03/01") %>%
+  separate(crash_date, 
+           into = c("Date", "Hour"), sep = 11) %>%
+  group_by(Date) %>%
+  summarize(count = length(unique(key_crash)))
+
+crashes_ts.noncovid %>%
+  filter(as.Date(Date) >= "2015/01/01") %>%
+  ggplot(aes(x = as.Date(Date), y = count)) + 
+  geom_line() + 
+  scale_x_date(date_labels = "%m-%Y", date_breaks = "6 month") + 
+  theme(axis.text.x = element_text(angle = 90))
+```
+
+### Time Series Plot for Frequency of Daily Crashes From January 2015 to May 2021 and Regression Line (With Pandemic Data)
 
 #### Loading necessary libraries
 
-```{r}
+```{r, message=FALSE}
 library(forecast)
 library(fpp2)
 library(TTR)
@@ -1735,6 +1753,10 @@ library(TTR)
 #### Plotting
 
 ```{r}
+#Converting crashes_ts to a time series object 
+crashests2 <- ts(crashes_ts$count, start = c(2015,1), end = c(2021,153),
+                frequency = 365)
+
 #Converting crashes_ts to a time series object 
 crashests <- as.ts(crashes_ts)
 
@@ -1751,7 +1773,30 @@ autoplot(crashests[,'count'], series="Data") +
 
 ```
 
-### Time Series Plot for Frequency of Crashes Everyday Organized by Year (from January 2015 to May 2021)
+### Time Series Plot for Frequency of Daily Crashes From January 2015 to May 2021 and Regression Line (Without Pandemic Data)
+
+```{r}
+#Converting crashes_ts to a time series object using ts
+crashests.noncovid <- ts(crashes_ts.noncovid$count, start = c(2015,1), 
+                         end = c(2020,59), frequency = 365)
+
+#Converting crashes_ts to a time series object using as.ts
+crashests.noncovid2 <- as.ts(crashes_ts.noncovid, start = c(2015,1), 
+                             end = c(2020,59), frequency = 365)
+
+#Least squares estimation
+fit.crashes.noncovid2 <- tslm(count ~ Date, data=crashests.noncovid2)
+summary(fit.crashes.noncovid2)
+
+#Fitted values (linear plot through ts)
+autoplot(crashests.noncovid2[,'count'], series="Data") +
+  autolayer(fitted(fit.crashes.noncovid2), series="Fitted") +
+  xlab("Date") + ylab("") +
+  ggtitle("Number of Daily") +
+  guides(colour=guide_legend(title=" "))
+```
+
+### Time Series Plot for Frequency of Daily Crashes Organized by Year From January 2015 to May 2021 (With Pandemic Data)
 
 ```{r}
 crashes_annual = crashes_ts %>%
@@ -1768,3 +1813,122 @@ crashes_annual %>%
   facet_wrap(~Year, scales = "free_x")
 ```
 
+## Forecasting Using Time Series Plots
+
+### Time Series Forecast of Daily Crashes (With Pandemic Data)
+
+#### Basic Prediction (With Pandemic Data)
+
+```{r}
+m <- HoltWinters(crashests2)
+plot(fitted(m))
+fcast <- forecast(m, 210)
+autoplot(fcast) +
+  ggtitle("Forecasts of car crashes using regression") +
+  xlab("Year") + ylab("Crashes")
+```
+
+#### Forecasting and Time Series (With Pandemic Data) 
+
+```{r}
+crashests2 %>%
+  stlf(lambda = 0, h = 210) %>%
+  autoplot() + 
+  ggtitle("Forecasts of Daily Car Crashes (With Pandemic Data) Using Regression") +
+  xlab("Year") + ylab("Daily Crashes")
+```
+
+### Time Series Forecast of Daily Crashes (Without Pandemic Data)
+
+#### Basic Prediction (Without Pandemic Data)
+
+```{r}
+noncovid <- HoltWinters(crashests.noncovid)
+plot(fitted(noncovid))
+fcast.noncovid <- forecast(noncovid, 700)
+autoplot(fcast.noncovid) +
+  ggtitle("Forecasts of car crashes using regression without pandemic data") +
+  xlab("Year") + ylab("Crashes")
+```
+
+#### Forecast and Time Series (Without Pandemic Data)
+
+```{r}
+crashests.noncovid %>%
+  stlf(lambda = 0, h = 700) %>%
+  autoplot() + 
+  ggtitle("Forecasts of Daily Car Crashes (Without Pandemic Data) Using Regression") +
+  xlab("Year") + ylab("Daily Crashes")
+```
+
+### Time Series Forecast of Monthly Crashes (With Pandemic Data)
+
+#### Loading Necessary Packages
+
+```{r, message=FALSE}
+library(Mcomp)
+library(smooth)
+```
+
+#### Forecast and Time Series (With Pandemic Data)
+
+```{r, message=FALSE}
+crashes_mts = crashes %>%
+  filter(as.Date(crash_date) >= "2015/01/01" & as.Date(crash_date) <= "2021/05/31") %>%
+  separate(crash_date, 
+           into = c("Date", "Hour"), sep = 11) %>%
+  group_by(Date) %>%
+  summarize(count = length(unique(key_crash))) %>%
+  separate(Date, into = c("Year", "Month", "Day"), sep = "/") %>%
+  group_by(Year, Month) %>%
+  summarise(mcount = sum(count)) %>%
+  tidyr::spread(key=Month, value=mcount)
+
+crashes_mts = as.data.frame(crashes_mts)
+
+rownames(crashes_mts) = seq(2015, 2021)
+
+crashes_mts3 = crashes_mts %>%
+  select(02:13)
+
+crashes_mts2 <- ts(c(t(crashes_mts3)), frequency=12)
+
+crashes_mts4 <- window(crashes_mts2, start=c(1,01), end=c(7,05), frequency=12)
+fit.crashes <- tslm(crashes_mts4 ~ trend + season)
+fcast <- forecast::forecast(fit.crashes)
+autoplot(fcast) +
+  ggtitle("Forecasts of Monthly Car Crashes (With Pandemic Data) Using Regression") +
+  xlab("Year") + ylab("Monthly Crashes")
+```
+
+### Time Series Forecast of Monthly Crashes (Without Pandemic Data)
+
+```{r, message=FALSE}
+crashes_mts.noncovid = crashes %>%
+  filter(as.Date(crash_date) >= "2015/01/01" & as.Date(crash_date) <= "2020/02/29") %>%
+  separate(crash_date, 
+           into = c("Date", "Hour"), sep = 11) %>%
+  group_by(Date) %>%
+  summarize(count = length(unique(key_crash))) %>%
+  separate(Date, into = c("Year", "Month", "Day"), sep = "/") %>%
+  group_by(Year, Month) %>%
+  summarise(mcount = sum(count)) %>%
+  tidyr::spread(key=Month, value=mcount)
+
+crashes_mts.noncovid = as.data.frame(crashes_mts.noncovid)
+
+rownames(crashes_mts.noncovid) = seq(2015, 2020)
+
+crashes_mts3.noncovid = crashes_mts.noncovid %>%
+  select(02:13)
+
+crashes_mts2.noncovid <- ts(c(t(crashes_mts3.noncovid)), frequency=12)
+
+crashes_mts4.noncovid <- window(crashes_mts2.noncovid, start=c(1,01), 
+                                end=c(6,02), frequency=12)
+fit.crashes.noncovid <- tslm(crashes_mts4.noncovid ~ trend + season)
+fcast.noncovid <- forecast::forecast(fit.crashes.noncovid)
+autoplot(fcast.noncovid) +
+  ggtitle("Forecasts of Monthly Car Crashes Without Pandemic Using Regression") +
+  xlab("Year") + ylab("Monthly Crashes")
+```
