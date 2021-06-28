@@ -1256,7 +1256,7 @@ library(forecast)
 library(fpp2)
 library(TTR)
 
-##Working with entire time series (THIS WORKS!)
+##Working with entire time series (THIS WORKS)
 #Converting crashes_ts to a time series object 
 crashests2 <- ts(crashes_ts$count, start = c(2015,1), end = c(2021,153),
                 frequency = 365)
