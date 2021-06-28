@@ -1256,10 +1256,13 @@ library(forecast)
 library(fpp2)
 library(TTR)
 
-##Working with entire time series 
+##Working with entire time series (THIS WORKS!)
 #Converting crashes_ts to a time series object 
-crashests <- ts(crashes_ts$count, start = c(2015,1), end = c(2021,153),
+crashests2 <- ts(crashes_ts$count, start = c(2015,1), end = c(2021,153),
                 frequency = 365)
+
+#Converting crashes_ts to a time series object 
+crashests <- as.ts(crashes_ts)
 
 #Least squares estimation
 fit.crashes <- tslm(count ~ Date, data=crashests)
@@ -1272,6 +1275,21 @@ autoplot(crashests[,'count'], series="Data") +
   ggtitle("Number of Daily") +
   guides(colour=guide_legend(title=" "))
 
+#Prediction with HoltWinters() and plotting
+m <- HoltWinters(crashests2)
+plot(fitted(m))
+plot(forecast(m, 210))
+fcast <- forecast(m, 210)
+autoplot(fcast) +
+  ggtitle("Forecasts of car crashes using regression") +
+  xlab("Year") + ylab("Crashes")
+
+#Plotting the time series and forecast together
+crashests2 %>%
+  stlf(lambda = 0, h = 210) %>%
+  autoplot()
+
+#Different attempt at forecasting 
 install.packages("Mcomp")
 install.packages("smooth")
 library(Mcomp)
@@ -1297,6 +1315,7 @@ rownames(crashes_mts) = seq(2015, 2021)
 crashes_mts3 = crashes_mts %>%
   select(02:13)
 
+<<<<<<< HEAD
 crashes_mts2 <- ts(c(t(crashes_mts3)), frequency=12)
 
 
@@ -1310,6 +1329,23 @@ autoplot(fcast) +
 crashes_ts %>%
   mutate(month = case_when(
     Date >= 3))
+=======
+crashes_mts2 <- as.ts(crashes_mts3, start = c(2015, 1), 
+                   end = c(2021,5), frequency = 12)
+
+crashes_mts2.new <- as.ts(crashes_mts3)
+
+#Least squares estimation
+fit.crashes.mts2 <- tslm(count ~ Date, data=crashes_mts2)
+summary(fit.crashes.mts2)
+
+#Fitted values 
+autoplot(crashests[,'count'], series="Data") +
+  autolayer(fitted(fit.crashes), series="Fitted") +
+  xlab("Date") + ylab("") +
+  ggtitle("Number of Daily") +
+  guides(colour=guide_legend(title=" "))
+>>>>>>> 92943b5943592011f135a324f7b99d9454d8eef5
 
 ##Working with annual plots (don't think this works)
 #Converting crashes_annual to a time series object 
@@ -1325,7 +1361,6 @@ autoplot(crashests_annual[,'count'], series="Data") +
   xlab("Year") + ylab("") +
   ggtitle("Number of Daily") +
   guides(colour=guide_legend(title=" ")) 
-
 
 #Evaluating the regression model 
 checkresiduals(fit.crashes)
