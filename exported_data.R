@@ -1276,20 +1276,24 @@ crashests <- as.ts(crashes_ts)
 
 #Least squares estimation
 fit.crashes2 <- tslm(count ~ Date, data=crashests)
-summary(fit.crashes)
+summary(fit.crashes2)
 
 #Fitted values (linear plot through ts)
 autoplot(crashests[,'count'], series="Data") +
   autolayer(fitted(fit.crashes2), series="Fitted") +
   xlab("Date") + ylab("") +
   ggtitle("Number of Daily") +
-  guides(colour=guide_legend(title=" "))
+  guides(colour=guide_legend(title=" ")) + 
+  scale_x_continuous(breaks = seq(as.Date("2015/01/01"), as.Date("2021/05/31"), 
+                                  "day"))
+
+####CANNOT CHANGE X AXIS????
 
 #Prediction with HoltWinters() and plotting forecast
-m <- HoltWinters(crashests2)
-plot(fitted(m))
-plot(forecast(m, 210))
-fcast <- forecast(m, 210)
+covid <- HoltWinters(crashests2)
+plot(fitted(covid))
+plot(forecast(covid, 210))
+fcast <- forecast(covid, 210)
 autoplot(fcast) +
   ggtitle("Forecasts of car crashes using regression") +
   xlab("Year") + ylab("Crashes")
