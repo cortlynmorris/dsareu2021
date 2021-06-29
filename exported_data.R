@@ -1642,7 +1642,7 @@ crashes_rain = crashes %>%
 
 crashes_rain <- mutate(crashes_rain, rain = WeatherCondition1 == "Rain")
 
-t.test(x=crashes_rain$rain)
+t.test(count ~ rain, data = crashes_rain)
 
 crashes_rain %>%
   ggplot(aes(fill=WeatherCondition1, x=WeatherCondition1)) + 
