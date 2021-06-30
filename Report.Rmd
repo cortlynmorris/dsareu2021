@@ -1771,6 +1771,9 @@ autoplot(fcast) +
 #### STLF Forecasting and Time Series (With Pandemic Data) 
 
 ```{r}
+crashests2 %>% mstl() %>%
+  autoplot()
+
 m <- crashests2 %>%
   stlf(lambda = 0, h = 210) 
 
@@ -1805,6 +1808,9 @@ autoplot(fcast.noncovid) +
 #### STLF Forecast and Time Series (Without Pandemic Data)
 
 ```{r}
+crashests.noncovid %>% mstl() %>%
+  autoplot()
+
 p <- crashests.noncovid %>%
   stlf(lambda = 0, h = 700) 
 
@@ -1940,6 +1946,9 @@ autoplot(fcast.noncovid.monthly) +
 ### Seasonal and Trend Decomposition Using Loess Forecasting Model of Monthly Crashes (With Pandemic Data)
 
 ```{r}
+crashes_mts4 %>% mstl() %>%
+  autoplot()
+
 t <- crashes_mts4 %>%
   stlf(lambda = 0, h = 20) 
 
@@ -1954,6 +1963,9 @@ t %>% summary()
 ### Seasonal and Trend Decomposition Using Loess Forecasting Model of Monthly Crashes (Without Pandemic Data)
 
 ```{r}
+crashes_mts4.noncovid %>% mstl() %>%
+  autoplot()
+
 q <- crashes_mts4.noncovid %>%
   stlf(lambda = 0, h = 25) 
 
@@ -1963,6 +1975,58 @@ q %>%
   xlab("Year") + ylab("Crashes")
 
 q %>% summary()
+```
+
+## Advanced Forecasting Methods 
+
+### Neural Network Autoregression Forecasting Model of Daily Crashes (With Pandemic Data)
+
+```{r}
+fit.nnetar <- nnetar(crashests2, lambda=0)
+
+summary(fit.nnetar)
+
+forecast(fit.nnetar, h=700)
+
+autoplot(forecast(fit.nnetar,h=700,lambda=0)) + 
+  ggtitle("Neural Network Autoregression Forecasting Model of Daily Crashes (With Pandemic Data)")
+```
+
+### Neural Network Autoregression Forecasting Model of Daily Crashes (Without Pandemic Data)
+
+```{r}
+fit.nnetar.noncovid <- nnetar(crashests.noncovid, lambda=0)
+
+summary(fit.nnetar.noncovid)
+
+forecast(fit.nnetar.noncovid, h=700)
+
+autoplot(forecast(fit.nnetar.noncovid,h=700,lambda=0)) + 
+  ggtitle("Neural Network Autoregression Forecasting Model of Daily Crashes (Without Pandemic Data)")
+```
+
+### Neural Network Autoregression Forecasting Model of Monthly Crashes (With Pandemic Data)
+
+```{r}
+fit.nnetar.monthly <- nnetar(crashes_mts4, lambda=0)
+
+summary(fit.nnetar.monthly)
+
+forecast(fit.nnetar.monthly, h=20)
+
+autoplot(forecast(fit.nnetar.monthly,h=20,lambda=0))
+```
+
+### Neural Network Autoregression Forecasting Model of Monthly Crashes (Without Pandemic Data)
+
+```{r}
+fit.nnetar.monthly.noncovid <- nnetar(crashes_mts4.noncovid, lambda=0)
+
+summary(fit.nnetar.monthly.noncovid)
+
+forecast(fit.nnetar.monthly.noncovid, h=25)
+
+autoplot(forecast(fit.nnetar.monthly.noncovid,h=25,lambda=0))
 ```
 
 ## Comparing Models 
@@ -2031,6 +2095,9 @@ autoplot(fcast.2019) +
 ### 2015-2019 Seasonal and Trend Decomposition Using Loess Forecasting Model of Daily Crashes 
 
 ```{r}
+crashests.2019 %>% mstl() %>%
+  autoplot()
+
 p <- crashests.2019 %>%
   stlf(lambda = 0, h = 200) 
 
@@ -2106,6 +2173,9 @@ autoplot(fcast.covid.monthly.2019) +
 ### 2015-2019 Seasonal and Trend Decomposition Using Loess Forecasting Model of Daily Crashes 
 
 ```{r}
+crashes_mts4.2019 %>% mstl() %>%
+  autoplot()
+
 t <- crashes_mts4.2019 %>%
   stlf(lambda = 0, h = 20) 
 

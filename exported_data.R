@@ -1209,7 +1209,7 @@ crashes_ts %>%
   ggplot(aes(x = as.Date(Date), y = count)) + 
   geom_line() + 
   scale_x_date(date_labels = "%m-%Y", date_breaks = "6 month") + 
-  theme(axis.text.x = element_text(angle = 90))
+  theme(axis.text.x = element_text(angle = 90)) 
 
 crashes_annual %>%
   filter(as.Date(Date) >= "2015/01/01") %>%
@@ -1217,7 +1217,7 @@ crashes_annual %>%
   geom_line() + 
   scale_x_date(date_labels = "%m-%Y", date_breaks = "1 month") + 
   theme(axis.text.x = element_text(angle = 90)) +
-  facet_wrap(~Year, scales = "free_x")
+  facet_wrap(~Year, scales = "free_x") 
 
 #Different attempt at forecasting daily (THIS WORKS) 
 #Loading necessary packages 
@@ -1270,6 +1270,9 @@ autoplot(fcast) +
 
 #Prediction with stlf (Seasonal and Trend Decomposition using Loess 
 #Forecasting Model)
+crashests2 %>% mstl() %>%
+  autoplot()
+
 m <- crashests2 %>%
   stlf(lambda = 0, h = 210, s.window = "periodic") 
 
@@ -1279,6 +1282,15 @@ m %>%
   xlab("Year") + ylab("Crashes")
 
 m %>% summary()
+
+#Prediction with nnetar() for a NNAR (advanced) model 
+fit.nnetar <- nnetar(crashests2, lambda=0)
+
+summary(fit.nnetar)
+
+forecast(fit.nnetar, h=700)
+
+autoplot(forecast(fit.nnetar,h=700,lambda=0))
 
 ####Working with non COVID time series daily (THIS WORKS)
 #Regular non COVID time series daily 
@@ -1315,7 +1327,7 @@ autoplot(crashests.noncovid2[,'count'], series="Data") +
   ggtitle("Number of Daily Car Crashes (Without Pandemic Data)") +
   guides(colour=guide_legend(title=" "))
 
-#Prediction with HoltWinters() and plotting forecast
+#Prediction with HoltWinters() and plotting forecast (noncovid)
 noncovid <- HoltWinters(crashests.noncovid)
 
 summary(noncovid)
@@ -1330,7 +1342,10 @@ autoplot(fcast.noncovid) +
   ggtitle("Forecasts of Daily Car Crashes Using HoltWinters (Without Pandemic Data)") +
   xlab("Year") + ylab("Crashes")
 
-#Plotting the time series and forecast together STLF
+#Plotting the time series and forecast together STLF (noncovid)
+crashests.noncovid %>% mstl() %>%
+  autoplot()
+
 p <- crashests.noncovid %>%
   stlf(lambda = 0, h = 700) 
 
@@ -1340,6 +1355,16 @@ p %>%
   xlab("Year") + ylab("Daily Crashes")
 
 p %>% summary()
+
+#Prediction with nnetar() for a NNAR (advanced) model (noncovid)
+fit.nnetar.noncovid <- nnetar(crashests.noncovid, lambda=0)
+
+summary(fit.nnetar.noncovid)
+
+forecast(fit.nnetar.noncovid, h=700)
+
+autoplot(forecast(fit.nnetar.noncovid,h=700,lambda=0)) + 
+  ggtitle("NNAR Forecast for Daily Car Crashes (Without Pandemic Data")
 
 ##Ending at end of 2019 and Predicting Jan and Feb 2020 Daily TS 
 #COVID time series end at 2019 daily 
@@ -1393,6 +1418,9 @@ autoplot(fcast.2019) +
   xlab("Year") + ylab("Crashes")
 
 #Plotting the time series and forecast together STLF
+crashests.2019 %>% mstl() %>%
+  autoplot()
+
 p <- crashests.2019 %>%
   stlf(lambda = 0, h = 200) 
 
@@ -1461,6 +1489,9 @@ autoplot(fcast.covid.monthly) +
   xlab("Year") + ylab("Crashes")
 
 #STLF Model Monthly (COVID)
+crashes_mts4 %>% mstl() %>%
+  autoplot()
+
 t <- crashes_mts4 %>%
   stlf(lambda = 0, h = 20) 
 
@@ -1470,6 +1501,15 @@ t %>%
   xlab("Year") + ylab("Daily Crashes")
 
 t %>% summary()
+
+#Prediction with nnetar() for a NNAR (advanced) model monthly (covid)
+fit.nnetar.monthly <- nnetar(crashes_mts4, lambda=0)
+
+summary(fit.nnetar.monthly)
+
+forecast(fit.nnetar.monthly, h=20)
+
+autoplot(forecast(fit.nnetar.monthly,h=20,lambda=0))
 
 ##Working with non COVID time series monthly (THIS Works) 
 crashes_mts.noncovid = crashes %>%
@@ -1524,6 +1564,9 @@ autoplot(fcast.noncovid.monthly) +
   xlab("Year") + ylab("Crashes")
 
 #STLF Monthly Model (NonCovid)
+crashes_mts4.noncovid %>% mstl() %>%
+  autoplot()
+
 q <- crashes_mts4.noncovid %>%
   stlf(lambda = 0, h = 25) 
 
@@ -1533,6 +1576,15 @@ q %>%
   xlab("Year") + ylab("Daily Crashes")
 
 q %>% summary()
+
+#Prediction with nnetar() for a NNAR (advanced) model monthly (noncovid)
+fit.nnetar.monthly.noncovid <- nnetar(crashes_mts4.noncovid, lambda=0)
+
+summary(fit.nnetar.monthly.noncovid)
+
+forecast(fit.nnetar.monthly.noncovid, h=25)
+
+autoplot(forecast(fit.nnetar.monthly.noncovid,h=25,lambda=0))
 
 ##Ending at end of 2019 and Predicting Jan and Feb 2020 Monthly TS 
 #time series end at 2019 monthly 
@@ -1559,7 +1611,7 @@ crashes_mts2.2019 <- ts(c(t(crashes_mts3.2019)), frequency=12)
 crashes_mts4.2019 <- window(crashes_mts2.2019, start=c(1,01), end=c(5,12), 
                             frequency=12)
 
-#Linear Model Monthly (Covid)
+#Linear Model Monthly (2015-2019)
 fit.crashes.2019 <- tslm(crashes_mts4.2019 ~ trend + season)
 
 summary(fit.crashes.2019)
@@ -1572,7 +1624,7 @@ autoplot(fcast.2019) +
   ggtitle("2015-2019 Forecasts of Monthly Car Crashes Using Linear Model") +
   xlab("Year") + ylab("Monthly Crashes")
 
-#HoltWinters Model Monthly (Covid)
+#HoltWinters Model Monthly (2015-2019)
 covid.monthly.2019 <- HoltWinters(crashes_mts4.2019)
 
 summary(covid.monthly.2019)
@@ -1587,7 +1639,10 @@ autoplot(fcast.covid.monthly.2019) +
   ggtitle("Forecasts of Monthly Car Crashes Using HoltWinters") +
   xlab("Year") + ylab("Crashes")
 
-#STLF Model Monthly (COVID)
+#STLF Model Monthly (2015-2019)
+crashes_mts4.2019 %>% mstl() %>%
+  autoplot()
+
 t <- crashes_mts4.2019 %>%
   stlf(lambda = 0, h = 20) 
 
