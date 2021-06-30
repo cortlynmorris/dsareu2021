@@ -44,19 +44,19 @@ library(scales)
 
 #Code for Kelly's computer (Windows)
 #library(readr)
-# persons <- read_csv("~/NCAT REU/Mostafa/Data/Persons_Involved_in_Crashes.csv")
-#  
-# locations <- read_csv("~/NCAT REU/Mostafa/Data/Reported_Crash_Locations.csv")
-# 
-# crashes <- persons %>% left_join(locations, by="key_crash")
+persons <- read_csv("~/NCAT REU/Mostafa/Data/Persons_Involved_in_Crashes.csv")
+
+locations <- read_csv("~/NCAT REU/Mostafa/Data/Reported_Crash_Locations.csv")
+
+crashes <- persons %>% left_join(locations, by="key_crash")
 
 # Code for Ayan's computer (Window)
 #library(readr)
-persons <- read_csv("C:/Users/ayang/Desktop/Project FIles REU A&T/REU Research Project1/Persons_Involved_in_Crashes.csv")
-
-locations <- read_csv("C:/Users/ayang/Desktop/Project FIles REU A&T/REU Research Project1/Reported_Crash_Locations.csv")
-
-crashes <- persons %>% left_join(locations, by="key_crash")
+# persons <- read_csv("C:/Users/ayang/Desktop/Project FIles REU A&T/REU Research Project1/Persons_Involved_in_Crashes.csv")
+# 
+# locations <- read_csv("C:/Users/ayang/Desktop/Project FIles REU A&T/REU Research Project1/Reported_Crash_Locations.csv")
+# 
+# crashes <- persons %>% left_join(locations, by="key_crash")
 ```
 
 ## Exploratory data analysis 
@@ -1873,7 +1873,7 @@ fcast.noncovid <- forecast(noncovid, 700)
 summary(fcast)
 
 autoplot(fcast.noncovid) +
-  ggtitle("Forecasts of Car Crashes Using HoltWinters (Without Pandemic Data)") +
+  ggtitle("Forecasts of Daily Car Crashes Using HoltWinters (Without Pandemic Data)") +
   xlab("Year") + ylab("Crashes")
 ```
 
@@ -1900,7 +1900,7 @@ library(Mcomp)
 library(smooth)
 ```
 
-#### Forecast and Time Series (With Pandemic Data)
+#### Time Series Forecast of Monthly Crashes Using Linear Model (With Pandemic Data)
 
 ```{r, message=FALSE}
 crashes_mts = crashes %>%
@@ -1938,7 +1938,7 @@ autoplot(fcast) +
   xlab("Year") + ylab("Monthly Crashes")
 ```
 
-### Time Series Forecast of Monthly Crashes (Without Pandemic Data)
+### Time Series Forecast of Monthly Crashes Using Linear Model (Without Pandemic Data)
 
 ```{r, message=FALSE}
 crashes_mts.noncovid = crashes %>%
@@ -1975,3 +1975,68 @@ autoplot(fcast.noncovid) +
   ggtitle("Forecasts of Monthly Car Crashes Using Linear Model (Without Pandemic Data)") +
   xlab("Year") + ylab("Monthly Crashes")
 ```
+
+### Time Series Forecast of Monthly Crashes Using HoltWinters (With Pandemic Data)
+
+```{r}
+covid.monthly <- HoltWinters(crashes_mts4)
+
+summary(covid.monthly)
+
+plot(fitted(covid.monthly), main = "Box Jenkins Decomposition of Monthly Crashes (With Pandemic Data)") 
+
+fcast.covid.monthly <- forecast(covid.monthly, 20)
+
+summary(fcast.covid.monthly)
+
+autoplot(fcast.covid.monthly) +
+  ggtitle("Forecasts of Monthly Car Crashes Using HoltWinters (With Pandemic Data)") +
+  xlab("Year") + ylab("Crashes")
+```
+
+### Time Series Forecast of Monthly Crashes Using HoltWinters (Without Pandemic Data)
+
+```{r}
+noncovid.monthly <- HoltWinters(crashes_mts4.noncovid)
+
+summary(noncovid.monthly)
+
+plot(fitted(noncovid.monthly), main = "Box Jenkins Decomposition of Monthly Crashes (Without Pandemic Data)") 
+
+fcast.noncovid.monthly <- forecast(noncovid.monthly, 35)
+
+summary(fcast.noncovid.monthly)
+
+autoplot(fcast.noncovid.monthly) +
+  ggtitle("Forecasts of Monthly Car Crashes Using HoltWinters (Without Pandemic Data)") +
+  xlab("Year") + ylab("Crashes")
+```
+
+### Seasonal and Trend Decomposition Using Loess Forecasting Model of Monthly Crashes (With Pandemic Data)
+
+```{r}
+t <- crashes_mts4 %>%
+  stlf(lambda = 0, h = 20) 
+
+t %>%
+  autoplot() + 
+  ggtitle("Seasonal and Trend Decomposition Using Loess Forecasting Model for Monthly Car Crashes (With Pandemic Data)") +
+  xlab("Year") + ylab("Daily Crashes")
+
+t %>% summary()
+```
+
+### Seasonal and Trend Decomposition Using Loess Forecasting Model of Monthly Crashes (Without Pandemic Data)
+
+```{r}
+q <- crashes_mts4.noncovid %>%
+  stlf(lambda = 0, h = 25) 
+
+q %>%
+  autoplot() + 
+  ggtitle("Seasonal and Trend Decomposition Using Loess Forecasting Model for Monthly Car Crashes (Without Pandemic Data)") +
+  xlab("Year") + ylab("Daily Crashes")
+
+q %>% summary()
+```
+
