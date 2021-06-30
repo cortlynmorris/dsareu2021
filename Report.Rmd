@@ -9,7 +9,7 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-### Here we will be loading necessary packages.
+### Loading Necessary Packages
 
 ```{r, message=FALSE, warning=FALSE}
 library(reshape2)
@@ -23,15 +23,15 @@ library(maps)
 library(scales)
 ```
 
-### Setting working directory.
+### Setting Working Directory
 
 ```{r}
 #setwd("/Users/cmorris/Desktop/dsreu2021/rstudiodirectory/ResearchProject")
 ```
 
-### Reading and merging the data.
+### Reading and Merging the Data
 
-```{r}
+```{r, message=FALSE}
 #Code for Cortlyn's computer (Mac)
 # setwd("/Users/cmorris/Desktop/dsreu2021/rstudiodirectory/ResearchProject")
 # persons <- read.csv(file="Persons_Involved_in_Crashes.csv")
@@ -59,11 +59,9 @@ crashes <- persons %>% left_join(locations, by="key_crash")
 # crashes <- persons %>% left_join(locations, by="key_crash")
 ```
 
-## Exploratory data analysis 
+## Exploratory Data Analysis 
 
-### Frequency of crashes by vehicle type
-
-#### Plot
+### Frequency of Crashes by Vehicle Type
 
 The highest frequency of crashes occur in a passenger car. However, this is not very surprising because passenger cars are relatively common. An interesting note is that sport utility vehicles have the second highest frequency of crashes, however, sport utility vehicles are not nearly as common of a car.
 
@@ -82,7 +80,7 @@ crashes %>%
        y = "Count (log10 Scale)")
 ```
 
-### Frequency of crashes by weather condition.
+### Frequency of Crashes by Weather Condition
 
 The highest frequency of crashes occur when the weather conditions are clear. This is not very surprising because in North Carolina, the majority of the time the weather is clear. An interesting note is that snow still has a relatively high frequency despite it snowing minimally in North Carolina. 
 
@@ -120,9 +118,7 @@ crashes %>%
        y = "Count (log10 Scale)")
 ```
 
-### Frequency of crashes by traffic control type 
-
-#### Plot
+### Frequency of Crashes by Traffic Control Type 
 
 The highest frequency of crashes occur when there is no traffic control present. Without a control present, drivers may be less confident in their actions. 
 
@@ -143,8 +139,6 @@ crashes %>%
 ```
 
 ### Frequency of crashes by road feature
-
-#### Plot
 
 The highest frequency of crashes occur when there is no special road feature present. Without a road feature present, drivers may be less confident in their actions. 
 
@@ -209,8 +203,6 @@ crashes %>%
 
 ### Frequency of Crashes by Alcohol Result Type (excluding Unknown and Pending results)
 
-#### Plot
-
 ```{r}
 crashes %>% 
   filter(AlcoholResultType != "NA", AlcoholResultType != "", 
@@ -231,8 +223,6 @@ crashes %>%
 
 ### Frequency of Crashes by Day of Week
 
-#### Plot
-
 ```{r}
 crashes %>% 
   filter(Crash_Date_DOW != "NA") %>%
@@ -247,8 +237,6 @@ crashes %>%
 ```
 
 ### Frequency of Crashes by Month 
-
-#### Plot
 
 ```{r}
 crashes %>% 
@@ -295,7 +283,6 @@ crashes %>%
   geom_bar(aes(x=shift, fill = shift), show.legend = F) +
   labs(title="Frequency of Crashes by Shift", x="Shift", y="Count")
 ```
-
 
 ### Frequency of Crashes by Drivers' v. Passengers' Age
 
@@ -344,8 +331,6 @@ crashes %>%
 ```
 
 ### Frequency of Crashes by Airbag Deployed 
-
-#### Plot
 
 The highest frequency of crashes occured where the airbags were not deployed. It is interesting to note that the second highest frequency of crashes occured where the car(s) did not have airbags to begin with. 
 Airbags did not deploy during most crashes, therefore many accidents logged were minor. 
@@ -405,8 +390,6 @@ crashes %>%
 
 ### Frequency of Crashes by Race
 
-#### Plot
-
 According to census.gov...
 
 In the United States, 76.3 % of people are White, 13.4% of people are Black or African American, 18.5% are Hispanic or Latina, 0.2 are Native Hawaiian and Other Pacific Islander, 2.8% are two or more races, 5.9% are Asian, 1.3% are American Indian and Alaska Native, . 
@@ -449,61 +432,6 @@ crashes %>%
   labs(title = "Frequency of Crashes by Injury",
        x = "Injury",
        y = "Percent")
-```
-
-### Frequency of Injuries by Person Type (old code)
-
-```{r}
-# Finding the counts of each injury by person type
-crashes %>% 
-  filter(Injury != "NA", Injury != "Unknown", Injury != "", 
-         PersonType == "Driver") %>%
-  count(Injury)
-
-crashes %>% 
-  filter(Injury != "NA", Injury != "Unknown", Injury != "", 
-         PersonType == "Passenger") %>%
-  count(Injury)
-
-crashes %>% 
-  filter(Injury != "NA", Injury != "Unknown", Injury != "", 
-         PersonType == "Pedestrian") %>%
-  count(Injury)
-
-crashes %>% 
-  filter(Injury != "NA", Injury != "Unknown", Injury != "", 
-         PersonType == "Pedalcyclist") %>%
-  count(Injury)
-
-crashes %>% 
-  filter(Injury != "NA", Injury != "Unknown", Injury != "", 
-         PersonType == "Other*") %>%
-  count(Injury)
-
-#Creating a dataset using injury type, person type, and counts
-persontype2 <- c(rep("Driver" , 5) , rep("Passenger" , 5) , rep("Pedestrian" , 5) ,
-                 rep("Pedalcyclist" , 5) , rep("Other" , 5) )
-
-injury2 <- rep(c("Type A" , "Type B" , "Type C", "Killed", "No Injury") , 5)
-
-value <- c(851, 7295, 22020, 105, 227811, 232, 2307, 9163, 31, 72373, 183, 596, 554,
-           62, 154, 19, 168, 123, 3, 68, 10, 48, 34, 1, 141)
-
-data <- data.frame(persontype2,injury2,value)
-```
-
-```{r}
-#Bar plot
-data %>%
-  mutate(
-         injury2 = reorder(injury2, -value),
-         persontype2 = factor(persontype2,
-                              levels = c("Driver", "Passenger", "Pedestrian", 
-                                         "Pedalcyclist", "Other"))) %>%
-  ggplot(aes(fill=injury2, y=value, x=persontype2)) +
-  geom_bar(position="dodge", stat="identity") +
-  geom_text(aes(label=value), nudge_x = -0.35) +
-  coord_flip()
 ```
 
 ### Frequency of Injuries by Contributing Circumstance 
@@ -592,8 +520,6 @@ crashes %>%
 ```
 
 ### Frequency of Injury by Weather Condition
-
-#### Plot
 
 Rain and sleet, hail, freezing rain/drizzle leads to the most disabling type injuries. 
 
@@ -893,8 +819,6 @@ crashes %>%
 
 ### Frequency of Crashes by Protection
 
-#### Plot
-
 The highest frequency of crashes occured when drivers and passengers wore a shoulder and lap belt protection which are common protections in more recent vehicles. However, the second highest frequency of crashes occured when drivers and passengers had used no protection. Could this be because the vehicles they were driving didn't provide protection or that the vehicles had protection, the people just chose not to use any. 
 
 ```{r}
@@ -933,8 +857,6 @@ crashes %>%
 
 ### Frequency of Crashes by Vision Obstruction 
 
-#### Plot
-
 The highest frequency of crashes occured when there was was no vision obstruction. It is interesting to note, that "Blinded, sunlight" led to a significant amount of crashes. When looking at the variable Weather Condition, most of the time the Weather Condition was clear. The weather was clear, however, this may have led to the sun being brighter and more likely to cause a car crash due to vision obstruction. 
 
 ```{r}
@@ -953,8 +875,6 @@ crashes %>%
 ```
 
 ### Frequency of Crashes by Contributing Circumstance 1 
-
-#### Plot
 
 The highest frequency of crashes had no contributing circumstances indicated. 
 
@@ -1038,8 +958,6 @@ crashes %>%
 
 ### Frequency of Crashes by Location In Near Indicator
 
-.....
-
 ```{r}
 crashes %>% 
   filter(LocationInNearIndicator != "NA", LocationInNearIndicator != "Unknown") %>%
@@ -1056,8 +974,6 @@ crashes %>%
 ```
 
 ### Frequency of Crashes by Location Ramp Indicator 
-
-.....
 
 ```{r}
 crashes %>% 
@@ -1147,8 +1063,6 @@ crashes %>%
 
 ### Frequency of Crashes by First Harmful Event 
 
-#### Plot
-
 The data shows us that the (First Harmful Crash Event) is from a rear end, slow or stop. This implies that some drivers might be driving under the speed limit or not paying attention to what is in front of them on the road. 
 
 ```{r}
@@ -1167,8 +1081,6 @@ crashes %>%
 ```
 
 ### Frequency of Crashes by Most Harmful Event
-
-#### Plot
 
 The most harmful event is also a rear end, slow or stop accident just like the fist harmful event. Side swiped accidents and hitting parked vehicles are also pretty common accidents. This informs us that drivers are not paying attention to the road and are being distracted. 
 
@@ -1208,6 +1120,7 @@ crashes %>%
 ```
 
 ### Frequency of Crashes by Crash Date Year
+
 We included a horizontal dashed line to indicate where the yearly average lies 
 and we can see that only the years 202 and 2021 fall below this yearly average. 
 The year with the most crashes in 2019 but not by many. The full year with the
@@ -1230,6 +1143,7 @@ crashes %>%
 ```
 
 ### Number of Drivers per Crash
+
 This bar plot represents how many drivers were involved in each crash. We can 
 see that the majority of crashes involved 2 drivers, which was to be expected 
 since two car accidents seem to be the most common. In a distant second was 1 
@@ -1257,6 +1171,7 @@ crashes %>%
 ```
 
 ### Number of Passengers per Crash
+
 This data involved a much larger range of numbers than drivers involved per 
 crash. However, despite this fact, we can still follow a pretty regular 
 decreasing trend with the majority of crashes involved 1 passenger which 
@@ -1281,6 +1196,7 @@ crashes %>%
 ```
 
 ### Number of Pedestrians per Crash
+
 There is little variety in the number of pedestrians involved in crashes. When 
 pedestrians were involved, there was a majority of it only being 1 with a 
 distant second and third being 2 and 3 pedestrians.
@@ -1304,6 +1220,7 @@ crashes %>%
 ```
 
 ### Number of Pedalcyclists per Crash
+
 Similar to the number of pedestrians involved in crashes, the number of 
 pedalcyclists involved in crashes has little variety and is very low. Compared 
 to the total amount of data we are working with, very few crashes involve
@@ -1329,6 +1246,7 @@ crashes %>%
 ```
 
 ### Number of Other People per Crash
+
 Although there is more variety than both number of pedestriand and pedalcyclists 
 involved per crash, there is still a very small proportion of other people that 
 are involved in crashes. This category encompasses those who do not fit into the categories of driver, passenger, pedestiran, or pedalcyclist. There is a 
@@ -1354,6 +1272,7 @@ crashes %>%
 ```
 
 ### Number of Unknown People per Crash
+
 This data is likely not going to be useful to any of our analyses because it is
 fairly likely that the number of unknown people involved in crashes is much 
 higher than it realistically was due to poor data entry. This plot included 
@@ -1379,6 +1298,7 @@ crashes %>%
 ```
 
 ### Number of People Killed per Crash
+
 Fortunately, the number of people killed in crashes was low. Therefore, we only 
 have a small distribution of number of people killed per crash ranging from 1 
 to three with one being the majority and taking a large jump to 2 and 3 killed 
@@ -1403,6 +1323,7 @@ crashes %>%
 ```
 
 ### Number of Type A Injuries per Crash
+
 There were many more Type A injuries than people killed which represent all of 
 the disabling injuries. Once again, we can see a trend of decreasing number of 
 type A injuries per crash as the number of those injuries increases with the 
@@ -1428,6 +1349,7 @@ crashes %>%
 ```
 
 ### Number of Type B Injuries per Crash 
+
 Type B injuries represent all of the injuries that occurred that were evident. 
 We can see a higher variety in the number of these type of injuries per crash 
 as well as more of them total. A majority of the type B injuries per crash is 
@@ -1453,6 +1375,7 @@ crashes %>%
 ```
 
 ### Number of Type C Injuries per Crash
+
 Type C injuries are all of the most minor injuries and, fortunately, is the
 injury type that contains the most observations. Following the same trend as 
 the other type of injuries, the majority of crashes that involved type C 
@@ -1478,6 +1401,7 @@ crashes %>%
 ```
 
 ### Number of People with No Injuries per Crash 
+
 This plot looks similar to the plot that represents the number of passengers 
 involved per crash. There is a wide range of possible numbers of uninjured 
 people per crash spanning from 1 to 90. Despite this wide range of values, we 
@@ -1503,6 +1427,7 @@ crashes %>%
 ```
 
 ### Number of Unknown Injuries per Crash
+
 Once again, I do not think that this data will be useful for our analysis since it is likely that these unknown injuries are likely due to poor data entry but we can follow the same trend of a decreasing frequency as the number of unknown injuries per crash in creases from 1 all the way up to 16, with 1 having a very clear majority.
 
 ```{r}
@@ -1565,7 +1490,6 @@ wake_county <- nc_counties %>%
 wake_map <- wake_county %>% 
   ggplot() +
   geom_polygon(aes(lon, lat), color = "darkblue", fill = "lightblue")
-wake_map
 
 crashes_filter <- crashes %>%
   filter(LocationLatitude != "0", LocationLongitude != "0",
@@ -1576,6 +1500,7 @@ crashes_filter <- crashes %>%
 
 wake_map <- wake_map + 
   geom_point(data = crashes_filter, aes(x=LocationLongitude, y= LocationLatitude), colour = "blue", alpha = 1/10)
+
 wake_map
 ```
 
@@ -1591,7 +1516,7 @@ library(RColorBrewer)
 
 #### Create map (zoomed-out version)
 
-```{r, message=FALSE}
+```{r, message=FALSE, warning=FALSE}
 map_bounds <- c(-78.98, 35.51, -78.24, 36.06)
 
 coords.map <- get_stamenmap(map_bounds, zoom = 10, maptype = "toner-lite")
@@ -1614,7 +1539,7 @@ coords.map
 
 From the Wake County heat map, we can see that crashes are much more likely to occur in the center of the city. We see that as more streets populate an area, more crashes occur. 
 
-```{r, message=FALSE}
+```{r, message=FALSE, warning=FALSE}
 crashes_filter <- crashes %>%
   filter(LocationLatitude != "0", LocationLongitude != "0",
          LocationLatitude != "NA", LocationLatitude != "",
@@ -1652,7 +1577,7 @@ library(plotly)
 
 ### Create map 
 
-```{r, message=FALSE}
+```{r, message=FALSE, warning=FALSE}
 ggplotly(coords.map) %>%
   highlight(
     "plotly_hover",
@@ -2021,7 +1946,7 @@ t <- crashes_mts4 %>%
 t %>%
   autoplot() + 
   ggtitle("Seasonal and Trend Decomposition Using Loess Forecasting Model for Monthly Car Crashes (With Pandemic Data)") +
-  xlab("Year") + ylab("Daily Crashes")
+  xlab("Year") + ylab("Crashes")
 
 t %>% summary()
 ```
@@ -2035,8 +1960,428 @@ q <- crashes_mts4.noncovid %>%
 q %>%
   autoplot() + 
   ggtitle("Seasonal and Trend Decomposition Using Loess Forecasting Model for Monthly Car Crashes (Without Pandemic Data)") +
-  xlab("Year") + ylab("Daily Crashes")
+  xlab("Year") + ylab("Crashes")
 
 q %>% summary()
+```
+
+## Comparing Models 
+
+Ending at end of 2019 while predicting and comparing Jan and Feb 2020 daily time series plots with real data. 
+
+### 2015-2019 Daily Time Series 
+
+```{r}
+crashes_ts.2019 = crashes %>%
+  filter(as.Date(crash_date) >= "2015/01/01" & as.Date(crash_date) <= "2019/12/31") %>%
+  separate(crash_date, 
+           into = c("Date", "Hour"), sep = 11) %>%
+  group_by(Date) %>%
+  summarize(count = length(unique(key_crash)))
+
+crashes_ts.2019 %>%
+  filter(as.Date(Date) >= "2015/01/01") %>%
+  ggplot(aes(x = as.Date(Date), y = count)) + 
+  geom_line() + 
+  scale_x_date(date_labels = "%m-%Y", date_breaks = "6 month") + 
+  theme(axis.text.x = element_text(angle = 90))
+```
+
+### 2015-2019 Time Series Forecast of Daily Crashes Using Linear Model 
+
+```{r}
+#Converting crashes_ts.2019 to a time series object 
+crashests.2019 <- ts(crashes_ts.2019$count, start = c(2015,1), end = c(2019,365),
+                         frequency = 365)
+
+#Converting crashes_ts to a time series object 
+crashests.2019.2 <- as.ts(crashes_ts.noncovid, start = c(2015,1), end = c(2020,365), 
+                             frequency = 365)
+
+#Least squares estimation
+fit.crashes.2019.2 <- tslm(count ~ Date, data=crashests.2019.2)
+summary(fit.crashes.2019.2)
+
+#Fitted values (linear plot through ts)
+autoplot(crashests.2019.2[,'count'], series="Data") +
+  autolayer(fitted(fit.crashes.2019.2), series="Fitted") +
+  xlab("Date") + ylab("") +
+  ggtitle("2015-2019 Number of Daily Car Crashes") +
+  guides(colour=guide_legend(title=" "))
+```
+
+### 2015-2019 Time Series Forecast of Daily Crashes Using HoltWinters 
+
+```{r}
+twentynineteen <- HoltWinters(crashests.2019)
+
+summary(twentynineteen)
+
+plot(fitted(twentynineteen), main = "Box Jenkins Decomposition of Daily Crashes") 
+
+fcast.2019 <- forecast(noncovid, 10)
+
+summary(fcast.2019)
+
+autoplot(fcast.2019) +
+  ggtitle("2015-2019 Forecasts of Daily Car Crashes Using HoltWinters") +
+  xlab("Year") + ylab("Crashes")
+```
+
+### 2015-2019 Seasonal and Trend Decomposition Using Loess Forecasting Model of Daily Crashes 
+
+```{r}
+p <- crashests.2019 %>%
+  stlf(lambda = 0, h = 200) 
+
+p %>%
+  autoplot() + 
+  ggtitle("2015-2019 Seasonal and Trend Decomposition Using Loess Forecasting Model for Daily Car Crashes") +
+  xlab("Year") + ylab("Daily Crashes")
+
+p %>% summary()
+```
+
+### 2015-2019 Monthly Time Series 
+
+```{r}
+crashes_mts.2019 = crashes %>%
+  filter(as.Date(crash_date) >= "2015/01/01" & as.Date(crash_date) <= "2019/12/31") %>%
+  separate(crash_date, 
+           into = c("Date", "Hour"), sep = 11) %>%
+  group_by(Date) %>%
+  summarize(count = length(unique(key_crash))) %>%
+  separate(Date, into = c("Year", "Month", "Day"), sep = "/") %>%
+  group_by(Year, Month) %>%
+  summarise(mcount = sum(count)) %>%
+  tidyr::spread(key=Month, value=mcount)
+
+crashes_mts.2019 = as.data.frame(crashes_mts.2019)
+
+rownames(crashes_mts.2019) = seq(2015, 2019)
+
+crashes_mts3.2019 = crashes_mts.2019 %>%
+  select(02:13)
+
+crashes_mts2.2019 <- ts(c(t(crashes_mts3.2019)), frequency=12)
+
+crashes_mts4.2019 <- window(crashes_mts2.2019, start=c(1,01), end=c(5,12), 
+                            frequency=12)
+```
+
+### 2015-2019 Time Series Forecast of Monthly Crashes Using Linear Model 
+
+```{r}
+fit.crashes.2019 <- tslm(crashes_mts4.2019 ~ trend + season)
+
+summary(fit.crashes.2019)
+
+fcast.2019 <- forecast::forecast(fit.crashes.2019)
+
+summary(fcast.2019)
+
+autoplot(fcast.2019) +
+  ggtitle("2015-2019 Forecasts of Monthly Car Crashes Using Linear Model") +
+  xlab("Year") + ylab("Monthly Crashes")
+```
+
+### 2015-2019 Time Series Forecast of Monthly Crashes Using HoltWinters 
+
+```{r}
+covid.monthly.2019 <- HoltWinters(crashes_mts4.2019)
+
+summary(covid.monthly.2019)
+
+plot(fitted(covid.monthly.2019), main = "2015-2019 Box Jenkins Decomposition of Monthly Crashes") 
+
+fcast.covid.monthly.2019 <- forecast(covid.monthly.2019, 10)
+
+summary(fcast.covid.monthly.2019)
+
+autoplot(fcast.covid.monthly.2019) +
+  ggtitle("Forecasts of Monthly Car Crashes Using HoltWinters") +
+  xlab("Year") + ylab("Crashes")
+```
+
+### 2015-2019 Seasonal and Trend Decomposition Using Loess Forecasting Model of Daily Crashes 
+
+```{r}
+t <- crashes_mts4.2019 %>%
+  stlf(lambda = 0, h = 20) 
+
+t %>%
+  autoplot() + 
+  ggtitle("2015-2019 Seasonal and Trend Decomposition Using Loess Forecasting Model for Monthly Car Crashes") +
+  xlab("Year") + ylab("Daily Crashes")
+
+t %>% summary()
+```
+
+## Statistical Analyses Using ANOVA
+
+###Is there a significant difference between the amount of crashes on each DOW?
+
+```{r}
+crashes_dow = crashes %>%
+  separate(crash_date, 
+           into = c("Date", "Hour"), sep = 11) %>%
+  group_by(Date, Crash_Date_DOW) %>%
+  summarize(count = length(unique(key_crash)))
+
+anova_dow = aov(count ~ Crash_Date_DOW, data = crashes_dow)
+summary(anova_dow)
+
+TukeyHSD(anova_dow)
+```
+
+### Is there a significant difference between the amount of crashes per each race?
+
+```{r}
+crashes_race = crashes %>%
+  separate(crash_date, 
+           into = c("Date", "Hour"), sep = 11) %>%
+  filter(Race != "Unknown", Race != "NA") %>%
+  group_by(Date, Race) %>%
+  summarize(count = length(key_crash))
+
+anova_race = aov(count ~ Race, data = crashes_race)
+summary(anova_race)
+
+TukeyHSD(anova_race)
+```
+
+### Is there a significant difference between the amount of crashes per each gender?
+
+```{r}
+crashes_gender= crashes %>%
+  separate(crash_date, 
+           into = c("Date", "Hour"), sep = 11) %>%
+  filter(Gender != "Unknown", Gender != "NA") %>%
+  group_by(Date, Gender) %>%
+  summarize(count = length(key_crash))
+
+anova_gender = aov(count ~ Gender, data = crashes_gender)
+summary(anova_gender)
+
+TukeyHSD(anova_gender)
+```
+
+### Is there a significant difference between the amount of crashes per each Vision Obstruction?
+
+```{r}
+crashes_vision= crashes %>%
+  separate(crash_date, 
+           into = c("Date", "Hour"), sep = 11) %>%
+  filter(VisionObstruction != "Unknown", VisionObstruction != "NA") %>%
+  group_by(Date, VisionObstruction) %>%
+  summarize(count = length(key_crash))
+
+anova_vision = aov(count ~ VisionObstruction, data = crashes_vision)
+summary(anova_vision)
+
+TukeyHSD(anova_vision)
+```
+
+### Is there a significant difference between the amount of crashes per each vehicle type?
+
+```{r}
+crashes_vehicle= crashes %>%
+  separate(crash_date, 
+           into = c("Date", "Hour"), sep = 11) %>%
+  filter(VehicleType != "Unknown", VehicleType != "NA", VehicleType != "") %>%
+  group_by(Date, VehicleType) %>%
+  summarize(count = length(key_crash))
+
+anova_vehicle = aov(count ~ VehicleType, data = crashes_vehicle)
+summary(anova_vehicle)
+
+TukeyHSD(anova_vehicle)
+```
+
+### Is there a significant difference between the amount of crashes per each Weather Condition?
+
+```{r}
+crashes_weather= crashes %>%
+  separate(crash_date, 
+           into = c("Date", "Hour"), sep = 11) %>%
+  filter(WeatherCondition1 != "Unknown", WeatherCondition1 != "NA") %>%
+  group_by(Date, WeatherCondition1) %>%
+  summarize(count = length(key_crash))
+
+anova_weather = aov(count ~ WeatherCondition1, data = crashes_weather)
+summary(anova_weather)
+
+TukeyHSD(anova_weather)
+```
+
+### Is there a significant difference between the amount of crashes per each traffic control type?
+
+```{r}
+crashes_traffic= crashes %>%
+  separate(crash_date, 
+           into = c("Date", "Hour"), sep = 11) %>%
+  filter(TrafficControlType != "Unknown", TrafficControlType != "NA") %>%
+  group_by(Date, TrafficControlType) %>%
+  summarize(count = length(key_crash))
+
+anova_traffic = aov(count ~ TrafficControlType, data = crashes_traffic)
+summary(anova_traffic)
+
+TukeyHSD(anova_traffic)
+```
+
+### Is there a significant difference between the amount of crashes per each road feature?
+
+```{r}
+crashes_roadfeat = crashes %>%
+  separate(crash_date, 
+           into = c("Date", "Hour"), sep = 11) %>%
+  filter(RoadFeature != "Unknown", RoadFeature != "NA", RoadFeature != "NaN") %>%
+  group_by(Date, RoadFeature) %>%
+  summarize(count = length(key_crash))
+
+anova_roadfeat = aov(count ~ RoadFeature, data = crashes_roadfeat)
+summary(anova_roadfeat)
+
+TukeyHSD(anova_roadfeat)
+```
+
+### Is there a significant difference between the amount of crashes per each alcohol result type?
+
+```{r}
+crashes_alcohol= crashes %>%
+  separate(crash_date, 
+           into = c("Date", "Hour"), sep = 11) %>%
+  filter(AlcoholResultType != "Unknown", AlcoholResultType != "NA") %>%
+  group_by(Date, AlcoholResultType) %>%
+  summarize(count = length(key_crash))
+
+anova_alcohol = aov(count ~ AlcoholResultType, data = crashes_alcohol)
+summary(anova_alcohol)
+
+TukeyHSD(anova_alcohol)
+```
+
+### Is there a significant difference between the amount of crashes per each month?
+
+```{r}
+crashes_month = crashes %>%
+  separate(crash_date, 
+           into = c("Date", "Hour"), sep = 11) %>%
+  filter(Crash_Date_Month != "Unknown", Crash_Date_Month != "NA") %>%
+  group_by(Date, Crash_Date_Month) %>%
+  summarize(count = length(key_crash))
+
+anova_month = aov(count ~ Crash_Date_Month, data = crashes_month)
+summary(anova_month)
+
+TukeyHSD(anova_month)
+```
+
+### Is there a significant difference between the amount of crashes per each airbag deploy?
+
+```{r}
+crashes_airbag = crashes %>%
+  separate(crash_date, 
+           into = c("Date", "Hour"), sep = 11) %>%
+  filter(AirbagDeployed != "Unknown", AirbagDeployed != "NA") %>%
+  group_by(Date, AirbagDeployed) %>%
+  summarize(count = length(key_crash))
+
+anova_airbag = aov(count ~ AirbagDeployed, data = crashes_airbag)
+summary(anova_airbag)
+
+TukeyHSD(anova_airbag)
+```
+
+### Is there a significant difference between the amount of crashes per each protection?
+
+```{r}
+crashes_protection = crashes %>%
+  separate(crash_date, 
+           into = c("Date", "Hour"), sep = 11) %>%
+  filter(Protection != "Unknown", Protection != "NA", 
+         Protection != "Unable to determine") %>%
+  group_by(Date, Protection) %>%
+  summarize(count = length(key_crash))
+
+anova_protection = aov(count ~ Protection, data = crashes_protection)
+summary(anova_protection)
+
+TukeyHSD(anova_protection)
+```
+
+### Is there a significant difference between the amount of crashes per each contributing circumstance?
+
+```{r}
+crashes_contributing = crashes %>%
+  separate(crash_date, 
+           into = c("Date", "Hour"), sep = 11) %>%
+  filter(ContributingCircumstance1 != "Unknown", 
+         ContributingCircumstance1 != "NA") %>%
+  group_by(Date, ContributingCircumstance1) %>%
+  summarize(count = length(key_crash))
+
+anova_contributing = aov(count ~ ContributingCircumstance1, 
+                         data = crashes_contributing)
+summary(anova_contributing)
+
+TukeyHSD(anova_contributing)
+```
+
+### Is there a significant difference between the amount of crashes per each first harmful event?
+
+```{r}
+crashes_first_harm = crashes %>%
+  separate(crash_date, 
+           into = c("Date", "Hour"), sep = 11) %>%
+  filter(FirstHarmfulEvent != "Unknown", FirstHarmfulEvent != "NA") %>%
+  group_by(Date, FirstHarmfulEvent) %>%
+  summarize(count = length(key_crash))
+
+anova_first_harm = aov(count ~ FirstHarmfulEvent, data = crashes_first_harm)
+summary(anova_first_harm)
+
+TukeyHSD(anova_first_harm)
+```
+
+### Is there a significant difference between the amount of crashes per each most harmful event?
+
+```{r}
+crashes_most_harm = crashes %>%
+  separate(crash_date, 
+           into = c("Date", "Hour"), sep = 11) %>%
+  filter(MostHarmfulEvent != "Unknown", MostHarmfulEvent != "NA") %>%
+  group_by(Date, MostHarmfulEvent) %>%
+  summarize(count = length(key_crash))
+
+anova_most_harm = aov(count ~ MostHarmfulEvent, data = crashes_most_harm)
+summary(anova_most_harm)
+
+TukeyHSD(anova_most_harm)
+```
+
+##Statistical Analyses Using t Test
+
+### Is there a significant difference between the amount of crashes in rain v. no rain?
+
+```{r}
+crashes_rain = crashes %>%
+  filter(WeatherCondition1 != "Unknown", WeatherCondition1 != "NA", 
+         WeatherCondition1 != "") %>%
+  mutate(WeatherCondition1 = case_when(
+    WeatherCondition1 == "Rain" ~ "Rain", 
+    TRUE ~ "Not Rain")) %>%
+  group_by(key_crash,WeatherCondition1) %>%
+  summarize(count = length(key_crash))
+
+crashes_rain <- mutate(crashes_rain, rain = WeatherCondition1 == "Rain")
+
+t.test(count ~ rain, data = crashes_rain)
+
+crashes_rain %>%
+  ggplot(aes(fill=WeatherCondition1, x=WeatherCondition1)) + 
+  geom_bar(show.legend = FALSE) + 
+  geom_text(stat="count", aes(x=WeatherCondition1, label=..count..), vjust=-0.25)
 ```
 
