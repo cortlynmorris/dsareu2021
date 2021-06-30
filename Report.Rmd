@@ -1717,6 +1717,8 @@ crashes_ts = crashes %>%
 crashes_ts %>%
   filter(as.Date(Date) >= "2015/01/01") %>%
   ggplot(aes(x = as.Date(Date), y = count)) + 
+  ggtitle("Time Series Plot for Frequency of Daily Crashes (With Pandemic Data)") +
+  xlab("Date") + ylab("Count") + 
   geom_line() + 
   scale_x_date(date_labels = "%m-%Y", date_breaks = "6 month") + 
   theme(axis.text.x = element_text(angle = 90))
@@ -1735,6 +1737,7 @@ crashes_ts.noncovid = crashes %>%
 crashes_ts.noncovid %>%
   filter(as.Date(Date) >= "2015/01/01") %>%
   ggplot(aes(x = as.Date(Date), y = count)) + 
+  ggtitle("Time Series Plot for Frequency of Daily Crashes (Without Pandemic Data") + xlab("Date") + ylab("Count") + 
   geom_line() + 
   scale_x_date(date_labels = "%m-%Y", date_breaks = "6 month") + 
   theme(axis.text.x = element_text(angle = 90))
@@ -1752,7 +1755,7 @@ library(TTR)
 
 #### Plotting
 
-```{r}
+```{r, message=FALSE}
 #Converting crashes_ts to a time series object 
 crashests2 <- ts(crashes_ts$count, start = c(2015,1), end = c(2021,153),
                 frequency = 365)
@@ -1767,15 +1770,16 @@ summary(fit.crashes)
 #Fitted values 
 autoplot(crashests[,'count'], series="Data") +
   autolayer(fitted(fit.crashes), series="Fitted") +
-  xlab("Date") + ylab("") +
-  ggtitle("Number of Daily") +
-  guides(colour=guide_legend(title=" "))
-
+  xlab("Date") + ylab("Count") +
+  ggtitle("Number of Daily Car Crashes (With Pandemic Data)") +
+  guides(colour=guide_legend(title=" ")) + 
+  scale_x_continuous(breaks = seq(as.Date("2015/01/01"), as.Date("2021/05/31"), 
+                                  "day"))
 ```
 
 ### Time Series Plot for Frequency of Daily Crashes From January 2015 to May 2021 and Regression Line (Without Pandemic Data)
 
-```{r}
+```{r, message=FALSE}
 #Converting crashes_ts to a time series object using ts
 crashests.noncovid <- ts(crashes_ts.noncovid$count, start = c(2015,1), 
                          end = c(2020,59), frequency = 365)
@@ -1791,9 +1795,11 @@ summary(fit.crashes.noncovid2)
 #Fitted values (linear plot through ts)
 autoplot(crashests.noncovid2[,'count'], series="Data") +
   autolayer(fitted(fit.crashes.noncovid2), series="Fitted") +
-  xlab("Date") + ylab("") +
-  ggtitle("Number of Daily") +
-  guides(colour=guide_legend(title=" "))
+  xlab("Date") + ylab("Count") +
+  ggtitle("Number of Daily Car Crashes (Without Pandemic Data)") +
+  guides(colour=guide_legend(title=" ")) + 
+  scale_x_continuous(breaks = seq(as.Date("2015/01/01"), as.Date("2021/05/31"), 
+                                  "day"))
 ```
 
 ### Time Series Plot for Frequency of Daily Crashes Organized by Year From January 2015 to May 2021 (With Pandemic Data)
@@ -1807,8 +1813,10 @@ crashes_annual = crashes_ts %>%
 crashes_annual %>%
   filter(as.Date(Date) >= "2015/01/01") %>%
   ggplot(aes(x = as.Date(Date), y = count)) + 
+  ggtitle("Time Series Plots for Frequency of Daily Crashes Organized by Year") + 
   geom_line() + 
   scale_x_date(date_labels = "%m-%Y", date_breaks = "1 month") + 
+  xlab("Date") + ylab("Count") + 
   theme(axis.text.x = element_text(angle = 90)) +
   facet_wrap(~Year, scales = "free_x")
 ```
@@ -1817,48 +1825,70 @@ crashes_annual %>%
 
 ### Time Series Forecast of Daily Crashes (With Pandemic Data)
 
-#### Basic Prediction (With Pandemic Data)
+#### HoltWinters Forecasting and Time Series (With Pandemic Data)
 
 ```{r}
-m <- HoltWinters(crashests2)
-plot(fitted(m))
-fcast <- forecast(m, 210)
+covid <- HoltWinters(crashests2)
+
+summary(covid)
+
+plot(fitted(covid), main = "Box Jenkins Decomposition of Daily Crashes (With Pandemic Data)")
+
+fcast <- forecast(covid, 210)
+
+summary(fcast)
+
 autoplot(fcast) +
-  ggtitle("Forecasts of car crashes using regression") +
+  ggtitle("Forecasts of Daily Car Crashes Using Holt Winters (With Pandemic Data)") +
   xlab("Year") + ylab("Crashes")
 ```
 
-#### Forecasting and Time Series (With Pandemic Data) 
+#### STLF Forecasting and Time Series (With Pandemic Data) 
 
 ```{r}
-crashests2 %>%
-  stlf(lambda = 0, h = 210) %>%
+m <- crashests2 %>%
+  stlf(lambda = 0, h = 210) 
+
+m %>%
   autoplot() + 
-  ggtitle("Forecasts of Daily Car Crashes (With Pandemic Data) Using Regression") +
-  xlab("Year") + ylab("Daily Crashes")
+  ggtitle("Seasonal and Trend Decomposition Using Loess Forecasting Model for Daily Car Crashes (With Pandemic Data)") +
+  xlab("Year") + ylab("Crashes")
+
+m %>% summary()
 ```
 
 ### Time Series Forecast of Daily Crashes (Without Pandemic Data)
 
-#### Basic Prediction (Without Pandemic Data)
+#### HoltWinters Forecast and Time Series (Without Pandemic Data)
 
 ```{r}
 noncovid <- HoltWinters(crashests.noncovid)
-plot(fitted(noncovid))
+
+summary(noncovid)
+
+plot(fitted(noncovid), main = "Box Jenkins Decomposition of Daily Crashes (Without Pandemic Data)") 
+  
 fcast.noncovid <- forecast(noncovid, 700)
+
+summary(fcast)
+
 autoplot(fcast.noncovid) +
-  ggtitle("Forecasts of car crashes using regression without pandemic data") +
+  ggtitle("Forecasts of Car Crashes Using HoltWinters (Without Pandemic Data)") +
   xlab("Year") + ylab("Crashes")
 ```
 
-#### Forecast and Time Series (Without Pandemic Data)
+#### STLF Forecast and Time Series (Without Pandemic Data)
 
 ```{r}
-crashests.noncovid %>%
-  stlf(lambda = 0, h = 700) %>%
+p <- crashests.noncovid %>%
+  stlf(lambda = 0, h = 700) 
+
+p %>%
   autoplot() + 
-  ggtitle("Forecasts of Daily Car Crashes (Without Pandemic Data) Using Regression") +
+  ggtitle("Seasonal and Trend Decomposition Using Loess Forecasting Model for Daily Car Crashes (Without Pandemic Data)") +
   xlab("Year") + ylab("Daily Crashes")
+
+p %>% summary()
 ```
 
 ### Time Series Forecast of Monthly Crashes (With Pandemic Data)
@@ -1894,10 +1924,17 @@ crashes_mts3 = crashes_mts %>%
 crashes_mts2 <- ts(c(t(crashes_mts3)), frequency=12)
 
 crashes_mts4 <- window(crashes_mts2, start=c(1,01), end=c(7,05), frequency=12)
+
 fit.crashes <- tslm(crashes_mts4 ~ trend + season)
+
+summary(fit.crashes)
+
 fcast <- forecast::forecast(fit.crashes)
+
+summary(fcast)
+
 autoplot(fcast) +
-  ggtitle("Forecasts of Monthly Car Crashes (With Pandemic Data) Using Regression") +
+  ggtitle("Forecasts of Monthly Car Crashes Using Linear Model (With Pandemic Data)") +
   xlab("Year") + ylab("Monthly Crashes")
 ```
 
@@ -1927,8 +1964,14 @@ crashes_mts2.noncovid <- ts(c(t(crashes_mts3.noncovid)), frequency=12)
 crashes_mts4.noncovid <- window(crashes_mts2.noncovid, start=c(1,01), 
                                 end=c(6,02), frequency=12)
 fit.crashes.noncovid <- tslm(crashes_mts4.noncovid ~ trend + season)
+
+summary(fit.crashes.noncovid)
+
 fcast.noncovid <- forecast::forecast(fit.crashes.noncovid)
+
+summary(fcast.noncovid)
+
 autoplot(fcast.noncovid) +
-  ggtitle("Forecasts of Monthly Car Crashes Without Pandemic Using Regression") +
+  ggtitle("Forecasts of Monthly Car Crashes Using Linear Model (Without Pandemic Data)") +
   xlab("Year") + ylab("Monthly Crashes")
 ```
