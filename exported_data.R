@@ -1211,6 +1211,31 @@ crashes_ts %>%
   scale_x_date(date_labels = "%m-%Y", date_breaks = "6 month") + 
   theme(axis.text.x = element_text(angle = 90))
 
+#Adding 7 day moving average to daily time series
+library(zoo)
+
+filter(as.Date(Date) >= "2015/01/01") %>%
+  mutate(seven_avg= rollmean(count, 7,
+                             align="left", 
+                             fill=0)) %>%
+  ggplot(aes(x = as.Date(Date), y = count)) + 
+  geom_line() + 
+  geom_line(aes(y = seven_avg), 
+            color = "red", 
+            size = .75) +
+  scale_x_date(date_labels = "%m-%Y", date_breaks = "6 month") + 
+  theme(axis.text.x = element_text(angle = 90))
+
+crashes_ts %>%
+  filter(as.Date(Date) >= "2015/01/01") %>%
+  ggplot(aes(x = as.Date(Date), y = count)) + 
+  geom_line() +
+  geom_line(aes(y=rollmean(count, 7, na.pad = TRUE)), color = "red") +
+  scale_x_date(date_labels = "%m-%Y", date_breaks = "6 month") + 
+  theme(axis.text.x = element_text(angle = 90))
+
+
+# Annual crashes time series
 crashes_annual %>%
   filter(as.Date(Date) >= "2015/01/01") %>%
   ggplot(aes(x = as.Date(Date), y = count)) + 
