@@ -448,7 +448,44 @@ crashes %>%
   coord_flip() + 
   labs(title = "Injury Frequency by Contributing Circumstance",
        x = "Contributing Circumstance",
-       y = "Percentage")
+       y = "Percentage") + 
+  scale_x_discrete(labels = c("Alcohol use", 
+                              "Going wrong way",
+                              "Disregarded other traffic signs",
+                              "Disregarded road markings",
+                              "Disregarded stop sign",
+                              "Disregarded traffic signals",
+                              "Disregarded yield sign", 
+                              "Driver distracted",
+                              "Driver distracted by communication device",
+                              "Driver distracted by external distraction", 
+                              "Driver distracted by electronic",
+                              "Driver distracted by passenger", 
+                              "Drug use", 
+                              "Exceeded speed limit",
+                              "Exceeded safe speed", 
+                              "Failed to yield", 
+                              "Failure to reduce speed",
+                              "Followed too closely",
+                              "Improper backing",
+                              "Improper lane change", 
+                              "Improper or no signal",
+                              "Improper parking",
+                              "Improper turn",
+                              "Inattention",
+                              "No contributing circumstance",
+                              "Operated defective equipment", 
+                              "Erratic, reckless, negligent", 
+                              "Other improper passing", 
+                              "Other*",
+                              "Overcorrected/oversteered",
+                              "Passed on curve",  
+                              "Passed on hill",
+                              "Passed stopped school bus", 
+                              "Right turn on red",
+                              "Swerved or avoided",  
+                              "Use of improper lane",
+                              "Visibility obstructed"))
 ```
 
 ### Frequency of Injuries by Person Type 
@@ -880,7 +917,8 @@ The highest frequency of crashes had no contributing circumstances indicated.
 
 ```{r}
 crashes %>% 
-  filter(ContributingCircumstance1 != "NA", ContributingCircumstance1 != "Unknown") %>%
+  filter(ContributingCircumstance1 != "NA", ContributingCircumstance1 != "Unknown", 
+         ContributingCircumstance1 != "Unable to determine") %>%
   count(ContributingCircumstance1) %>% 
   mutate(logtrans = round(log10(n), digits = 2), 
          ContributingCircumstance1 = reorder(ContributingCircumstance1,logtrans)) %>% 
@@ -890,7 +928,44 @@ crashes %>%
   coord_flip() +
   labs(title = "Frequency of Crashes by Contributing Circumstance 1",
        x = "Contributing Circumstance 1",
-       y = "Count (log10 Scale)")
+       y = "Count (log10 Scale)") + 
+  scale_x_discrete(labels = c("Passed on hill", 
+                              "Passed on curve",  
+                              "Passed stopped school bus",
+                              "Driver distracted by electronic", 
+                              "Improper or no signal",
+                              "Driver distracted by external distraction",
+                              "Right turn on red",
+                              "Drug use",
+                              "Disregarded yield sign", 
+                              "Driver distracted by communication device", 
+                              "Driver distracted by passenger", 
+                              "Visibility obstructed",
+                              "Disregarded other traffic signs", 
+                              "Driver distracted", 
+                              "Disregarded road markings",
+                              "Operated defective equipment",
+                              "Exceeded speed limit",
+                              "Disregarded stop sign",
+                              "Going wrong way", 
+                              "Use of improper lane",
+                              "Alcohol use", 
+                              "Other improper passing", 
+                              "Followed too closely", 
+                              "Swerved or avoided",
+                              "Overcorrected/oversteered",
+                              "Erratic, reckless, negligent", 
+                              "Other*",
+                              "Disregarded traffic signals",
+                              "Exceeded safe speed",
+                              "Improper parking",
+                              "Improper turn",
+                              "Improper lane change",
+                              "Improper backing",
+                              "Failed to yield", 
+                              "Inattention", 
+                              "Failure to reduce speed",
+                              "No contributing circumstance"))
 ```
 
 ### Frequency of Crashes by Contributing Circumstance 2
@@ -900,7 +975,8 @@ The highest frequency of crashes had inattention as a contributing circumstance 
 ```{r}
 crashes %>% 
   filter(ContributingCircumstance2 != "NA", 
-         ContributingCircumstance2 != "Unknown") %>%
+         ContributingCircumstance2 != "Unknown", 
+         ContributingCircumstance2 != "Unable to determine") %>%
   count(ContributingCircumstance2) %>% 
   mutate(logtrans = round(log10(n), digits = 2), 
          ContributingCircumstance2 = reorder(ContributingCircumstance2,
@@ -912,7 +988,44 @@ crashes %>%
   coord_flip() +
   labs(title = "Frequency of Crashes by Contributing Circumstance 2",
        x = "Contributing Circumstance 2",
-       y = "Count (log10 Scale)")
+       y = "Count (log10 Scale)") + 
+  scale_x_discrete(labels = c("Passed on curve",  
+                              "Passed on hill", 
+                              "Passed stopped school bus",
+                              "Disregarded yield sign", 
+                              "Improper or no signal",
+                              "Right turn on red",
+                              "Disregarded other traffic signs", 
+                              "Disregarded stop sign",
+                              "Driver distracted by external distraction",
+                              "Driver distracted by electronic", 
+                              "Disregarded road markings",
+                              "Drug use",
+                              "Visibility obstructed",
+                              "Swerved or avoided",
+                              "Other improper passing",
+                              "Exceeded speed limit",
+                              "Use of improper lane",
+                              "Driver distracted by communication device", 
+                              "Driver distracted by passenger", 
+                              "Operated defective equipment",
+                              "Improper parking",
+                              "No contributing circumstance", 
+                              "Disregarded traffic signals",
+                              "Other*",
+                              "Driver distracted", 
+                              "Going wrong way",
+                              "Exceeded safe speed",
+                              "Followed too closely", 
+                              "Overcorrected/oversteered",
+                              "Improper turn",
+                              "Alcohol use", 
+                              "Improper lane change",
+                              "Erratic, reckless, negligent", 
+                              "Improper backing",
+                              "Failed to yield",
+                              "Failure to reduce speed",
+                              "Inattention"))
 ```
 
 ### Frequency of Crashes by Contributing Circumstance 3
@@ -922,7 +1035,8 @@ The higest frequency of crashes had inattention as a contributing circumstance 3
 ```{r}
 crashes %>% 
   filter(ContributingCircumstance3 != "NA", 
-         ContributingCircumstance3 != "Unknown") %>%
+         ContributingCircumstance3 != "Unknown", 
+         ContributingCircumstance3 != "Unable to determine") %>%
   count(ContributingCircumstance3) %>% 
   mutate(logtrans = round(log10(n), digits = 2), 
          ContributingCircumstance3 = 
@@ -934,7 +1048,43 @@ crashes %>%
   coord_flip() +
   labs(title = "Frequency of Crashes by Contributing Circumstance 3",
        x = "Contributing Circumstance 3",
-       y = "Count (log10 Scale)")
+       y = "Count (log10 Scale)") + 
+  scale_x_discrete(labels = c("Passed on hill", 
+                              "Right turn on red",
+                              "Passed on curve", 
+                              "Disregarded yield sign", 
+                              "Improper or no signal",
+                              "Disregarded other traffic signs", 
+                              "Disregarded stop sign",
+                              "Improper parking",
+                              "No contributing circumstance", 
+                              "Disregarded road markings",
+                              "Visibility obstructed",
+                              "Driver distracted by electronic",
+                              "Swerved or avoided",
+                              "Exceeded speed limit",
+                              "Driver distracted by external distraction",
+                              "Operated defective equipment",
+                              "Other improper passing",
+                              "Use of improper lane",
+                              "Disregarded traffic signals",
+                              "Exceeded safe speed",
+                              "Improper backing",
+                              "Driver distracted by communication device",
+                              "Going wrong way",
+                              "Driver distracted by passenger", 
+                              "Other*",
+                              "Improper lane change",
+                              "Drug use",
+                              "Improper turn",
+                              "Overcorrected/oversteered",
+                              "Driver distracted", 
+                              "Followed too closely", 
+                              "Failure to reduce speed",
+                              "Failed to yield",
+                              "Alcohol use", 
+                              "Erratic, reckless, negligent",
+                              "Inattention"))
 ```
 
 ### Frequency of Crashes by Location Relation to Road 
@@ -1698,8 +1848,10 @@ autoplot(crashests[,'count'], series="Data") +
   xlab("Date") + ylab("Count") +
   ggtitle("Number of Daily Car Crashes (With Pandemic Data)") +
   guides(colour=guide_legend(title=" ")) + 
-  scale_x_continuous(breaks = seq(as.Date("2015/01/01"), as.Date("2021/05/31"), 
-                                  "day"))
+  scale_x_continuous(breaks = c(0, 365, 731, 1096, 1461, 1826, 2192), 
+                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
+                                "Jan 2019", "Jan 2020", "Jan 2021")) + 
+  theme(axis.text.x = element_text(angle = 90))
 ```
 
 ### Time Series Plot for Frequency of Daily Crashes From January 2015 to May 2021 and Regression Line (Without Pandemic Data)
@@ -1723,8 +1875,10 @@ autoplot(crashests.noncovid2[,'count'], series="Data") +
   xlab("Date") + ylab("Count") +
   ggtitle("Number of Daily Car Crashes (Without Pandemic Data)") +
   guides(colour=guide_legend(title=" ")) + 
-  scale_x_continuous(breaks = seq(as.Date("2015/01/01"), as.Date("2021/05/31"), 
-                                  "day"))
+  scale_x_continuous(breaks = c(0, 365, 731, 1096, 1461, 1826, 2192), 
+                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
+                                "Jan 2019", "Jan 2020", "Jan 2021")) + 
+  theme(axis.text.x = element_text(angle = 90))
 ```
 
 ### Time Series Plot for Frequency of Daily Crashes Organized by Year From January 2015 to May 2021 (With Pandemic Data)
@@ -1865,8 +2019,11 @@ fcast <- forecast::forecast(fit.crashes)
 summary(fcast)
 
 autoplot(fcast) +
-  ggtitle("Forecasts of Monthly Car Crashes Using Linear Model (With Pandemic Data)") +
-  xlab("Year") + ylab("Monthly Crashes")
+  ggtitle("Forecasts of Monthly Car Crashes Using Linear Model (With Pandemic Data)") + xlab("Year") + ylab("Monthly Crashes") + 
+  scale_x_continuous(breaks = c(1,2,3,4,5,6,7,8), 
+                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
+                                "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022")) + 
+  theme(axis.text.x = element_text(angle = 90))
 ```
 
 ### Time Series Forecast of Monthly Crashes Using Linear Model (Without Pandemic Data)
@@ -1904,7 +2061,11 @@ summary(fcast.noncovid)
 
 autoplot(fcast.noncovid) +
   ggtitle("Forecasts of Monthly Car Crashes Using Linear Model (Without Pandemic Data)") +
-  xlab("Year") + ylab("Monthly Crashes")
+  xlab("Year") + ylab("Monthly Crashes") + 
+  scale_x_continuous(breaks = c(1,2,3,4,5,6,7), 
+                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
+                                "Jan 2019", "Jan 2020", "Jan 2021")) + 
+  theme(axis.text.x = element_text(angle = 90))
 ```
 
 ### Time Series Forecast of Monthly Crashes Using HoltWinters (With Pandemic Data)
@@ -1955,7 +2116,12 @@ t <- crashes_mts4 %>%
 t %>%
   autoplot() + 
   ggtitle("Seasonal and Trend Decomposition Using Loess Forecasting Model for Monthly Car Crashes (With Pandemic Data)") +
-  xlab("Year") + ylab("Crashes")
+  xlab("Year") + ylab("Crashes") + 
+  scale_x_continuous(breaks = c(1,2,3,4,5,6,7, 8, 9), 
+                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
+                                "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022", 
+                                "Jan 2023")) + 
+  theme(axis.text.x = element_text(angle = 90))
 
 t %>% summary()
 ```
@@ -1972,7 +2138,11 @@ q <- crashes_mts4.noncovid %>%
 q %>%
   autoplot() + 
   ggtitle("Seasonal and Trend Decomposition Using Loess Forecasting Model for Monthly Car Crashes (Without Pandemic Data)") +
-  xlab("Year") + ylab("Crashes")
+  xlab("Year") + ylab("Crashes") + 
+  scale_x_continuous(breaks = c(1,2,3,4,5,6,7, 8), 
+                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
+                                "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022")) + 
+  theme(axis.text.x = element_text(angle = 90))
 
 q %>% summary()
 ```
@@ -2014,7 +2184,12 @@ summary(fit.nnetar.monthly)
 
 forecast(fit.nnetar.monthly, h=20)
 
-autoplot(forecast(fit.nnetar.monthly,h=20,lambda=0))
+autoplot(forecast(fit.nnetar.monthly,h=20,lambda=0)) + 
+  scale_x_continuous(breaks = c(1,2,3,4,5,6,7, 8, 9), 
+                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
+                                "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022", 
+                                "Jan 2023")) + 
+  theme(axis.text.x = element_text(angle = 90))
 ```
 
 ### Neural Network Autoregression Forecasting Model of Monthly Crashes (Without Pandemic Data)
@@ -2026,7 +2201,11 @@ summary(fit.nnetar.monthly.noncovid)
 
 forecast(fit.nnetar.monthly.noncovid, h=25)
 
-autoplot(forecast(fit.nnetar.monthly.noncovid,h=25,lambda=0))
+autoplot(forecast(fit.nnetar.monthly.noncovid,h=25,lambda=0)) + 
+  scale_x_continuous(breaks = c(1,2,3,4,5,6,7, 8), 
+                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
+                                "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022")) + 
+  theme(axis.text.x = element_text(angle = 90))
 ```
 
 ## Comparing Models 
@@ -2071,7 +2250,11 @@ autoplot(crashests.2019.2[,'count'], series="Data") +
   autolayer(fitted(fit.crashes.2019.2), series="Fitted") +
   xlab("Date") + ylab("") +
   ggtitle("2015-2019 Number of Daily Car Crashes") +
-  guides(colour=guide_legend(title=" "))
+  guides(colour=guide_legend(title=" ")) + 
+  scale_x_continuous(breaks = c(0, 365, 731, 1096, 1461, 1826), 
+                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
+                                "Jan 2019", "Jan 2020")) + 
+  theme(axis.text.x = element_text(angle = 90))
 ```
 
 ### 2015-2019 Time Series Forecast of Daily Crashes Using HoltWinters 
@@ -2111,7 +2294,7 @@ p %>% summary()
 
 ### 2015-2019 Monthly Time Series 
 
-```{r}
+```{r, message=FALSE}
 crashes_mts.2019 = crashes %>%
   filter(as.Date(crash_date) >= "2015/01/01" & as.Date(crash_date) <= "2019/12/31") %>%
   separate(crash_date, 
@@ -2149,7 +2332,12 @@ summary(fcast.2019)
 
 autoplot(fcast.2019) +
   ggtitle("2015-2019 Forecasts of Monthly Car Crashes Using Linear Model") +
-  xlab("Year") + ylab("Monthly Crashes")
+  xlab("Year") + ylab("Monthly Crashes") + 
+  scale_x_continuous(breaks = c(1,2,3,4,5,6,7), 
+                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
+                                "Jan 2019", "Jan 2020", "Jan 2021")) + 
+  theme(axis.text.x = element_text(angle = 90))
+  
 ```
 
 ### 2015-2019 Time Series Forecast of Monthly Crashes Using HoltWinters 
@@ -2182,7 +2370,11 @@ t <- crashes_mts4.2019 %>%
 t %>%
   autoplot() + 
   ggtitle("2015-2019 Seasonal and Trend Decomposition Using Loess Forecasting Model for Monthly Car Crashes") +
-  xlab("Year") + ylab("Daily Crashes")
+  xlab("Year") + ylab("Daily Crashes") + 
+  scale_x_continuous(breaks = c(1,2,3,4,5,6,7), 
+                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
+                                "Jan 2019", "Jan 2020", "Jan 2021")) + 
+  theme(axis.text.x = element_text(angle = 90))
 
 t %>% summary()
 ```

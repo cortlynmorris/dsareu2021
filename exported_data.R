@@ -333,7 +333,44 @@ crashes %>%
   coord_flip() + 
   labs(title = "Injury Frequency by Contributing Circumstance",
        x = "Contributing Circumstance",
-       y = "Percentage")
+       y = "Percentage") + 
+  scale_x_discrete(labels = c("Alcohol use", 
+                              "Going wrong way",
+                              "Disregarded other traffic signs",
+                              "Disregarded road markings",
+                              "Disregarded stop sign",
+                              "Disregarded traffic signals",
+                              "Disregarded yield sign", 
+                              "Driver distracted",
+                              "Driver distracted by communication device",
+                              "Driver distracted by external distraction", 
+                              "Driver distracted by electronic",
+                              "Driver distracted by passenger", 
+                              "Drug use", 
+                              "Exceeded speed limit",
+                              "Exceeded safe speed", 
+                              "Failed to yield", 
+                              "Failure to reduce speed",
+                              "Followed too closely",
+                              "Improper backing",
+                              "Improper lane change", 
+                              "Improper or no signal",
+                              "Improper parking",
+                              "Improper turn",
+                              "Inattention",
+                              "No contributing circumstance",
+                              "Operated defective equipment", 
+                              "Erratic, reckless, negligent", 
+                              "Other improper passing", 
+                              "Other*",
+                              "Overcorrected/oversteered",
+                              "Passed on curve",  
+                              "Passed on hill",
+                              "Passed stopped school bus", 
+                              "Right turn on red",
+                              "Swerved or avoided",  
+                              "Use of improper lane",
+                              "Visibility obstructed"))
 
 crashes %>%
   filter(Injury != "NA", Injury != "Unknown", PersonType != "NA", 
@@ -534,7 +571,8 @@ crashes %>%
        y = "Count (log10 Scale)")
 
 crashes %>% 
-  filter(ContributingCircumstance1 != "NA", ContributingCircumstance1 != "Unknown") %>%
+  filter(ContributingCircumstance1 != "NA", ContributingCircumstance1 != "Unknown", 
+         ContributingCircumstance1 != "Unable to determine") %>%
   count(ContributingCircumstance1) %>% 
   mutate(logtrans = round(log10(n), digits = 2), 
          ContributingCircumstance1 = reorder(ContributingCircumstance1,logtrans)) %>% 
@@ -544,11 +582,49 @@ crashes %>%
   coord_flip() +
   labs(title = "Frequency of Crashes by Contributing Circumstance 1",
        x = "Contributing Circumstance 1",
-       y = "Count (log10 Scale)")
+       y = "Count (log10 Scale)") + 
+  scale_x_discrete(labels = c("Passed on hill", 
+                              "Passed on curve",  
+                              "Passed stopped school bus",
+                              "Driver distracted by electronic", 
+                              "Improper or no signal",
+                              "Driver distracted by external distraction",
+                              "Right turn on red",
+                              "Drug use",
+                              "Disregarded yield sign", 
+                              "Driver distracted by communication device", 
+                              "Driver distracted by passenger", 
+                              "Visibility obstructed",
+                              "Disregarded other traffic signs", 
+                              "Driver distracted", 
+                              "Disregarded road markings",
+                              "Operated defective equipment",
+                              "Exceeded speed limit",
+                              "Disregarded stop sign",
+                              "Going wrong way", 
+                              "Use of improper lane",
+                              "Alcohol use", 
+                              "Other improper passing", 
+                              "Followed too closely", 
+                              "Swerved or avoided",
+                              "Overcorrected/oversteered",
+                              "Erratic, reckless, negligent", 
+                              "Other*",
+                              "Disregarded traffic signals",
+                              "Exceeded safe speed",
+                              "Improper parking",
+                              "Improper turn",
+                              "Improper lane change",
+                              "Improper backing",
+                              "Failed to yield", 
+                              "Inattention", 
+                              "Failure to reduce speed",
+                              "No contributing circumstance"))
 
 crashes %>% 
   filter(ContributingCircumstance2 != "NA", 
-         ContributingCircumstance2 != "Unknown") %>%
+         ContributingCircumstance2 != "Unknown", 
+         ContributingCircumstance2 != "Unable to determine") %>%
   count(ContributingCircumstance2) %>% 
   mutate(logtrans = round(log10(n), digits = 2), 
          ContributingCircumstance2 = reorder(ContributingCircumstance2,
@@ -560,11 +636,49 @@ crashes %>%
   coord_flip() +
   labs(title = "Frequency of Crashes by Contributing Circumstance 2",
        x = "Contributing Circumstance 2",
-       y = "Count (log10 Scale)")
+       y = "Count (log10 Scale)") + 
+  scale_x_discrete(labels = c("Passed on curve",  
+                              "Passed on hill", 
+                              "Passed stopped school bus",
+                              "Disregarded yield sign", 
+                              "Improper or no signal",
+                              "Right turn on red",
+                              "Disregarded other traffic signs", 
+                              "Disregarded stop sign",
+                              "Driver distracted by external distraction",
+                              "Driver distracted by electronic", 
+                              "Disregarded road markings",
+                              "Drug use",
+                              "Visibility obstructed",
+                              "Swerved or avoided",
+                              "Other improper passing",
+                              "Exceeded speed limit",
+                              "Use of improper lane",
+                              "Driver distracted by communication device", 
+                              "Driver distracted by passenger", 
+                              "Operated defective equipment",
+                              "Improper parking",
+                              "No contributing circumstance", 
+                              "Disregarded traffic signals",
+                              "Other*",
+                              "Driver distracted", 
+                              "Going wrong way",
+                              "Exceeded safe speed",
+                              "Followed too closely", 
+                              "Overcorrected/oversteered",
+                              "Improper turn",
+                              "Alcohol use", 
+                              "Improper lane change",
+                              "Erratic, reckless, negligent", 
+                              "Improper backing",
+                              "Failed to yield",
+                              "Failure to reduce speed",
+                              "Inattention"))
 
 crashes %>% 
   filter(ContributingCircumstance3 != "NA", 
-         ContributingCircumstance3 != "Unknown") %>%
+         ContributingCircumstance3 != "Unknown", 
+         ContributingCircumstance3 != "Unable to determine") %>%
   count(ContributingCircumstance3) %>% 
   mutate(logtrans = round(log10(n), digits = 2), 
          ContributingCircumstance3 = 
@@ -576,7 +690,43 @@ crashes %>%
   coord_flip() +
   labs(title = "Frequency of Crashes by Contributing Circumstance 3",
        x = "Contributing Circumstance 3",
-       y = "Count (log10 Scale)")
+       y = "Count (log10 Scale)") + 
+  scale_x_discrete(labels = c("Passed on hill", 
+                              "Right turn on red",
+                              "Passed on curve", 
+                              "Disregarded yield sign", 
+                              "Improper or no signal",
+                              "Disregarded other traffic signs", 
+                              "Disregarded stop sign",
+                              "Improper parking",
+                              "No contributing circumstance", 
+                              "Disregarded road markings",
+                              "Visibility obstructed",
+                              "Driver distracted by electronic",
+                              "Swerved or avoided",
+                              "Exceeded speed limit",
+                              "Driver distracted by external distraction",
+                              "Operated defective equipment",
+                              "Other improper passing",
+                              "Use of improper lane",
+                              "Disregarded traffic signals",
+                              "Exceeded safe speed",
+                              "Improper backing",
+                              "Driver distracted by communication device",
+                              "Going wrong way",
+                              "Driver distracted by passenger", 
+                              "Other*",
+                              "Improper lane change",
+                              "Drug use",
+                              "Improper turn",
+                              "Overcorrected/oversteered",
+                              "Driver distracted", 
+                              "Followed too closely", 
+                              "Failure to reduce speed",
+                              "Failed to yield",
+                              "Alcohol use", 
+                              "Erratic, reckless, negligent",
+                              "Inattention"))
 
 crashes %>% 
   filter(LocationRelationToRoad != "NA", LocationRelationToRoad != "Unknown") %>%
@@ -1207,6 +1357,8 @@ crashes_annual = crashes_ts %>%
 crashes_ts %>%
   filter(as.Date(Date) >= "2015/01/01") %>%
   ggplot(aes(x = as.Date(Date), y = count)) + 
+  ggtitle("Time Series Plot for Frequency of Daily Crashes (With Pandemic Data)") +
+  xlab("Date") + ylab("Count") + 
   geom_line() + 
   scale_x_date(date_labels = "%m-%Y", date_breaks = "6 month") + 
   theme(axis.text.x = element_text(angle = 90))
@@ -1239,44 +1391,12 @@ crashes_ts %>%
 crashes_annual %>%
   filter(as.Date(Date) >= "2015/01/01") %>%
   ggplot(aes(x = as.Date(Date), y = count)) + 
+  ggtitle("Time Series Plots for Frequency of Daily Crashes Organized by Year") + 
   geom_line() + 
   scale_x_date(date_labels = "%m-%Y", date_breaks = "1 month") + 
+  xlab("Date") + ylab("Count") + 
   theme(axis.text.x = element_text(angle = 90)) +
   facet_wrap(~Year, scales = "free_x")
-
-#Forecasting attempt with Dr. Mostafa (does not work)
-library(zoo)
-zoo(crashes_ts, seq(from = as.Date("2015-01-01"), to = as.Date("2021-05-31"), by = 1))
-
-ts_crashes <- window(as.ts(crashes_ts$Date), start=2015)
-
-ts_crashes <- ts(data = crashes_ts, start = 1, frequency = 365)
-
-fit1 <- HoltWinters(ts_crashes)
-
-fit1
-
-plot(forecast(fit1))
-
-fit.crashes <- tslm(ts_crashes ~ trend)
-fcast <- forecast(fit.crashes)
-autoplot(fcast) +
-  ggtitle("Forecasts of daily number of car crashes in Wake County, NC using regression") +
-  xlab("Year") + ylab("number of crashes per day")
-
-
-ts_crashes2 <- window(as.ts(crashes_ts$Date), start=2015/01/01)
-fit <- HoltWinters(ts_crashes2, beta=FALSE, gamma=FALSE)
-
-crash_count <- crashes_ts %>%
-  group_by(Date)
-
-ts_crashes <- window(as.ts(crash_count), start=2015)
-fit.crashes <- tslm(ts_crashes ~ trend + season)
-fcast <- forecast(fit.crashes)
-autoplot(fcast) +
-  ggtitle("Forecasts of daily number of car crashes in Wake County, NC using regression") +
-  xlab("Year") + ylab("number of crashes per day")
 
 #Different attempt at forecasting daily (THIS WORKS) 
 #Loading necessary packages 
@@ -1301,30 +1421,47 @@ crashests <- as.ts(crashes_ts)
 
 #Least squares estimation
 fit.crashes2 <- tslm(count ~ Date, data=crashests)
-summary(fit.crashes)
+summary(fit.crashes2)
 
 #Fitted values (linear plot through ts)
 autoplot(crashests[,'count'], series="Data") +
   autolayer(fitted(fit.crashes2), series="Fitted") +
-  xlab("Date") + ylab("") +
-  ggtitle("Number of Daily") +
-  guides(colour=guide_legend(title=" "))
+  xlab("Date") + ylab("Count") +
+  ggtitle("Number of Daily Car Crashes") +
+  guides(colour=guide_legend(title=" ")) + 
+  scale_x_continuous(breaks = c(0, 365, 731, 1096, 1461, 1826, 2192), 
+                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
+                                "Jan 2019", "Jan 2020", "Jan 2021")) + 
+  theme(axis.text.x = element_text(angle = 90))
 
 #Prediction with HoltWinters() and plotting forecast
-m <- HoltWinters(crashests2)
-plot(fitted(m))
-plot(forecast(m, 210))
-fcast <- forecast(m, 210)
+covid <- HoltWinters(crashests2)
+
+summary(covid)
+
+plot(fitted(covid), main = "Box Jenkins Decomposition of Daily Crashes (With Pandemic Data)")
+
+fcast <- forecast(covid, 210)
+
+summary(fcast)
+
 autoplot(fcast) +
-  ggtitle("Forecasts of car crashes using regression") +
+  ggtitle("Forecasts of Daily Car Crashes Using Holt Winters (With Pandemic Data)") +
   xlab("Year") + ylab("Crashes")
 
-#Plotting the time series and forecast together
-crashests2 %>%
-  stlf(lambda = 0, h = 210) %>%
+#STLF forecasting
+crashests2 %>% mstl() %>%
+  autoplot()
+
+m <- crashests2 %>%
+  stlf(lambda = 0, h = 210) 
+
+m %>%
   autoplot() + 
-  ggtitle("Forecasts of Daily Car Crashes (With Pandemic Data) Using Regression") +
-  xlab("Year") + ylab("Daily Crashes")
+  ggtitle("Seasonal and Trend Decomposition Using Loess Forecasting Model for Daily Car Crashes (With Pandemic Data)") +
+  xlab("Year") + ylab("Crashes")
+
+m %>% summary()
 
 ####Working with non COVID time series daily (THIS WORKS)
 #Regular non COVID time series daily 
@@ -1338,6 +1475,7 @@ crashes_ts.noncovid = crashes %>%
 crashes_ts.noncovid %>%
   filter(as.Date(Date) >= "2015/01/01") %>%
   ggplot(aes(x = as.Date(Date), y = count)) + 
+  ggtitle("Time Series Plot for Frequency of Daily Crashes (Without Pandemic Data") + xlab("Date") + ylab("Count") + 
   geom_line() + 
   scale_x_date(date_labels = "%m-%Y", date_breaks = "6 month") + 
   theme(axis.text.x = element_text(angle = 90))
@@ -1357,26 +1495,42 @@ summary(fit.crashes.noncovid2)
 #Fitted values (linear plot through ts)
 autoplot(crashests.noncovid2[,'count'], series="Data") +
   autolayer(fitted(fit.crashes.noncovid2), series="Fitted") +
-  xlab("Date") + ylab("") +
-  ggtitle("Number of Daily") +
-  guides(colour=guide_legend(title=" "))
+  xlab("Date") + ylab("Count") +
+  ggtitle("Number of Daily Car Crashes (Without Pandemic Data)") +
+  guides(colour=guide_legend(title=" ")) + 
+  scale_x_continuous(breaks = c(0, 365, 731, 1096, 1461, 1826, 2192), 
+                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
+                                "Jan 2019", "Jan 2020", "Jan 2021")) + 
+  theme(axis.text.x = element_text(angle = 90))
 
 #Prediction with HoltWinters() and plotting forecast
 noncovid <- HoltWinters(crashests.noncovid)
-plot(fitted(noncovid))
-plot(forecast(noncovid, 210)) 
-#does same as above line ^^
-fcast.noncovid <- forecast(noncovid, 210)
+
+summary(noncovid)
+
+plot(fitted(noncovid), main = "Box Jenkins Decomposition of Daily Crashes (Without Pandemic Data)") 
+
+fcast.noncovid <- forecast(noncovid, 700)
+
+summary(fcast)
+
 autoplot(fcast.noncovid) +
-  ggtitle("Forecasts of car crashes using regression") +
+  ggtitle("Forecasts of Daily Car Crashes Using HoltWinters (Without Pandemic Data)") +
   xlab("Year") + ylab("Crashes")
 
-#Plotting the time series and forecast together
-crashests.noncovid %>%
-  stlf(lambda = 0, h = 700) %>%
+#STLF forecasting 
+crashests.noncovid %>% mstl() %>%
+  autoplot()
+
+p <- crashests.noncovid %>%
+  stlf(lambda = 0, h = 700) 
+
+p %>%
   autoplot() + 
-  ggtitle("Forecasts of Daily Car Crashes (Without Pandemic Data) Using Regression") +
+  ggtitle("Seasonal and Trend Decomposition Using Loess Forecasting Model for Daily Car Crashes (Without Pandemic Data)") +
   xlab("Year") + ylab("Daily Crashes")
+
+p %>% summary()
 
 ##Different attempt at forecasting for monthly (THIS WORKS)
 install.packages("Mcomp")
@@ -1403,18 +1557,27 @@ rownames(crashes_mts) = seq(2015, 2021)
 crashes_mts3 = crashes_mts %>%
   select(02:13)
 
-
 crashes_mts2 <- ts(c(t(crashes_mts3)), frequency=12)
 
 crashes_mts4 <- window(crashes_mts2, start=c(1,01), end=c(7,05), frequency=12)
-fit.crashes <- tslm(crashes_mts4 ~ trend + season)
-summary(fit.crashes)
-fcast <- forecast::forecast(fit.crashes)
-autoplot(fcast) +
-  ggtitle("Forecasts of Monthly Car Crashes (With Pandemic Data) Using Regression") +
-  xlab("Year") + ylab("Monthly Crashes")
 
-#Working with non COVID time series monthly (THIS Works)
+fit.crashes <- tslm(crashes_mts4 ~ trend + season)
+
+summary(fit.crashes)
+
+fcast <- forecast::forecast(fit.crashes)
+
+summary(fcast)
+
+autoplot(fcast) +
+  ggtitle("Forecasts of Monthly Car Crashes Using Linear Model (With Pandemic Data)") +
+  xlab("Year") + ylab("Monthly Crashes") + 
+  scale_x_continuous(breaks = c(1,2,3,4,5,6,7,8), 
+                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
+                                "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022")) + 
+  theme(axis.text.x = element_text(angle = 90))
+
+#Linear model with non COVID time series monthly (THIS Works)
 crashes_mts.noncovid = crashes %>%
   filter(as.Date(crash_date) >= "2015/01/01" & as.Date(crash_date) <= "2020/02/29") %>%
   separate(crash_date, 
@@ -1438,16 +1601,269 @@ crashes_mts2.noncovid <- ts(c(t(crashes_mts3.noncovid)), frequency=12)
 crashes_mts4.noncovid <- window(crashes_mts2.noncovid, start=c(1,01), 
                                 end=c(6,02), frequency=12)
 fit.crashes.noncovid <- tslm(crashes_mts4.noncovid ~ trend + season)
-summary(fit.crashes.noncovid)
-fcast.noncovid <- forecast::forecast(fit.crashes.noncovid)
-autoplot(fcast.noncovid) +
-  ggtitle("Forecasts of Monthly Car Crashes Without Pandemic Using Regression") +
-  xlab("Year") + ylab("Monthly Crashes") +
-  scale_x_discrete(breaks = seq.Date(from = as.Date("2015-01-01"), 
-                                       to = as.Date("2020-02-01"), 
-                                       by = "month"))
-#find way to rename x axes for time series forecasts
 
+summary(fit.crashes.noncovid)
+
+fcast.noncovid <- forecast::forecast(fit.crashes.noncovid)
+
+summary(fcast.noncovid)
+
+autoplot(fcast.noncovid) +
+  ggtitle("Forecasts of Monthly Car Crashes Using Linear Model (Without Pandemic Data)") +
+  xlab("Year") + ylab("Monthly Crashes") +
+  scale_x_continuous(breaks = c(1,2,3,4,5,6,7), 
+                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
+                                "Jan 2019", "Jan 2020", "Jan 2021")) + 
+  theme(axis.text.x = element_text(angle = 90))
+
+#Holtwinters with COVID time series monthly (THIS Works)
+covid.monthly <- HoltWinters(crashes_mts4)
+
+summary(covid.monthly)
+
+plot(fitted(covid.monthly), main = "Box Jenkins Decomposition of Monthly Crashes (With Pandemic Data)") 
+
+fcast.covid.monthly <- forecast(covid.monthly, 20)
+
+summary(fcast.covid.monthly)
+
+autoplot(fcast.covid.monthly) +
+  ggtitle("Forecasts of Monthly Car Crashes Using HoltWinters (With Pandemic Data)") +
+  xlab("Year") + ylab("Crashes")
+
+#Holtwinters with nonCOVID time series monthly (THIS Works)
+noncovid.monthly <- HoltWinters(crashes_mts4.noncovid)
+
+summary(noncovid.monthly)
+
+plot(fitted(noncovid.monthly), main = "Box Jenkins Decomposition of Monthly Crashes (Without Pandemic Data)") 
+
+fcast.noncovid.monthly <- forecast(noncovid.monthly, 35)
+
+summary(fcast.noncovid.monthly)
+
+autoplot(fcast.noncovid.monthly) +
+  ggtitle("Forecasts of Monthly Car Crashes Using HoltWinters (Without Pandemic Data)") +
+  xlab("Year") + ylab("Crashes")
+
+#Stlf Forecasting Model of Monthly Crashes (With Pandemic Data)
+crashes_mts4 %>% mstl() %>%
+  autoplot()
+
+t <- crashes_mts4 %>%
+  stlf(lambda = 0, h = 20) 
+
+t %>%
+  autoplot() + 
+  ggtitle("Seasonal and Trend Decomposition Using Loess Forecasting Model for Monthly Car Crashes (With Pandemic Data)") +
+  xlab("Year") + ylab("Crashes") + 
+  scale_x_continuous(breaks = c(1,2,3,4,5,6,7, 8, 9), 
+                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
+                                "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022", 
+                                "Jan 2023")) + 
+  theme(axis.text.x = element_text(angle = 90))
+
+
+t %>% summary()
+
+#Stlf Forecasting Model of Monthly Crashes (Without Pandemic Data)
+crashes_mts4.noncovid %>% mstl() %>%
+  autoplot()
+
+q <- crashes_mts4.noncovid %>%
+  stlf(lambda = 0, h = 25) 
+
+q %>%
+  autoplot() + 
+  ggtitle("Seasonal and Trend Decomposition Using Loess Forecasting Model for Monthly Car Crashes (Without Pandemic Data)") +
+  xlab("Year") + ylab("Crashes") + 
+  scale_x_continuous(breaks = c(1,2,3,4,5,6,7, 8), 
+                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
+                                "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022")) + 
+  theme(axis.text.x = element_text(angle = 90))
+
+q %>% summary()
+
+##Advanced Forecasting Methods
+
+#NNAR method forecasting daily crashes (with pandemic data)
+fit.nnetar <- nnetar(crashests2, lambda=0)
+
+summary(fit.nnetar)
+
+forecast(fit.nnetar, h=700)
+
+autoplot(forecast(fit.nnetar,h=700,lambda=0)) + 
+  ggtitle("Neural Network Autoregression Forecasting Model of Daily Crashes (With Pandemic Data)")
+
+#NNAR method forecasting daily crashes (without pandemic data)
+fit.nnetar.noncovid <- nnetar(crashests.noncovid, lambda=0)
+
+summary(fit.nnetar.noncovid)
+
+forecast(fit.nnetar.noncovid, h=700)
+
+autoplot(forecast(fit.nnetar.noncovid,h=700,lambda=0)) + 
+  ggtitle("Neural Network Autoregression Forecasting Model of Daily Crashes (Without Pandemic Data)")
+
+#NNAR method forecasting monthly crashes (with pandemic data)
+fit.nnetar.monthly <- nnetar(crashes_mts4, lambda=0)
+
+summary(fit.nnetar.monthly)
+
+forecast(fit.nnetar.monthly, h=20)
+
+autoplot(forecast(fit.nnetar.monthly,h=20,lambda=0)) + 
+  scale_x_continuous(breaks = c(1,2,3,4,5,6,7, 8, 9), 
+                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
+                                "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022", 
+                                "Jan 2023")) + 
+  theme(axis.text.x = element_text(angle = 90))
+
+#NNAR method forecasting monthly crashes (without pandemic data)
+fit.nnetar.monthly.noncovid <- nnetar(crashes_mts4.noncovid, lambda=0)
+
+summary(fit.nnetar.monthly.noncovid)
+
+forecast(fit.nnetar.monthly.noncovid, h=25)
+
+autoplot(forecast(fit.nnetar.monthly.noncovid,h=25,lambda=0)) + 
+  scale_x_continuous(breaks = c(1,2,3,4,5,6,7, 8), 
+                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
+                                "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022")) + 
+  theme(axis.text.x = element_text(angle = 90))
+
+##Comparing Models 
+
+#Basic 2015-2019 daily ts 
+crashes_ts.2019 = crashes %>%
+  filter(as.Date(crash_date) >= "2015/01/01" & as.Date(crash_date) <= "2019/12/31") %>%
+  separate(crash_date, 
+           into = c("Date", "Hour"), sep = 11) %>%
+  group_by(Date) %>%
+  summarize(count = length(unique(key_crash)))
+
+crashes_ts.2019 %>%
+  filter(as.Date(Date) >= "2015/01/01") %>%
+  ggplot(aes(x = as.Date(Date), y = count)) + 
+  geom_line() + 
+  scale_x_date(date_labels = "%m-%Y", date_breaks = "6 month") + 
+  theme(axis.text.x = element_text(angle = 90))
+
+#Linear model 2015-2019 daily ts 
+crashests.2019 <- ts(crashes_ts.2019$count, start = c(2015,1), end = c(2019,365),
+                     frequency = 365)
+
+crashests.2019.2 <- as.ts(crashes_ts.noncovid, start = c(2015,1), end = c(2020,365), 
+                          frequency = 365)
+
+fit.crashes.2019.2 <- tslm(count ~ Date, data=crashests.2019.2)
+summary(fit.crashes.2019.2)
+
+autoplot(crashests.2019.2[,'count'], series="Data") +
+  autolayer(fitted(fit.crashes.2019.2), series="Fitted") +
+  xlab("Date") + ylab("") +
+  ggtitle("2015-2019 Number of Daily Car Crashes") +
+  guides(colour=guide_legend(title=" ")) + 
+  scale_x_continuous(breaks = c(0, 365, 731, 1096, 1461, 1826), 
+                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
+                                "Jan 2019", "Jan 2020")) + 
+  theme(axis.text.x = element_text(angle = 90))
+
+#Holtwinters 2015-2019 daily ts 
+twentynineteen <- HoltWinters(crashests.2019)
+
+summary(twentynineteen)
+
+plot(fitted(twentynineteen), main = "Box Jenkins Decomposition of Daily Crashes") 
+
+fcast.2019 <- forecast(noncovid, 10)
+
+summary(fcast.2019)
+
+autoplot(fcast.2019) +
+  ggtitle("2015-2019 Forecasts of Daily Car Crashes Using HoltWinters") +
+  xlab("Year") + ylab("Crashes")
+
+#Stlf model 2015-2019 daily ts 
+crashests.2019 %>% mstl() %>%
+  autoplot()
+
+p <- crashests.2019 %>%
+  stlf(lambda = 0, h = 200) 
+
+p %>%
+  autoplot() + 
+  ggtitle("2015-2019 Seasonal and Trend Decomposition Using Loess Forecasting Model for Daily Car Crashes") +
+  xlab("Year") + ylab("Daily Crashes")
+
+p %>% summary()
+
+#2015-2016 monthly ts 
+crashes_mts.2019 = crashes %>%
+  filter(as.Date(crash_date) >= "2015/01/01" & as.Date(crash_date) <= "2019/12/31") %>%
+  separate(crash_date, 
+           into = c("Date", "Hour"), sep = 11) %>%
+  group_by(Date) %>%
+  summarize(count = length(unique(key_crash))) %>%
+  separate(Date, into = c("Year", "Month", "Day"), sep = "/") %>%
+  group_by(Year, Month) %>%
+  summarise(mcount = sum(count)) %>%
+  tidyr::spread(key=Month, value=mcount)
+
+crashes_mts.2019 = as.data.frame(crashes_mts.2019)
+
+rownames(crashes_mts.2019) = seq(2015, 2019)
+
+crashes_mts3.2019 = crashes_mts.2019 %>%
+  select(02:13)
+
+crashes_mts2.2019 <- ts(c(t(crashes_mts3.2019)), frequency=12)
+
+crashes_mts4.2019 <- window(crashes_mts2.2019, start=c(1,01), end=c(5,12), 
+                            frequency=12)
+
+#Linear model 2015-2019 monthly ts 
+fit.crashes.2019 <- tslm(crashes_mts4.2019 ~ trend + season)
+
+summary(fit.crashes.2019)
+
+fcast.2019 <- forecast::forecast(fit.crashes.2019)
+
+summary(fcast.2019)
+
+autoplot(fcast.2019) +
+  ggtitle("2015-2019 Forecasts of Monthly Car Crashes Using Linear Model") +
+  xlab("Year") + ylab("Monthly Crashes")
+
+#Holtwinters model 2015-2019 monthly ts 
+covid.monthly.2019 <- HoltWinters(crashes_mts4.2019)
+
+summary(covid.monthly.2019)
+
+plot(fitted(covid.monthly.2019), main = "2015-2019 Box Jenkins Decomposition of Monthly Crashes") 
+
+fcast.covid.monthly.2019 <- forecast(covid.monthly.2019, 10)
+
+summary(fcast.covid.monthly.2019)
+
+autoplot(fcast.covid.monthly.2019) +
+  ggtitle("Forecasts of Monthly Car Crashes Using HoltWinters") +
+  xlab("Year") + ylab("Crashes")
+
+#STLF model 2015-2019 monthly ts
+crashes_mts4.2019 %>% mstl() %>%
+  autoplot()
+
+t <- crashes_mts4.2019 %>%
+  stlf(lambda = 0, h = 20) 
+
+t %>%
+  autoplot() + 
+  ggtitle("2015-2019 Seasonal and Trend Decomposition Using Loess Forecasting Model for Monthly Car Crashes") +
+  xlab("Year") + ylab("Daily Crashes")
+
+t %>% summary()
 
 ##Statistical Analyses - ANOVA
 
