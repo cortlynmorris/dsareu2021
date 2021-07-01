@@ -1219,40 +1219,6 @@ crashes_annual %>%
   theme(axis.text.x = element_text(angle = 90)) +
   facet_wrap(~Year, scales = "free_x")
 
-#Forecasting attempt with Dr. Mostafa (does not work)
-library(zoo)
-zoo(crashes_ts, seq(from = as.Date("2015-01-01"), to = as.Date("2021-05-31"), by = 1))
-
-ts_crashes <- window(as.ts(crashes_ts$Date), start=2015)
-
-ts_crashes <- ts(data = crashes_ts, start = 1, frequency = 365)
-
-fit1 <- HoltWinters(ts_crashes)
-
-fit1
-
-plot(forecast(fit1))
-
-fit.crashes <- tslm(ts_crashes ~ trend)
-fcast <- forecast(fit.crashes)
-autoplot(fcast) +
-  ggtitle("Forecasts of daily number of car crashes in Wake County, NC using regression") +
-  xlab("Year") + ylab("number of crashes per day")
-
-
-ts_crashes2 <- window(as.ts(crashes_ts$Date), start=2015/01/01)
-fit <- HoltWinters(ts_crashes2, beta=FALSE, gamma=FALSE)
-
-crash_count <- crashes_ts %>%
-  group_by(Date)
-
-ts_crashes <- window(as.ts(crash_count), start=2015)
-fit.crashes <- tslm(ts_crashes ~ trend + season)
-fcast <- forecast(fit.crashes)
-autoplot(fcast) +
-  ggtitle("Forecasts of daily number of car crashes in Wake County, NC using regression") +
-  xlab("Year") + ylab("number of crashes per day")
-
 #Different attempt at forecasting daily (THIS WORKS) 
 #Loading necessary packages 
 library(forecast)
@@ -1276,14 +1242,18 @@ crashests <- as.ts(crashes_ts)
 
 #Least squares estimation
 fit.crashes2 <- tslm(count ~ Date, data=crashests)
-summary(fit.crashes)
+summary(fit.crashes2)
 
 #Fitted values (linear plot through ts)
 autoplot(crashests[,'count'], series="Data") +
   autolayer(fitted(fit.crashes2), series="Fitted") +
   xlab("Date") + ylab("") +
   ggtitle("Number of Daily") +
-  guides(colour=guide_legend(title=" "))
+  guides(colour=guide_legend(title=" ")) + 
+  scale_x_continuous(breaks = c(0, 365, 731, 1096, 1461, 1826, 2192), 
+                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
+                                "Jan 2019", "Jan 2020", "Jan 2021")) + 
+  theme(axis.text.x = element_text(angle = 90))
 
 #Prediction with HoltWinters() and plotting forecast
 m <- HoltWinters(crashests2)
@@ -1421,8 +1391,6 @@ autoplot(fcast.noncovid) +
   scale_x_discrete(breaks = seq.Date(from = as.Date("2015-01-01"), 
                                        to = as.Date("2020-02-01"), 
                                        by = "month"))
-#find way to rename x axes for time series forecasts
-
 
 ##Statistical Analyses - ANOVA
 
