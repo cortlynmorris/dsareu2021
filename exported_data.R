@@ -333,7 +333,44 @@ crashes %>%
   coord_flip() + 
   labs(title = "Injury Frequency by Contributing Circumstance",
        x = "Contributing Circumstance",
-       y = "Percentage")
+       y = "Percentage") + 
+  scale_x_discrete(labels = c("Alcohol use", 
+                              "Going wrong way",
+                              "Disregarded other traffic signs",
+                              "Disregarded road markings",
+                              "Disregarded stop sign",
+                              "Disregarded traffic signals",
+                              "Disregarded yield sign", 
+                              "Driver distracted",
+                              "Driver distracted by communication device",
+                              "Driver distracted by external distraction", 
+                              "Driver distracted by electronic",
+                              "Driver distracted by passenger", 
+                              "Drug use", 
+                              "Exceeded speed limit",
+                              "Exceeded safe speed", 
+                              "Failed to yield", 
+                              "Failure to reduce speed",
+                              "Followed too closely",
+                              "Improper backing",
+                              "Improper lane change", 
+                              "Improper or no signal",
+                              "Improper parking",
+                              "Improper turn",
+                              "Inattention",
+                              "No contributing circumstance",
+                              "Operated defective equipment", 
+                              "Erratic, reckless, negligent", 
+                              "Other improper passing", 
+                              "Other*",
+                              "Overcorrected/oversteered",
+                              "Passed on curve",  
+                              "Passed on hill",
+                              "Passed stopped school bus", 
+                              "Right turn on red",
+                              "Swerved or avoided",  
+                              "Use of improper lane",
+                              "Visibility obstructed"))
 
 crashes %>%
   filter(Injury != "NA", Injury != "Unknown", PersonType != "NA", 
@@ -534,7 +571,8 @@ crashes %>%
        y = "Count (log10 Scale)")
 
 crashes %>% 
-  filter(ContributingCircumstance1 != "NA", ContributingCircumstance1 != "Unknown") %>%
+  filter(ContributingCircumstance1 != "NA", ContributingCircumstance1 != "Unknown", 
+         ContributingCircumstance1 != "Unable to determine") %>%
   count(ContributingCircumstance1) %>% 
   mutate(logtrans = round(log10(n), digits = 2), 
          ContributingCircumstance1 = reorder(ContributingCircumstance1,logtrans)) %>% 
@@ -544,11 +582,49 @@ crashes %>%
   coord_flip() +
   labs(title = "Frequency of Crashes by Contributing Circumstance 1",
        x = "Contributing Circumstance 1",
-       y = "Count (log10 Scale)")
+       y = "Count (log10 Scale)") + 
+  scale_x_discrete(labels = c("Passed on hill", 
+                              "Passed on curve",  
+                              "Passed stopped school bus",
+                              "Driver distracted by electronic", 
+                              "Improper or no signal",
+                              "Driver distracted by external distraction",
+                              "Right turn on red",
+                              "Drug use",
+                              "Disregarded yield sign", 
+                              "Driver distracted by communication device", 
+                              "Driver distracted by passenger", 
+                              "Visibility obstructed",
+                              "Disregarded other traffic signs", 
+                              "Driver distracted", 
+                              "Disregarded road markings",
+                              "Operated defective equipment",
+                              "Exceeded speed limit",
+                              "Disregarded stop sign",
+                              "Going wrong way", 
+                              "Use of improper lane",
+                              "Alcohol use", 
+                              "Other improper passing", 
+                              "Followed too closely", 
+                              "Swerved or avoided",
+                              "Overcorrected/oversteered",
+                              "Erratic, reckless, negligent", 
+                              "Other*",
+                              "Disregarded traffic signals",
+                              "Exceeded safe speed",
+                              "Improper parking",
+                              "Improper turn",
+                              "Improper lane change",
+                              "Improper backing",
+                              "Failed to yield", 
+                              "Inattention", 
+                              "Failure to reduce speed",
+                              "No contributing circumstance"))
 
 crashes %>% 
   filter(ContributingCircumstance2 != "NA", 
-         ContributingCircumstance2 != "Unknown") %>%
+         ContributingCircumstance2 != "Unknown", 
+         ContributingCircumstance2 != "Unable to determine") %>%
   count(ContributingCircumstance2) %>% 
   mutate(logtrans = round(log10(n), digits = 2), 
          ContributingCircumstance2 = reorder(ContributingCircumstance2,
@@ -560,11 +636,49 @@ crashes %>%
   coord_flip() +
   labs(title = "Frequency of Crashes by Contributing Circumstance 2",
        x = "Contributing Circumstance 2",
-       y = "Count (log10 Scale)")
+       y = "Count (log10 Scale)") + 
+  scale_x_discrete(labels = c("Passed on curve",  
+                              "Passed on hill", 
+                              "Passed stopped school bus",
+                              "Disregarded yield sign", 
+                              "Improper or no signal",
+                              "Right turn on red",
+                              "Disregarded other traffic signs", 
+                              "Disregarded stop sign",
+                              "Driver distracted by external distraction",
+                              "Driver distracted by electronic", 
+                              "Disregarded road markings",
+                              "Drug use",
+                              "Visibility obstructed",
+                              "Swerved or avoided",
+                              "Other improper passing",
+                              "Exceeded speed limit",
+                              "Use of improper lane",
+                              "Driver distracted by communication device", 
+                              "Driver distracted by passenger", 
+                              "Operated defective equipment",
+                              "Improper parking",
+                              "No contributing circumstance", 
+                              "Disregarded traffic signals",
+                              "Other*",
+                              "Driver distracted", 
+                              "Going wrong way",
+                              "Exceeded safe speed",
+                              "Followed too closely", 
+                              "Overcorrected/oversteered",
+                              "Improper turn",
+                              "Alcohol use", 
+                              "Improper lane change",
+                              "Erratic, reckless, negligent", 
+                              "Improper backing",
+                              "Failed to yield",
+                              "Failure to reduce speed",
+                              "Inattention"))
 
 crashes %>% 
   filter(ContributingCircumstance3 != "NA", 
-         ContributingCircumstance3 != "Unknown") %>%
+         ContributingCircumstance3 != "Unknown", 
+         ContributingCircumstance3 != "Unable to determine") %>%
   count(ContributingCircumstance3) %>% 
   mutate(logtrans = round(log10(n), digits = 2), 
          ContributingCircumstance3 = 
@@ -576,7 +690,43 @@ crashes %>%
   coord_flip() +
   labs(title = "Frequency of Crashes by Contributing Circumstance 3",
        x = "Contributing Circumstance 3",
-       y = "Count (log10 Scale)")
+       y = "Count (log10 Scale)") + 
+  scale_x_discrete(labels = c("Passed on hill", 
+                              "Right turn on red",
+                              "Passed on curve", 
+                              "Disregarded yield sign", 
+                              "Improper or no signal",
+                              "Disregarded other traffic signs", 
+                              "Disregarded stop sign",
+                              "Improper parking",
+                              "No contributing circumstance", 
+                              "Disregarded road markings",
+                              "Visibility obstructed",
+                              "Driver distracted by electronic",
+                              "Swerved or avoided",
+                              "Exceeded speed limit",
+                              "Driver distracted by external distraction",
+                              "Operated defective equipment",
+                              "Other improper passing",
+                              "Use of improper lane",
+                              "Disregarded traffic signals",
+                              "Exceeded safe speed",
+                              "Improper backing",
+                              "Driver distracted by communication device",
+                              "Going wrong way",
+                              "Driver distracted by passenger", 
+                              "Other*",
+                              "Improper lane change",
+                              "Drug use",
+                              "Improper turn",
+                              "Overcorrected/oversteered",
+                              "Driver distracted", 
+                              "Followed too closely", 
+                              "Failure to reduce speed",
+                              "Failed to yield",
+                              "Alcohol use", 
+                              "Erratic, reckless, negligent",
+                              "Inattention"))
 
 crashes %>% 
   filter(LocationRelationToRoad != "NA", LocationRelationToRoad != "Unknown") %>%
