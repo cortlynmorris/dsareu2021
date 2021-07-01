@@ -1698,8 +1698,10 @@ autoplot(crashests[,'count'], series="Data") +
   xlab("Date") + ylab("Count") +
   ggtitle("Number of Daily Car Crashes (With Pandemic Data)") +
   guides(colour=guide_legend(title=" ")) + 
-  scale_x_continuous(breaks = seq(as.Date("2015/01/01"), as.Date("2021/05/31"), 
-                                  "day"))
+  scale_x_continuous(breaks = c(0, 365, 731, 1096, 1461, 1826, 2192), 
+                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
+                                "Jan 2019", "Jan 2020", "Jan 2021")) + 
+  theme(axis.text.x = element_text(angle = 90))
 ```
 
 ### Time Series Plot for Frequency of Daily Crashes From January 2015 to May 2021 and Regression Line (Without Pandemic Data)
@@ -1723,8 +1725,10 @@ autoplot(crashests.noncovid2[,'count'], series="Data") +
   xlab("Date") + ylab("Count") +
   ggtitle("Number of Daily Car Crashes (Without Pandemic Data)") +
   guides(colour=guide_legend(title=" ")) + 
-  scale_x_continuous(breaks = seq(as.Date("2015/01/01"), as.Date("2021/05/31"), 
-                                  "day"))
+  scale_x_continuous(breaks = c(0, 365, 731, 1096, 1461, 1826, 2192), 
+                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
+                                "Jan 2019", "Jan 2020", "Jan 2021")) + 
+  theme(axis.text.x = element_text(angle = 90))
 ```
 
 ### Time Series Plot for Frequency of Daily Crashes Organized by Year From January 2015 to May 2021 (With Pandemic Data)
@@ -1865,8 +1869,11 @@ fcast <- forecast::forecast(fit.crashes)
 summary(fcast)
 
 autoplot(fcast) +
-  ggtitle("Forecasts of Monthly Car Crashes Using Linear Model (With Pandemic Data)") +
-  xlab("Year") + ylab("Monthly Crashes")
+  ggtitle("Forecasts of Monthly Car Crashes Using Linear Model (With Pandemic Data)") + xlab("Year") + ylab("Monthly Crashes") + 
+  scale_x_continuous(breaks = c(1,2,3,4,5,6,7,8), 
+                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
+                                "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022")) + 
+  theme(axis.text.x = element_text(angle = 90))
 ```
 
 ### Time Series Forecast of Monthly Crashes Using Linear Model (Without Pandemic Data)
@@ -1904,7 +1911,11 @@ summary(fcast.noncovid)
 
 autoplot(fcast.noncovid) +
   ggtitle("Forecasts of Monthly Car Crashes Using Linear Model (Without Pandemic Data)") +
-  xlab("Year") + ylab("Monthly Crashes")
+  xlab("Year") + ylab("Monthly Crashes") + 
+  scale_x_continuous(breaks = c(1,2,3,4,5,6,7), 
+                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
+                                "Jan 2019", "Jan 2020", "Jan 2021")) + 
+  theme(axis.text.x = element_text(angle = 90))
 ```
 
 ### Time Series Forecast of Monthly Crashes Using HoltWinters (With Pandemic Data)
@@ -1955,7 +1966,12 @@ t <- crashes_mts4 %>%
 t %>%
   autoplot() + 
   ggtitle("Seasonal and Trend Decomposition Using Loess Forecasting Model for Monthly Car Crashes (With Pandemic Data)") +
-  xlab("Year") + ylab("Crashes")
+  xlab("Year") + ylab("Crashes") + 
+  scale_x_continuous(breaks = c(1,2,3,4,5,6,7, 8, 9), 
+                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
+                                "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022", 
+                                "Jan 2023")) + 
+  theme(axis.text.x = element_text(angle = 90))
 
 t %>% summary()
 ```
@@ -1972,7 +1988,11 @@ q <- crashes_mts4.noncovid %>%
 q %>%
   autoplot() + 
   ggtitle("Seasonal and Trend Decomposition Using Loess Forecasting Model for Monthly Car Crashes (Without Pandemic Data)") +
-  xlab("Year") + ylab("Crashes")
+  xlab("Year") + ylab("Crashes") + 
+  scale_x_continuous(breaks = c(1,2,3,4,5,6,7, 8), 
+                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
+                                "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022")) + 
+  theme(axis.text.x = element_text(angle = 90))
 
 q %>% summary()
 ```
@@ -2014,7 +2034,12 @@ summary(fit.nnetar.monthly)
 
 forecast(fit.nnetar.monthly, h=20)
 
-autoplot(forecast(fit.nnetar.monthly,h=20,lambda=0))
+autoplot(forecast(fit.nnetar.monthly,h=20,lambda=0)) + 
+  scale_x_continuous(breaks = c(1,2,3,4,5,6,7, 8, 9), 
+                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
+                                "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022", 
+                                "Jan 2023")) + 
+  theme(axis.text.x = element_text(angle = 90))
 ```
 
 ### Neural Network Autoregression Forecasting Model of Monthly Crashes (Without Pandemic Data)
@@ -2026,7 +2051,11 @@ summary(fit.nnetar.monthly.noncovid)
 
 forecast(fit.nnetar.monthly.noncovid, h=25)
 
-autoplot(forecast(fit.nnetar.monthly.noncovid,h=25,lambda=0))
+autoplot(forecast(fit.nnetar.monthly.noncovid,h=25,lambda=0)) + 
+  scale_x_continuous(breaks = c(1,2,3,4,5,6,7, 8), 
+                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
+                                "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022")) + 
+  theme(axis.text.x = element_text(angle = 90))
 ```
 
 ## Comparing Models 
@@ -2071,7 +2100,11 @@ autoplot(crashests.2019.2[,'count'], series="Data") +
   autolayer(fitted(fit.crashes.2019.2), series="Fitted") +
   xlab("Date") + ylab("") +
   ggtitle("2015-2019 Number of Daily Car Crashes") +
-  guides(colour=guide_legend(title=" "))
+  guides(colour=guide_legend(title=" ")) + 
+  scale_x_continuous(breaks = c(0, 365, 731, 1096, 1461, 1826), 
+                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
+                                "Jan 2019", "Jan 2020")) + 
+  theme(axis.text.x = element_text(angle = 90))
 ```
 
 ### 2015-2019 Time Series Forecast of Daily Crashes Using HoltWinters 
@@ -2111,7 +2144,7 @@ p %>% summary()
 
 ### 2015-2019 Monthly Time Series 
 
-```{r}
+```{r, message=FALSE}
 crashes_mts.2019 = crashes %>%
   filter(as.Date(crash_date) >= "2015/01/01" & as.Date(crash_date) <= "2019/12/31") %>%
   separate(crash_date, 
@@ -2149,7 +2182,12 @@ summary(fcast.2019)
 
 autoplot(fcast.2019) +
   ggtitle("2015-2019 Forecasts of Monthly Car Crashes Using Linear Model") +
-  xlab("Year") + ylab("Monthly Crashes")
+  xlab("Year") + ylab("Monthly Crashes") + 
+  scale_x_continuous(breaks = c(1,2,3,4,5,6,7), 
+                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
+                                "Jan 2019", "Jan 2020", "Jan 2021")) + 
+  theme(axis.text.x = element_text(angle = 90))
+  
 ```
 
 ### 2015-2019 Time Series Forecast of Monthly Crashes Using HoltWinters 
@@ -2182,7 +2220,11 @@ t <- crashes_mts4.2019 %>%
 t %>%
   autoplot() + 
   ggtitle("2015-2019 Seasonal and Trend Decomposition Using Loess Forecasting Model for Monthly Car Crashes") +
-  xlab("Year") + ylab("Daily Crashes")
+  xlab("Year") + ylab("Daily Crashes") + 
+  scale_x_continuous(breaks = c(1,2,3,4,5,6,7), 
+                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
+                                "Jan 2019", "Jan 2020", "Jan 2021")) + 
+  theme(axis.text.x = element_text(angle = 90))
 
 t %>% summary()
 ```
