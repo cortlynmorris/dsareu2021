@@ -1644,7 +1644,7 @@ summary(covid.monthly)
 
 plot(fitted(covid.monthly), main = "Box Jenkins Decomposition of Monthly Crashes (With Pandemic Data)") 
 
-fcast.covid.monthly <- forecast(covid.monthly, 20)
+fcast.covid.monthly <- forecast::forecast(covid.monthly, 20)
 
 summary(fcast.covid.monthly)
 
