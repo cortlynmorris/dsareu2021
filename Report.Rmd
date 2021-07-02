@@ -1957,7 +1957,7 @@ summary(covid)
 
 plot(fitted(covid), main = "Box Jenkins Decomposition of Daily Crashes (With Pandemic Data)")
 
-fcast <- forecast(covid, 210)
+fcast <- forecast::forecast(covid, 212)
 
 summary(fcast)
 
@@ -1973,7 +1973,7 @@ crashests2 %>% mstl() %>%
   autoplot()
 
 m <- crashests2 %>%
-  stlf(lambda = 0, h = 210) 
+  stlf(lambda = 0, h = 212) 
 
 m %>%
   autoplot() + 
@@ -1994,7 +1994,7 @@ summary(noncovid)
 
 plot(fitted(noncovid), main = "Box Jenkins Decomposition of Daily Crashes (Without Pandemic Data)") 
   
-fcast.noncovid <- forecast(noncovid, 700)
+fcast.noncovid <- forecast::forecast(noncovid, 671)
 
 summary(fcast)
 
@@ -2010,7 +2010,7 @@ crashests.noncovid %>% mstl() %>%
   autoplot()
 
 p <- crashests.noncovid %>%
-  stlf(lambda = 0, h = 700) 
+  stlf(lambda = 0, h = 671) 
 
 p %>%
   autoplot() + 
@@ -2058,7 +2058,7 @@ fit.crashes <- tslm(crashes_mts4 ~ trend + season)
 
 summary(fit.crashes)
 
-fcast <- forecast::forecast(fit.crashes)
+fcast <- forecast::forecast(fit.crashes, h=8)
 
 summary(fcast)
 
@@ -2099,17 +2099,18 @@ fit.crashes.noncovid <- tslm(crashes_mts4.noncovid ~ trend + season)
 
 summary(fit.crashes.noncovid)
 
-fcast.noncovid <- forecast::forecast(fit.crashes.noncovid)
+fcast.noncovid <- forecast::forecast(fit.crashes.noncovid, h=23)
 
 summary(fcast.noncovid)
 
 autoplot(fcast.noncovid) +
   ggtitle("Forecasts of Monthly Car Crashes Using Linear Model (Without Pandemic Data)") +
   xlab("Year") + ylab("Monthly Crashes") + 
-  scale_x_continuous(breaks = c(1,2,3,4,5,6,7), 
+  scale_x_continuous(breaks = c(1,2,3,4,5,6,7, 8), 
                      labels = c("Jan 2015", "Jan 2016", "Jan 2017", 
                                 "Jan 2018", 
-                                "Jan 2019", "Jan 2020", "Jan 2021")) + 
+                                "Jan 2019", "Jan 2020", "Jan 2021", 
+                                "Jan 2022")) + 
   theme(axis.text.x = element_text(angle = 90))
 ```
 
@@ -2168,16 +2169,15 @@ crashes_mts4 %>% mstl() %>%
   autoplot()
 
 t <- crashes_mts4 %>%
-  stlf(lambda = 0, h = 20) 
+  stlf(lambda = 0, h = 8) 
 
 t %>%
   autoplot() + 
   ggtitle("Seasonal and Trend Decomposition Using Loess Forecasting Model for Monthly Car Crashes (With Pandemic Data)") +
   xlab("Year") + ylab("Crashes") + 
-  scale_x_continuous(breaks = c(1,2,3,4,5,6,7, 8, 9), 
+  scale_x_continuous(breaks = c(1,2,3,4,5,6,7, 8), 
                      labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
-                                "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022", 
-                                "Jan 2023")) + 
+                                "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022")) + 
   theme(axis.text.x = element_text(angle = 90))
 
 t %>% summary()
@@ -2190,7 +2190,7 @@ crashes_mts4.noncovid %>% mstl() %>%
   autoplot()
 
 q <- crashes_mts4.noncovid %>%
-  stlf(lambda = 0, h = 25) 
+  stlf(lambda = 0, h = 23) 
 
 q %>%
   autoplot() + 
@@ -2213,9 +2213,9 @@ fit.nnetar <- nnetar(crashests2, lambda=0)
 
 summary(fit.nnetar)
 
-forecast(fit.nnetar, h=700)
+forecast::forecast(fit.nnetar, h=212)
 
-autoplot(forecast(fit.nnetar,h=700,lambda=0)) + 
+autoplot(forecast(fit.nnetar,h=212,lambda=0)) + 
   ggtitle("Neural Network Autoregression Forecasting Model of Daily Crashes (With Pandemic Data)")
 ```
 
@@ -2226,9 +2226,9 @@ fit.nnetar.noncovid <- nnetar(crashests.noncovid, lambda=0)
 
 summary(fit.nnetar.noncovid)
 
-forecast(fit.nnetar.noncovid, h=700)
+forecast::forecast(fit.nnetar.noncovid, h=30)
 
-autoplot(forecast(fit.nnetar.noncovid,h=700,lambda=0)) + 
+autoplot(forecast(fit.nnetar.noncovid,h=210,lambda=0)) + 
   ggtitle("Neural Network Autoregression Forecasting Model of Daily Crashes (Without Pandemic Data)")
 ```
 
@@ -2239,7 +2239,7 @@ fit.nnetar.monthly <- nnetar(crashes_mts4, lambda=0)
 
 summary(fit.nnetar.monthly)
 
-forecast(fit.nnetar.monthly, h=20)
+forecast::forecast(fit.nnetar.monthly, h=20)
 
 autoplot(forecast(fit.nnetar.monthly,h=20,lambda=0)) + 
   scale_x_continuous(breaks = c(1,2,3,4,5,6,7, 8, 9), 
@@ -2256,7 +2256,7 @@ fit.nnetar.monthly.noncovid <- nnetar(crashes_mts4.noncovid, lambda=0)
 
 summary(fit.nnetar.monthly.noncovid)
 
-forecast(fit.nnetar.monthly.noncovid, h=25)
+forecast::forecast(fit.nnetar.monthly.noncovid, h=25)
 
 autoplot(forecast(fit.nnetar.monthly.noncovid,h=25,lambda=0)) + 
   scale_x_continuous(breaks = c(1,2,3,4,5,6,7, 8), 
@@ -2295,7 +2295,7 @@ crashests.2019 <- ts(crashes_ts.2019$count, start = c(2015,1), end = c(2019,365)
                          frequency = 365)
 
 #Converting crashes_ts to a time series object 
-crashests.2019.2 <- as.ts(crashes_ts.noncovid, start = c(2015,1), end = c(2020,365), 
+crashests.2019.2 <- as.ts(crashes_ts.2019, start = c(2015,1), end = c(2019,365), 
                              frequency = 365)
 
 #Least squares estimation
@@ -2323,7 +2323,7 @@ summary(twentynineteen)
 
 plot(fitted(twentynineteen), main = "Box Jenkins Decomposition of Daily Crashes") 
 
-fcast.2019 <- forecast(noncovid, 10)
+fcast.2019 <- forecast::forecast(noncovid, 667)
 
 summary(fcast.2019)
 
@@ -2339,7 +2339,7 @@ crashests.2019 %>% mstl() %>%
   autoplot()
 
 p <- crashests.2019 %>%
-  stlf(lambda = 0, h = 200) 
+  stlf(lambda = 0, h = 366) 
 
 p %>%
   autoplot() + 
@@ -2383,7 +2383,7 @@ fit.crashes.2019 <- tslm(crashes_mts4.2019 ~ trend + season)
 
 summary(fit.crashes.2019)
 
-fcast.2019 <- forecast::forecast(fit.crashes.2019)
+fcast.2019 <- forecast::forecast(fit.crashes.2019, h=13)
 
 summary(fcast.2019)
 
@@ -2406,13 +2406,17 @@ summary(covid.monthly.2019)
 
 plot(fitted(covid.monthly.2019), main = "2015-2019 Box Jenkins Decomposition of Monthly Crashes") 
 
-fcast.covid.monthly.2019 <- forecast(covid.monthly.2019, 10)
+fcast.covid.monthly.2019 <- forecast::forecast(covid.monthly.2019, 13)
 
 summary(fcast.covid.monthly.2019)
 
 autoplot(fcast.covid.monthly.2019) +
   ggtitle("Forecasts of Monthly Car Crashes Using HoltWinters") +
-  xlab("Year") + ylab("Crashes")
+  xlab("Year") + ylab("Crashes") + 
+  scale_x_continuous(breaks = c(1,2,3,4,5,6,7), 
+                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
+                                "Jan 2019", "Jan 2020", "Jan 2021")) + 
+  theme(axis.text.x = element_text(angle = 90))
 ```
 
 ### 2015-2019 Seasonal and Trend Decomposition Using Loess Forecasting Model of Daily Crashes 
@@ -2422,7 +2426,7 @@ crashes_mts4.2019 %>% mstl() %>%
   autoplot()
 
 t <- crashes_mts4.2019 %>%
-  stlf(lambda = 0, h = 20) 
+  stlf(lambda = 0, h = 13) 
 
 t %>%
   autoplot() + 
