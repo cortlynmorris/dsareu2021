@@ -1644,13 +1644,17 @@ summary(covid.monthly)
 
 plot(fitted(covid.monthly), main = "Box Jenkins Decomposition of Monthly Crashes (With Pandemic Data)") 
 
-fcast.covid.monthly <- forecast::forecast(covid.monthly, 20)
+fcast.covid.monthly <- forecast::forecast(covid.monthly, 8)
 
 summary(fcast.covid.monthly)
 
 autoplot(fcast.covid.monthly) +
   ggtitle("Forecasts of Monthly Car Crashes Using HoltWinters (With Pandemic Data)") +
-  xlab("Year") + ylab("Crashes")
+  xlab("Year") + ylab("Crashes") +
+  scale_x_continuous(breaks = c(1,2,3,4,5,6,7, 8), 
+                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
+                                "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022")) + 
+  theme(axis.text.x = element_text(angle = 90))
 
 #Holtwinters with nonCOVID time series monthly (THIS Works)
 noncovid.monthly <- HoltWinters(crashes_mts4.noncovid)
@@ -1659,13 +1663,17 @@ summary(noncovid.monthly)
 
 plot(fitted(noncovid.monthly), main = "Box Jenkins Decomposition of Monthly Crashes (Without Pandemic Data)") 
 
-fcast.noncovid.monthly <- forecast(noncovid.monthly, 35)
+fcast.noncovid.monthly <- forecast::forecast(noncovid.monthly, 23)
 
 summary(fcast.noncovid.monthly)
 
 autoplot(fcast.noncovid.monthly) +
   ggtitle("Forecasts of Monthly Car Crashes Using HoltWinters (Without Pandemic Data)") +
-  xlab("Year") + ylab("Crashes")
+  xlab("Year") + ylab("Crashes") + 
+  scale_x_continuous(breaks = c(1,2,3,4,5,6,7, 8), 
+                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
+                                "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022")) + 
+  theme(axis.text.x = element_text(angle = 90))
 
 #Stlf Forecasting Model of Monthly Crashes (With Pandemic Data)
 crashes_mts4 %>% mstl() %>%
