@@ -21,34 +21,35 @@ library(ggrepel)
 library(ggthemes)
 library(maps)
 library(scales)
+library(zoo)
 ```
 
 ### Setting Working Directory
 
 ```{r}
-#setwd("/Users/cmorris/Desktop/dsreu2021/rstudiodirectory/ResearchProject")
+setwd("/Users/cmorris/Desktop/dsreu2021/rstudiodirectory/ResearchProject")
 ```
 
 ### Reading and Merging the Data
 
 ```{r, message=FALSE}
-#Code for Cortlyn's computer (Mac)
-# setwd("/Users/cmorris/Desktop/dsreu2021/rstudiodirectory/ResearchProject")
-# persons <- read.csv(file="Persons_Involved_in_Crashes.csv")
-# glimpse(persons)
-#  
-# locations <- read.csv(file="Reported_Crash_Locations.csv")
-# glimpse(locations)
-#  
-# crashes <- persons %>% left_join(locations, by="key_crash")
+ ##Code for Cortlyn's computer (Mac)
+setwd("/Users/cmorris/Desktop/dsreu2021/rstudiodirectory/ResearchProject")
+persons <- read.csv(file="Persons_Involved_in_Crashes.csv")
+glimpse(persons)
+  
+locations <- read.csv(file="Reported_Crash_Locations.csv")
+glimpse(locations)
+  
+ crashes <- persons %>% left_join(locations, by="key_crash")
 
 #Code for Kelly's computer (Windows)
 #library(readr)
-persons <- read_csv("~/NCAT REU/Mostafa/Data/Persons_Involved_in_Crashes.csv")
-
-locations <- read_csv("~/NCAT REU/Mostafa/Data/Reported_Crash_Locations.csv")
-
-crashes <- persons %>% left_join(locations, by="key_crash")
+#persons <- read_csv("~/NCAT REU/Mostafa/Data/Persons_Involved_in_Crashes.csv")
+#
+#locations <- read_csv("~/NCAT REU/Mostafa/Data/Reported_Crash_Locations.csv")
+#
+#crashes <- persons %>% left_join(locations, by="key_crash")
 
 # Code for Ayan's computer (Window)
 #library(readr)
