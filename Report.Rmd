@@ -1798,7 +1798,12 @@ crashes_ts %>%
   scale_x_date(date_labels = "%m-%Y", date_breaks = "6 month") + 
   theme(axis.text.x = element_text(angle = 90))
 ```
+
 ### Time Series Plot for Frequency of Daily Crashes With 7 Day Moving Average (With Pandemic Data)
+
+```{r}
+library(zoo)
+```
 
 ```{r}
 crashes_ts %>%
@@ -1810,6 +1815,7 @@ crashes_ts %>%
   theme(axis.text.x = element_text(angle = 90)) + 
   ggtitle("Time Series Plot for Frequency of Daily Crashes With 7 Day Moving Average (With Pandemic Data)")
 ```
+
 ### Time Series Plot for Frequency of Daily Crashes With 30 Day Moving Average (With Pandemic Data)
 
 ```{r}
