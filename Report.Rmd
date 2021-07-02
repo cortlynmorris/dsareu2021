@@ -1776,7 +1776,7 @@ location_road_name_at_freq %>%
 
 ## Visualizing Data Using Time Series Plots
 
-### Time Series Plot for Frequency of Daily Crashes From January 2015 to May 2021 (With Pandemic Data)
+### Time Series Plot for Frequency of Daily Crashes (With Pandemic Data)
 
 From the plot, we see that there are major spikes around March 2015, late October 2015, and December 2016. The two latter spikes may be related to the popular holidays, Halloween and Christmas. 
 
@@ -1798,8 +1798,45 @@ crashes_ts %>%
   scale_x_date(date_labels = "%m-%Y", date_breaks = "6 month") + 
   theme(axis.text.x = element_text(angle = 90))
 ```
+### Time Series Plot for Frequency of Daily Crashes With 7 Day Moving Average (With Pandemic Data)
 
-### Time Series Plot for Frequency of Daily Crashes From January 2015 to May 2021 (Without Pandemic Data)
+```{r}
+crashes_ts %>%
+  filter(as.Date(Date) >= "2015/01/01") %>%
+  ggplot(aes(x = as.Date(Date), y = count)) + 
+  geom_line() +
+  geom_line(aes(y=rollmean(count, 7, na.pad = TRUE)), color = "red") +
+  scale_x_date(date_labels = "%m-%Y", date_breaks = "6 month") + 
+  theme(axis.text.x = element_text(angle = 90)) + 
+  ggtitle("Time Series Plot for Frequency of Daily Crashes With 7 Day Moving Average (With Pandemic Data)")
+```
+### Time Series Plot for Frequency of Daily Crashes With 30 Day Moving Average (With Pandemic Data)
+
+```{r}
+crashes_ts %>%
+  filter(as.Date(Date) >= "2015/01/01") %>%
+  ggplot(aes(x = as.Date(Date), y = count)) + 
+  geom_line() +
+  geom_line(aes(y=rollmean(count, 30, na.pad = TRUE)), color = "red") +
+  scale_x_date(date_labels = "%m-%Y", date_breaks = "6 month") + 
+  theme(axis.text.x = element_text(angle = 90)) + 
+  ggtitle("Time Series Plot for Frequency of Daily Crashes With 30 Day Moving Average (With Pandemic Data)")
+```
+
+### Time Series Plot for Frequency of Daily Crashes With 100 Day Moving Average (With Pandemic Data)
+
+```{r}
+crashes_ts %>%
+  filter(as.Date(Date) >= "2015/01/01") %>%
+  ggplot(aes(x = as.Date(Date), y = count)) + 
+  geom_line() +
+  geom_line(aes(y=rollmean(count, 100, na.pad = TRUE)), color = "red") +
+  scale_x_date(date_labels = "%m-%Y", date_breaks = "6 month") + 
+  theme(axis.text.x = element_text(angle = 90)) + 
+  ggtitle("Time Series Plot for Frequency of Daily Crashes with 100 Day Moving Average (with Pandemic Data)")
+```
+
+### Time Series Plot for Frequency of Daily Crashes (Without Pandemic Data)
 
 ```{r}
 crashes_ts.noncovid = crashes %>%
