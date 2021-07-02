@@ -1385,7 +1385,28 @@ crashes_ts %>%
   geom_line() +
   geom_line(aes(y=rollmean(count, 7, na.pad = TRUE)), color = "red") +
   scale_x_date(date_labels = "%m-%Y", date_breaks = "6 month") + 
-  theme(axis.text.x = element_text(angle = 90))
+  theme(axis.text.x = element_text(angle = 90)) + 
+  ggtitle("Time Series Plot for Frequency of Daily Crashes With 7 Day Moving Average (With Pandemic Data)")
+
+#30 day moving average 
+crashes_ts %>%
+  filter(as.Date(Date) >= "2015/01/01") %>%
+  ggplot(aes(x = as.Date(Date), y = count)) + 
+  geom_line() +
+  geom_line(aes(y=rollmean(count, 30, na.pad = TRUE)), color = "red") +
+  scale_x_date(date_labels = "%m-%Y", date_breaks = "6 month") + 
+  theme(axis.text.x = element_text(angle = 90)) + 
+  ggtitle("Time Series Plot for Frequency of Daily Crashes With 30 Day Moving Average (With Pandemic Data)")
+
+#100 day moving average 
+crashes_ts %>%
+  filter(as.Date(Date) >= "2015/01/01") %>%
+  ggplot(aes(x = as.Date(Date), y = count)) + 
+  geom_line() +
+  geom_line(aes(y=rollmean(count, 100, na.pad = TRUE)), color = "red") +
+  scale_x_date(date_labels = "%m-%Y", date_breaks = "6 month") + 
+  theme(axis.text.x = element_text(angle = 90)) + 
+  ggtitle("Time Series Plot for Frequency of Daily Crashes With 100 Day Moving Average (With Pandemic Data)")
 
 # Annual crashes time series
 crashes_annual %>%
