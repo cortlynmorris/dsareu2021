@@ -2442,7 +2442,7 @@ t %>% summary()
 
 ## Statistical Analyses Using ANOVA
 
-###Is there a significant difference between the amount of crashes on each DOW?
+### Is there a significant difference between the amount of crashes on each DOW?
 
 ```{r}
 crashes_dow = crashes %>%
