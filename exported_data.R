@@ -1692,7 +1692,6 @@ t %>%
                                 "Jan 2023")) + 
   theme(axis.text.x = element_text(angle = 90))
 
-
 t %>% summary()
 
 #Stlf Forecasting Model of Monthly Crashes (Without Pandemic Data)
