@@ -1465,7 +1465,10 @@ plot(fitted(covid), main = "Box Jenkins Decomposition of Daily Crashes (With Pan
 
 fcast <- forecast::forecast(covid, 210)
 
-summary(fcast)
+daily_forecast_values_covid_HW <- summary(fcast)
+
+rownames(daily_forecast_values_covid_HW) <- seq(as.Date("2021/06/01"), 
+                                                as.Date("2021/12/27"), "day")
 
 autoplot(fcast) +
   ggtitle("Forecasts of Daily Car Crashes Using Holt Winters (With Pandemic Data)") +
