@@ -1414,6 +1414,7 @@ crashes_annual %>%
   ggplot(aes(x = as.Date(Date), y = count)) + 
   ggtitle("Time Series Plots for Frequency of Daily Crashes Organized by Year") + 
   geom_line() + 
+  geom_line(aes(y=rollmean(count, 7, na.pad = TRUE)), color = "red") +
   scale_x_date(date_labels = "%m-%Y", date_breaks = "1 month") + 
   xlab("Date") + ylab("Count") + 
   theme(axis.text.x = element_text(angle = 90)) +
@@ -1462,7 +1463,7 @@ summary(covid)
 
 plot(fitted(covid), main = "Box Jenkins Decomposition of Daily Crashes (With Pandemic Data)")
 
-fcast <- forecast(covid, 210)
+fcast <- forecast::forecast(covid, 210)
 
 summary(fcast)
 
@@ -1596,7 +1597,7 @@ autoplot(fcast) +
   scale_x_continuous(breaks = c(1,2,3,4,5,6,7,8), 
                      labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
                                 "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022")) + 
-  theme(axis.text.x = element_text(angle = 90))
+  theme(axis.text.x = element_text(angle = 90)) 
 
 #Linear model with non COVID time series monthly (THIS Works)
 crashes_mts.noncovid = crashes %>%
