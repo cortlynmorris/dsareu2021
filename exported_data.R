@@ -1851,8 +1851,14 @@ fcast.2019 <- forecast(twentynineteen, 61)
 twenty_nineteen_daily_forecast_values_HW <- summary(fcast.2019)
 
 rownames(twenty_nineteen_daily_forecast_values_HW) <- seq(as.Date("2020/01/01"), 
-                                                           as.Date("2020/03/01"), "day")
+                                                           as.Date("2020/03/01"), 
+                                                          "day")
+true_value = crashes_ts %>%
+  filter(Date >= as.Date("2020/01/01") & Date <= as.Date("2020/03/01"))
 
+twenty_nineteen_daily_forecast_values_HW <- twenty_nineteen_daily_forecast_values_HW %>%
+  mutate(true_count = true_value$count)
+                                                        
 autoplot(fcast.2019) +
   ggtitle("2015-2019 Forecasts of Daily Car Crashes Using HoltWinters") +
   xlab("Year") + ylab("Crashes")
@@ -1873,6 +1879,12 @@ twenty_nineteen_daily_forecast_values_STLF <- summary(p)
 
 rownames(twenty_nineteen_daily_forecast_values_STLF) <- seq(as.Date("2020/01/01"), 
                                                            as.Date("2020/03/01"), "day")
+
+true_value = crashes_ts %>%
+  filter(Date >= as.Date("2020/01/01") & Date <= as.Date("2020/03/01"))
+
+twenty_nineteen_daily_forecast_values_STLF <- twenty_nineteen_daily_forecast_values_STLF %>%
+  mutate(true_count = true_value$count)
 
 #2015-2016 monthly ts 
 crashes_mts.2019 = crashes %>%
