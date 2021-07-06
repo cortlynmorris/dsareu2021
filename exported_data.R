@@ -1423,7 +1423,6 @@ crashes_annual %>%
 #Different attempt at forecasting daily (THIS WORKS) 
 #Loading necessary packages 
 library(forecast)
-library(fpp2)
 library(TTR)
 
 ##Working with entire time series (THIS WORKS)
@@ -1463,12 +1462,14 @@ summary(covid)
 
 plot(fitted(covid), main = "Box Jenkins Decomposition of Daily Crashes (With Pandemic Data)")
 
-fcast <- forecast::forecast(covid, 210)
+fcast <- forecast::forecast(covid, 214)
 
 daily_forecast_values_covid_HW <- summary(fcast)
 
 rownames(daily_forecast_values_covid_HW) <- seq(as.Date("2021/06/01"), 
-                                                as.Date("2021/12/27"), "day")
+                                                as.Date("2021/12/31"), "day")
+
+daily_forecast_values_covid_HW
 
 autoplot(fcast) +
   ggtitle("Forecasts of Daily Car Crashes Using Holt Winters (With Pandemic Data)") +
@@ -1479,19 +1480,22 @@ crashests2 %>% mstl() %>%
   autoplot()
 
 m <- crashests2 %>%
-  stlf(lambda = 0, h = 210) 
+  stlf(lambda = 0, h = 214) 
 
 m %>%
   autoplot() + 
   ggtitle("Seasonal and Trend Decomposition Using Loess Forecasting Model for Daily Car Crashes (With Pandemic Data)") +
   xlab("Year") + ylab("Crashes")
 
-m %>% summary()
+daily_forecast_values_covid_STLF <- summary(m)
+
+rownames(daily_forecast_values_covid_STLF) <- seq(as.Date("2021/06/01"), 
+                                                as.Date("2021/12/31"), "day")
 
 ####Working with non COVID time series daily (THIS WORKS)
 #Regular non COVID time series daily 
 crashes_ts.noncovid = crashes %>%
-  filter(as.Date(crash_date) >= "2015/01/01" & as.Date(crash_date) <= "2020/03/01") %>%
+  filter(as.Date(crash_date) >= "2015/01/01" & as.Date(crash_date) <= "2020/02/29") %>%
   separate(crash_date, 
            into = c("Date", "Hour"), sep = 11) %>%
   group_by(Date) %>%
@@ -1500,17 +1504,18 @@ crashes_ts.noncovid = crashes %>%
 crashes_ts.noncovid %>%
   filter(as.Date(Date) >= "2015/01/01") %>%
   ggplot(aes(x = as.Date(Date), y = count)) + 
-  ggtitle("Time Series Plot for Frequency of Daily Crashes (Without Pandemic Data") + xlab("Date") + ylab("Count") + 
+  ggtitle("Time Series Plot for Frequency of Daily Crashes (Without Pandemic Data") + 
+  xlab("Date") + ylab("Count") + 
   geom_line() + 
   scale_x_date(date_labels = "%m-%Y", date_breaks = "6 month") + 
   theme(axis.text.x = element_text(angle = 90))
 
 #Converting crashes_ts to a time series object 
-crashests.noncovid <- ts(crashes_ts.noncovid$count, start = c(2015,1), end = c(2020,59),
+crashests.noncovid <- ts(crashes_ts.noncovid$count, start = c(2015,1), end = c(2020,60),
                  frequency = 365)
 
 #Converting crashes_ts to a time series object 
-crashests.noncovid2 <- as.ts(crashes_ts.noncovid, start = c(2015,1), end = c(2020,59), 
+crashests.noncovid2 <- as.ts(crashes_ts.noncovid, start = c(2015,1), end = c(2020,60), 
                             frequency = 365)
 
 #Least squares estimation
@@ -1535,9 +1540,14 @@ summary(noncovid)
 
 plot(fitted(noncovid), main = "Box Jenkins Decomposition of Daily Crashes (Without Pandemic Data)") 
 
-fcast.noncovid <- forecast(noncovid, 700)
+fcast.noncovid <- forecast(noncovid, 671)
 
-summary(fcast)
+daily_forecast_values_noncovid_HW <- summary(fcast.noncovid)
+
+rownames(daily_forecast_values_noncovid_HW) <- seq(as.Date("2020/03/01"), 
+                                                  as.Date("2021/12/31"), "day")
+
+daily_forecast_values_noncovid_HW
 
 autoplot(fcast.noncovid) +
   ggtitle("Forecasts of Daily Car Crashes Using HoltWinters (Without Pandemic Data)") +
@@ -1548,18 +1558,21 @@ crashests.noncovid %>% mstl() %>%
   autoplot()
 
 p <- crashests.noncovid %>%
-  stlf(lambda = 0, h = 700) 
+  stlf(lambda = 0, h = 671) 
 
 p %>%
   autoplot() + 
   ggtitle("Seasonal and Trend Decomposition Using Loess Forecasting Model for Daily Car Crashes (Without Pandemic Data)") +
   xlab("Year") + ylab("Daily Crashes")
 
-p %>% summary()
+daily_forecast_values_noncovid_STLF <- summary(p)
+
+rownames(daily_forecast_values_noncovid_STLF) <- seq(as.Date("2020/03/01"), 
+                                                   as.Date("2021/12/31"), "day")
 
 ##Different attempt at forecasting for monthly (THIS WORKS)
-install.packages("Mcomp")
-install.packages("smooth")
+#install.packages("Mcomp")
+#install.packages("smooth")
 library(Mcomp)
 library(smooth)
 
@@ -1590,9 +1603,13 @@ fit.crashes <- tslm(crashes_mts4 ~ trend + season)
 
 summary(fit.crashes)
 
-fcast <- forecast::forecast(fit.crashes)
+fcast <- forecast::forecast(fit.crashes, h=8)
 
-summary(fcast)
+monthly_forecast_values_covid_lin <- summary(fcast)
+
+rownames(monthly_forecast_values_covid_lin) <- seq(as.Date("2021/05/31"), 
+                                                     as.Date("2021/12/31"), 
+                                                   "month")
 
 autoplot(fcast) +
   ggtitle("Forecasts of Monthly Car Crashes Using Linear Model (With Pandemic Data)") +
@@ -1629,16 +1646,19 @@ fit.crashes.noncovid <- tslm(crashes_mts4.noncovid ~ trend + season)
 
 summary(fit.crashes.noncovid)
 
-fcast.noncovid <- forecast::forecast(fit.crashes.noncovid)
+fcast.noncovid <- forecast::forecast(fit.crashes.noncovid, h=23)
 
-summary(fcast.noncovid)
+monthly_forecast_values_noncovid_lin <- summary(fcast.noncovid)
+
+rownames(monthly_forecast_values_noncovid_lin) <- seq(as.Date("2020/02/29"), 
+                                                   as.Date("2021/12/31"), "month")
 
 autoplot(fcast.noncovid) +
   ggtitle("Forecasts of Monthly Car Crashes Using Linear Model (Without Pandemic Data)") +
   xlab("Year") + ylab("Monthly Crashes") +
-  scale_x_continuous(breaks = c(1,2,3,4,5,6,7), 
+  scale_x_continuous(breaks = c(1,2,3,4,5,6,7, 8), 
                      labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
-                                "Jan 2019", "Jan 2020", "Jan 2021")) + 
+                                "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022")) + 
   theme(axis.text.x = element_text(angle = 90))
 
 #Holtwinters with COVID time series monthly (THIS Works)
@@ -1650,7 +1670,10 @@ plot(fitted(covid.monthly), main = "Box Jenkins Decomposition of Monthly Crashes
 
 fcast.covid.monthly <- forecast::forecast(covid.monthly, 8)
 
-summary(fcast.covid.monthly)
+monthly_forecast_values_covid_HW <- summary(fcast.covid.monthly)
+
+rownames(monthly_forecast_values_covid_HW) <- seq(as.Date("2021/05/31"), 
+                                                      as.Date("2021/12/31"), "month")
 
 autoplot(fcast.covid.monthly) +
   ggtitle("Forecasts of Monthly Car Crashes Using HoltWinters (With Pandemic Data)") +
@@ -1669,7 +1692,10 @@ plot(fitted(noncovid.monthly), main = "Box Jenkins Decomposition of Monthly Cras
 
 fcast.noncovid.monthly <- forecast::forecast(noncovid.monthly, 23)
 
-summary(fcast.noncovid.monthly)
+monthly_forecast_values_noncovid_HW <- summary(fcast.noncovid.monthly)
+
+rownames(monthly_forecast_values_noncovid_HW) <- seq(as.Date("2020/02/29"), 
+                                                      as.Date("2021/12/31"), "month")
 
 autoplot(fcast.noncovid.monthly) +
   ggtitle("Forecasts of Monthly Car Crashes Using HoltWinters (Without Pandemic Data)") +
@@ -1684,7 +1710,7 @@ crashes_mts4 %>% mstl() %>%
   autoplot()
 
 t <- crashes_mts4 %>%
-  stlf(lambda = 0, h = 20) 
+  stlf(lambda = 0, h = 8) 
 
 t %>%
   autoplot() + 
@@ -1692,18 +1718,20 @@ t %>%
   xlab("Year") + ylab("Crashes") + 
   scale_x_continuous(breaks = c(1,2,3,4,5,6,7, 8, 9), 
                      labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
-                                "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022", 
-                                "Jan 2023")) + 
+                                "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022")) + 
   theme(axis.text.x = element_text(angle = 90))
 
-t %>% summary()
+monthly_forecast_values_covid_STLF <- summary(t)
+
+rownames(monthly_forecast_values_covid_STLF) <- seq(as.Date("2021/05/31"), 
+                                                     as.Date("2021/12/31"), "month")
 
 #Stlf Forecasting Model of Monthly Crashes (Without Pandemic Data)
 crashes_mts4.noncovid %>% mstl() %>%
   autoplot()
 
 q <- crashes_mts4.noncovid %>%
-  stlf(lambda = 0, h = 25) 
+  stlf(lambda = 0, h = 23) 
 
 q %>%
   autoplot() + 
@@ -1714,7 +1742,10 @@ q %>%
                                 "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022")) + 
   theme(axis.text.x = element_text(angle = 90))
 
-q %>% summary()
+monthly_forecast_values_noncovid_STLF <- summary(q)
+
+rownames(monthly_forecast_values_noncovid_STLF) <- seq(as.Date("2020/02/29"), 
+                                                     as.Date("2021/12/31"), "month")
 
 ##Advanced Forecasting Methods
 
@@ -1723,9 +1754,12 @@ fit.nnetar <- nnetar(crashests2, lambda=0)
 
 summary(fit.nnetar)
 
-forecast(fit.nnetar, h=700)
+daily_forecast_values_covid_NNAR <- summary(forecast(fit.nnetar, h=214))
 
-autoplot(forecast(fit.nnetar,h=700,lambda=0)) + 
+rownames(daily_forecast_values_covid_NNAR) <- seq(as.Date("2021/06/01"), 
+                                                       as.Date("2021/12/31"), "day")
+
+autoplot(forecast(fit.nnetar,h=214,lambda=0)) + 
   ggtitle("Neural Network Autoregression Forecasting Model of Daily Crashes (With Pandemic Data)")
 
 #NNAR method forecasting daily crashes (without pandemic data)
@@ -1733,9 +1767,12 @@ fit.nnetar.noncovid <- nnetar(crashests.noncovid, lambda=0)
 
 summary(fit.nnetar.noncovid)
 
-forecast(fit.nnetar.noncovid, h=700)
+daily_forecast_values_noncovid_NNAR <- summary(forecast(fit.nnetar.noncovid, h=671))
 
-autoplot(forecast(fit.nnetar.noncovid,h=700,lambda=0)) + 
+rownames(daily_forecast_values_noncovid_NNAR) <- seq(as.Date("2020/03/01"), 
+                                                  as.Date("2021/12/31"), "day")
+
+autoplot(forecast(fit.nnetar.noncovid,h=671,lambda=0)) + 
   ggtitle("Neural Network Autoregression Forecasting Model of Daily Crashes (Without Pandemic Data)")
 
 #NNAR method forecasting monthly crashes (with pandemic data)
@@ -1743,7 +1780,7 @@ fit.nnetar.monthly <- nnetar(crashes_mts4, lambda=0)
 
 summary(fit.nnetar.monthly)
 
-forecast(fit.nnetar.monthly, h=20)
+forecast(fit.nnetar.monthly, h=8)
 
 autoplot(forecast(fit.nnetar.monthly,h=20,lambda=0)) + 
   scale_x_continuous(breaks = c(1,2,3,4,5,6,7, 8, 9), 
@@ -1757,9 +1794,9 @@ fit.nnetar.monthly.noncovid <- nnetar(crashes_mts4.noncovid, lambda=0)
 
 summary(fit.nnetar.monthly.noncovid)
 
-forecast(fit.nnetar.monthly.noncovid, h=25)
+forecast(fit.nnetar.monthly.noncovid, h=23)
 
-autoplot(forecast(fit.nnetar.monthly.noncovid,h=25,lambda=0)) + 
+autoplot(forecast(fit.nnetar.monthly.noncovid,h=23,lambda=0)) + 
   scale_x_continuous(breaks = c(1,2,3,4,5,6,7, 8), 
                      labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
                                 "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022")) + 

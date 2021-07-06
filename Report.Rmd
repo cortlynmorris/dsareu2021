@@ -27,29 +27,29 @@ library(zoo)
 ### Setting Working Directory
 
 ```{r}
-setwd("/Users/cmorris/Desktop/dsreu2021/rstudiodirectory/ResearchProject")
+#setwd("/Users/cmorris/Desktop/dsreu2021/rstudiodirectory/ResearchProject")
 ```
 
 ### Reading and Merging the Data
 
 ```{r, message=FALSE}
  ##Code for Cortlyn's computer (Mac)
-setwd("/Users/cmorris/Desktop/dsreu2021/rstudiodirectory/ResearchProject")
-persons <- read.csv(file="Persons_Involved_in_Crashes.csv")
-glimpse(persons)
-  
-locations <- read.csv(file="Reported_Crash_Locations.csv")
-glimpse(locations)
-  
- crashes <- persons %>% left_join(locations, by="key_crash")
+# setwd("/Users/cmorris/Desktop/dsreu2021/rstudiodirectory/ResearchProject")
+# persons <- read.csv(file="Persons_Involved_in_Crashes.csv")
+# glimpse(persons)
+#   
+# locations <- read.csv(file="Reported_Crash_Locations.csv")
+# glimpse(locations)
+#   
+#  crashes <- persons %>% left_join(locations, by="key_crash")
 
 #Code for Kelly's computer (Windows)
 #library(readr)
-#persons <- read_csv("~/NCAT REU/Mostafa/Data/Persons_Involved_in_Crashes.csv")
-#
-#locations <- read_csv("~/NCAT REU/Mostafa/Data/Reported_Crash_Locations.csv")
-#
-#crashes <- persons %>% left_join(locations, by="key_crash")
+persons <- read_csv("~/NCAT REU/Mostafa/Data/Persons_Involved_in_Crashes.csv")
+
+locations <- read_csv("~/NCAT REU/Mostafa/Data/Reported_Crash_Locations.csv")
+
+crashes <- persons %>% left_join(locations, by="key_crash")
 
 # Code for Ayan's computer (Window)
 #library(readr)
@@ -1957,9 +1957,14 @@ summary(covid)
 
 plot(fitted(covid), main = "Box Jenkins Decomposition of Daily Crashes (With Pandemic Data)")
 
-fcast <- forecast::forecast(covid, 212)
+fcast <- forecast::forecast(covid, 214)
 
-summary(fcast)
+daily_forecast_values_covid_HW <- summary(fcast)
+
+rownames(daily_forecast_values_covid_HW) <- seq(as.Date("2021/06/01"), 
+                                                as.Date("2021/12/31"), "day")
+
+daily_forecast_values_covid_HW
 
 autoplot(fcast) +
   ggtitle("Forecasts of Daily Car Crashes Using Holt Winters (With Pandemic Data)") +
@@ -1973,14 +1978,19 @@ crashests2 %>% mstl() %>%
   autoplot()
 
 m <- crashests2 %>%
-  stlf(lambda = 0, h = 212) 
+  stlf(lambda = 0, h = 214) 
 
 m %>%
   autoplot() + 
   ggtitle("Seasonal and Trend Decomposition Using Loess Forecasting Model for Daily Car Crashes (With Pandemic Data)") +
   xlab("Year") + ylab("Crashes")
 
-m %>% summary()
+daily_forecast_values_covid_STLF <- summary(m)
+
+rownames(daily_forecast_values_covid_STLF) <- seq(as.Date("2021/06/01"), 
+                                                as.Date("2021/12/31"), "day")
+
+daily_forecast_values_covid_STLF
 ```
 
 ### Time Series Forecast of Daily Crashes (Without Pandemic Data)
@@ -1993,14 +2003,20 @@ noncovid <- HoltWinters(crashests.noncovid)
 summary(noncovid)
 
 plot(fitted(noncovid), main = "Box Jenkins Decomposition of Daily Crashes (Without Pandemic Data)") 
-  
-fcast.noncovid <- forecast::forecast(noncovid, 671)
 
-summary(fcast)
+fcast.noncovid <- forecast(noncovid, 671)
+
+daily_forecast_values_noncovid_HW <- summary(fcast.noncovid)
+
+rownames(daily_forecast_values_noncovid_HW) <- seq(as.Date("2020/03/01"), 
+                                                  as.Date("2021/12/31"), "day")
+
+daily_forecast_values_noncovid_HW
 
 autoplot(fcast.noncovid) +
   ggtitle("Forecasts of Daily Car Crashes Using HoltWinters (Without Pandemic Data)") +
   xlab("Year") + ylab("Crashes")
+
 ```
 
 #### STLF Forecast and Time Series (Without Pandemic Data)
@@ -2017,7 +2033,12 @@ p %>%
   ggtitle("Seasonal and Trend Decomposition Using Loess Forecasting Model for Daily Car Crashes (Without Pandemic Data)") +
   xlab("Year") + ylab("Daily Crashes")
 
-p %>% summary()
+daily_forecast_values_noncovid_STLF <- summary(p)
+
+rownames(daily_forecast_values_noncovid_STLF) <- seq(as.Date("2020/03/01"), 
+                                                   as.Date("2021/12/31"), "day")
+
+daily_forecast_values_noncovid_STLF
 ```
 
 ### Time Series Forecast of Monthly Crashes (With Pandemic Data)
@@ -2060,7 +2081,13 @@ summary(fit.crashes)
 
 fcast <- forecast::forecast(fit.crashes, h=8)
 
-summary(fcast)
+monthly_forecast_values_covid_lin <- summary(fcast)
+
+rownames(monthly_forecast_values_covid_lin) <- seq(as.Date("2021/05/31"), 
+                                                     as.Date("2021/12/31"), 
+                                                   "month")
+
+monthly_forecast_values_covid_lin
 
 autoplot(fcast) +
   ggtitle("Forecasts of Monthly Car Crashes Using Linear Model (With Pandemic Data)") + xlab("Year") + ylab("Monthly Crashes") + 
@@ -2101,7 +2128,13 @@ summary(fit.crashes.noncovid)
 
 fcast.noncovid <- forecast::forecast(fit.crashes.noncovid, h=23)
 
-summary(fcast.noncovid)
+monthly_forecast_values_noncovid_lin <- summary(fcast.noncovid)
+
+rownames(monthly_forecast_values_noncovid_lin) <- seq(as.Date("2020/02/29"), 
+                                                   as.Date("2021/12/31"),
+                                                   "month")
+
+monthly_forecast_values_noncovid_lin
 
 autoplot(fcast.noncovid) +
   ggtitle("Forecasts of Monthly Car Crashes Using Linear Model (Without Pandemic Data)") +
@@ -2125,16 +2158,20 @@ plot(fitted(covid.monthly), main = "Box Jenkins Decomposition of Monthly Crashes
 
 fcast.covid.monthly <- forecast::forecast(covid.monthly, 8)
 
-summary(fcast.covid.monthly)
+monthly_forecast_values_covid_HW <- summary(fcast.covid.monthly)
+
+rownames(monthly_forecast_values_covid_HW) <- seq(as.Date("2021/05/31"), 
+                                                      as.Date("2021/12/31"), 
+                                                  "month")
+
+monthly_forecast_values_covid_HW
 
 autoplot(fcast.covid.monthly) +
   ggtitle("Forecasts of Monthly Car Crashes Using HoltWinters (With Pandemic Data)") +
-  xlab("Year") + ylab("Crashes") + 
+  xlab("Year") + ylab("Crashes") +
   scale_x_continuous(breaks = c(1,2,3,4,5,6,7, 8), 
-                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", 
-                                "Jan 2018", 
-                                "Jan 2019", "Jan 2020", "Jan 2021", 
-                                "Jan 2022")) + 
+                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
+                                "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022")) + 
   theme(axis.text.x = element_text(angle = 90))
 ```
 
@@ -2149,16 +2186,20 @@ plot(fitted(noncovid.monthly), main = "Box Jenkins Decomposition of Monthly Cras
 
 fcast.noncovid.monthly <- forecast::forecast(noncovid.monthly, 23)
 
-summary(fcast.noncovid.monthly)
+monthly_forecast_values_noncovid_HW <- summary(fcast.noncovid.monthly)
+
+rownames(monthly_forecast_values_noncovid_HW) <- seq(as.Date("2020/02/29"), 
+                                                      as.Date("2021/12/31"), 
+                                                     "month")
+
+monthly_forecast_values_noncovid_HW
 
 autoplot(fcast.noncovid.monthly) +
   ggtitle("Forecasts of Monthly Car Crashes Using HoltWinters (Without Pandemic Data)") +
   xlab("Year") + ylab("Crashes") + 
   scale_x_continuous(breaks = c(1,2,3,4,5,6,7, 8), 
-                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", 
-                                "Jan 2018", 
-                                "Jan 2019", "Jan 2020", "Jan 2021", 
-                                "Jan 2022")) + 
+                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
+                                "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022")) + 
   theme(axis.text.x = element_text(angle = 90))
 ```
 
@@ -2175,12 +2216,17 @@ t %>%
   autoplot() + 
   ggtitle("Seasonal and Trend Decomposition Using Loess Forecasting Model for Monthly Car Crashes (With Pandemic Data)") +
   xlab("Year") + ylab("Crashes") + 
-  scale_x_continuous(breaks = c(1,2,3,4,5,6,7, 8), 
+  scale_x_continuous(breaks = c(1,2,3,4,5,6,7,8), 
                      labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
                                 "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022")) + 
   theme(axis.text.x = element_text(angle = 90))
 
-t %>% summary()
+monthly_forecast_values_covid_STLF <- summary(t)
+
+rownames(monthly_forecast_values_covid_STLF) <- seq(as.Date("2021/05/31"), 
+                                                     as.Date("2021/12/31"), "month")
+
+monthly_forecast_values_covid_STLF
 ```
 
 ### Seasonal and Trend Decomposition Using Loess Forecasting Model of Monthly Crashes (Without Pandemic Data)
@@ -2201,7 +2247,12 @@ q %>%
                                 "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022")) + 
   theme(axis.text.x = element_text(angle = 90))
 
-q %>% summary()
+monthly_forecast_values_noncovid_STLF <- summary(q)
+
+rownames(monthly_forecast_values_noncovid_STLF) <- seq(as.Date("2020/02/29"), 
+                                                     as.Date("2021/12/31"), "month")
+
+monthly_forecast_values_noncovid_STLF
 ```
 
 ## Advanced Forecasting Methods 
