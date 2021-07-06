@@ -2374,9 +2374,15 @@ summary(twentynineteen)
 
 plot(fitted(twentynineteen), main = "Box Jenkins Decomposition of Daily Crashes") 
 
-fcast.2019 <- forecast::forecast(noncovid, 667)
+fcast.2019 <- forecast(twentynineteen, 61)
 
-summary(fcast.2019)
+twenty_nineteen_daily_forecast_values_HW <- summary(fcast.2019)
+
+rownames(twenty_nineteen_daily_forecast_values_HW) <- seq(as.Date("2020/01/01"),
+                                                          as.Date("2020/03/01"),
+                                                          "day")
+
+twenty_nineteen_daily_forecast_values_HW
 
 autoplot(fcast.2019) +
   ggtitle("2015-2019 Forecasts of Daily Car Crashes Using HoltWinters") +
@@ -2390,14 +2396,18 @@ crashests.2019 %>% mstl() %>%
   autoplot()
 
 p <- crashests.2019 %>%
-  stlf(lambda = 0, h = 366) 
+  stlf(lambda = 0, h = 61) 
 
 p %>%
   autoplot() + 
   ggtitle("2015-2019 Seasonal and Trend Decomposition Using Loess Forecasting Model for Daily Car Crashes") +
   xlab("Year") + ylab("Daily Crashes")
 
-p %>% summary()
+twenty_nineteen_daily_forecast_values_STLF <- summary(p)
+
+rownames(twenty_nineteen_daily_forecast_values_STLF) <- seq(as.Date("2020/01/01"), as.Date("2020/03/01"), "day")
+
+twenty_nineteen_daily_forecast_values_STLF
 ```
 
 ### 2015-2019 Monthly Time Series 
@@ -2434,9 +2444,13 @@ fit.crashes.2019 <- tslm(crashes_mts4.2019 ~ trend + season)
 
 summary(fit.crashes.2019)
 
-fcast.2019 <- forecast::forecast(fit.crashes.2019, h=13)
+fcast.2019 <- forecast::forecast(fit.crashes.2019, h=3)
 
-summary(fcast.2019)
+twenty_nineteen_monthly_forecast_values_lin <- summary(fcast.2019)
+
+rownames(twenty_nineteen_monthly_forecast_values_lin) <- seq(as.Date("2020/01/01"), as.Date("2020/03/01"), "month")
+
+twenty_nineteen_monthly_forecast_values_lin
 
 autoplot(fcast.2019) +
   ggtitle("2015-2019 Forecasts of Monthly Car Crashes Using Linear Model") +
@@ -2457,9 +2471,14 @@ summary(covid.monthly.2019)
 
 plot(fitted(covid.monthly.2019), main = "2015-2019 Box Jenkins Decomposition of Monthly Crashes") 
 
-fcast.covid.monthly.2019 <- forecast::forecast(covid.monthly.2019, 13)
+fcast.covid.monthly.2019 <- forecast(covid.monthly.2019, 3)
 
-summary(fcast.covid.monthly.2019)
+twenty_nineteen_monthly_forecast_values_HW <- summary(fcast.covid.monthly.2019)
+
+rownames(twenty_nineteen_monthly_forecast_values_HW) <- seq(as.Date("2020/01/01"), 
+                                                           as.Date("2020/03/01"), "month")
+
+twenty_nineteen_monthly_forecast_values_HW
 
 autoplot(fcast.covid.monthly.2019) +
   ggtitle("Forecasts of Monthly Car Crashes Using HoltWinters") +
@@ -2477,7 +2496,7 @@ crashes_mts4.2019 %>% mstl() %>%
   autoplot()
 
 t <- crashes_mts4.2019 %>%
-  stlf(lambda = 0, h = 13) 
+  stlf(lambda = 0, h = 3) 
 
 t %>%
   autoplot() + 
@@ -2488,7 +2507,13 @@ t %>%
                                 "Jan 2019", "Jan 2020", "Jan 2021")) + 
   theme(axis.text.x = element_text(angle = 90))
 
-t %>% summary()
+twenty_nineteen_monthly_forecast_values_STLF <- summary(t)
+
+rownames(twenty_nineteen_monthly_forecast_values_STLF) <- seq(as.Date("2020/01/01"), 
+                                                           as.Date("2020/03/01"), "month")
+
+twenty_nineteen_daily_forecast_values_STLF
+
 ```
 
 ## Statistical Analyses Using ANOVA
