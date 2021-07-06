@@ -2,7 +2,10 @@
 title: "Visualizing, Modeling and Forecasting Crashes in Wake County, North Carolina"
 author: "Cortlyn Morris, Kelly Wentzlof, Ayan Gulzar"
 date: "6/11/2021"
-output: html_document
+output: 
+  html_document:
+    toc: true
+    theme: united
 ---
 
 ```{r setup, include=FALSE}
@@ -2504,7 +2507,7 @@ summary(twentynineteen)
 
 plot(fitted(twentynineteen), main = "Box Jenkins Decomposition of Daily Crashes") 
 
-fcast.2019 <- forecast(twentynineteen, 61)
+fcast.2019 <- forecast::forecast(twentynineteen, 61)
 
 twenty_nineteen_daily_forecast_values_HW <- summary(fcast.2019)
 
@@ -2612,7 +2615,7 @@ summary(covid.monthly.2019)
 
 plot(fitted(covid.monthly.2019), main = "2015-2019 Box Jenkins Decomposition of Monthly Crashes") 
 
-fcast.covid.monthly.2019 <- forecast(covid.monthly.2019, 3)
+fcast.covid.monthly.2019 <- forecast::forecast(covid.monthly.2019, 3)
 
 twenty_nineteen_monthly_forecast_values_HW <- summary(fcast.covid.monthly.2019)
 
@@ -2650,8 +2653,7 @@ t %>%
 
 twenty_nineteen_monthly_forecast_values_STLF <- summary(t)
 
-rownames(twenty_nineteen_monthly_forecast_values_STLF) <- seq(as.Date("2020/01/01"), 
-                                                           as.Date("2020/03/01"), "month")
+rownames(twenty_nineteen_monthly_forecast_values_STLF) <- seq(as.Date("2020/01/01"), as.Date("2020/03/01"), "month")
 
 twenty_nineteen_daily_forecast_values_STLF
 
