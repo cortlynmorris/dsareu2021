@@ -1962,6 +1962,8 @@ plot(fitted(covid), main = "Box Jenkins Decomposition of Daily Crashes (With Pan
 
 fcast <- forecast::forecast(covid, 214)
 
+fcast$method
+
 daily_forecast_values_covid_HW <- summary(fcast)
 
 rownames(daily_forecast_values_covid_HW) <- seq(as.Date("2021/06/01"), 
@@ -2139,6 +2141,8 @@ fit.crashes <- tslm(crashes_mts4 ~ trend + season)
 summary(fit.crashes)
 
 fcast <- forecast::forecast(fit.crashes, h=8)
+
+summary(fcast$model)
 
 monthly_forecast_values_covid_lin <- summary(fcast)
 
