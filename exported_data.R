@@ -1631,6 +1631,25 @@ autoplot(training_STLF_noncovid, series="Training data") +
 crashes.test_STLF_noncovid <- Arima(test_STLF_noncovid)
 accuracy(crashes.test_STLF_noncovid)
 
+##Forecast Combinations (daily covid)
+train <- length(crashests2) - 214
+h <- length(crashests2) - length(train)
+ETS <- forecast(ets(train), h=h)
+ARIMA <- forecast(auto.arima(train, lambda=0, biasadj=TRUE),h=h)
+#STL <- stlf(train, lambda=0, h=h, biasadj=TRUE)
+#NNAR <- forecast(nnetar(train), h=h)
+TBATS <- forecast(tbats(train, biasadj=TRUE), h=h)
+Combination <- (ETS[["mean"]] + ARIMA[["mean"]] + TBATS[["mean"]])/3
+
+#plot does not work ??
+autoplot(crashests2) +
+  autolayer(ETS, series="ETS") +
+  autolayer(ARIMA, series="ARIMA") +
+  autolayer(TBATS, series="TBATS") +
+  autolayer(Combination, series="Combination") +
+  xlab("Year") + ylab("Crashes") +
+  ggtitle("Crashes")
+
 ##Different attempt at forecasting for monthly (THIS WORKS)
 #install.packages("Mcomp")
 #install.packages("smooth")
