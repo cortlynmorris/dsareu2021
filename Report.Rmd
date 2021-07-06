@@ -14,7 +14,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ### Loading Necessary Packages
 
-```{r, message=FALSE, warning=FALSE}
+```{r, message=FALSE, warning=FALSE, echo=FALSE}
 library(reshape2)
 library(tidyverse)
 library(ggplot2)
@@ -29,7 +29,7 @@ library(zoo)
 
 ### Setting Working Directory
 
-```{r}
+```{r, echo=FALSE}
 #setwd("/Users/cmorris/Desktop/dsreu2021/rstudiodirectory/ResearchProject")
 ```
 
@@ -47,6 +47,17 @@ glimpse(locations)
 crashes <- persons %>% left_join(locations, by="key_crash")
 
 #Code for Kellys computer (Windows)
+ ##Code for Cortlyn's computer (Mac)
+# setwd("/Users/cmorris/Desktop/dsreu2021/rstudiodirectory/ResearchProject")
+# persons <- read.csv(file="Persons_Involved_in_Crashes.csv")
+# glimpse(persons)
+#   
+# locations <- read.csv(file="Reported_Crash_Locations.csv")
+# glimpse(locations)
+#   
+#  crashes <- persons %>% left_join(locations, by="key_crash")
+
+#Code for Kelly's computer (Windows)
 #library(readr)
 # persons <- read_csv("~/NCAT REU/Mostafa/Data/Persons_Involved_in_Crashes.csv")
 
@@ -65,11 +76,11 @@ crashes <- persons %>% left_join(locations, by="key_crash")
 
 ## Exploratory Data Analysis 
 
-### Frequency of Crashes by Vehicle Type
+### Univariate Explorations
 
 The highest frequency of crashes occur in a passenger car. However, this is not very surprising because passenger cars are relatively common. An interesting note is that sport utility vehicles have the second highest frequency of crashes, however, sport utility vehicles are not nearly as common of a car.
 
-```{r}
+```{r, echo=FALSE}
 crashes %>% 
   filter(VehicleType != "Unknown", VehicleType != "") %>%
   count(VehicleType) %>% 
@@ -84,11 +95,9 @@ crashes %>%
        y = "Count (log10 Scale)")
 ```
 
-### Frequency of Crashes by Weather Condition
-
 The highest frequency of crashes occur when the weather conditions are clear. This is not very surprising because in North Carolina, the majority of the time the weather is clear. An interesting note is that snow still has a relatively high frequency despite it snowing minimally in North Carolina. 
 
-```{r}
+```{r, echo=FALSE}
 crashes %>% 
   filter(WeatherCondition1 != "NA") %>%
   count(WeatherCondition1) %>% 
@@ -103,10 +112,9 @@ crashes %>%
        y = "Count (log10 Scale)")
 ```
 
-### Frequency of Crashes by Weather Condition and if Weather Contributed to Crash
-When looking at the weather conditions for only those crashesvwhere it was believed that weather was a contribution factor in the crash, we can see that rain jumps from third most frequent to first. This is not something unexpected because heavy rain conditions make driving much harder and can cause things such as hydroplaning to happen. Clear weather is now the second most common which is slightly surprising because clear weather is not typically associated with causing car crashes but since it is the most common weather type, we can better understand this conclusion. Although the order of which weather conditions are the most frequent when looking only at the crashes where the weather contributed, there is still the same number of weather types.
+When looking at the weather conditions for only those crashes where it was believed that weather was a contribution factor in the crash, we can see that rain jumps from third most frequent to first. This is not something unexpected because heavy rain conditions make driving much harder and can cause things such as hydroplaning to happen. Clear weather is now the second most common which is slightly surprising because clear weather is not typically associated with causing car crashes but since it is the most common weather type, we can better understand this conclusion. Although the order of which weather conditions are the most frequent when looking only at the crashes where the weather contributed, there is still the same number of weather types.
 
-```{r}
+```{r, echo=FALSE}
 crashes %>% 
   filter(WeatherCondition1 != "NA", WeatherContributedToCrash == "Yes") %>%
   count(WeatherCondition1) %>% 
@@ -122,11 +130,9 @@ crashes %>%
        y = "Count (log10 Scale)")
 ```
 
-### Frequency of Crashes by Traffic Control Type 
-
 The highest frequency of crashes occur when there is no traffic control present. Without a control present, drivers may be less confident in their actions. 
 
-```{r}
+```{r, echo=FALSE}
 crashes %>% 
   filter(TrafficControlType != "NA", TrafficControlType != "", 
          TrafficControlType != "NaN") %>%
@@ -142,11 +148,9 @@ crashes %>%
        y = "Count (log10 Scale)")
 ```
 
-### Frequency of crashes by road feature
-
 The highest frequency of crashes occur when there is no special road feature present. Without a road feature present, drivers may be less confident in their actions. 
 
-```{r}
+```{r, echo=FALSE}
 crashes %>% 
   filter(RoadFeature != "NA", RoadFeature != "", RoadFeature != "NaN") %>%
   count(RoadFeature) %>% 
@@ -161,10 +165,9 @@ crashes %>%
        y = "Count (log10 Sclae)")
 ```
 
-### Histogram for Drivers' Ages 
 We were surprised to see that the ages of drivers had such a wide range with the maximum age of a driver being 120 years old. 
 
-```{r}
+```{r, echo=FALSE}
 crashes %>%
   filter(PersonType == "Driver", Age != "NA", Age != "NaN", Age != "") %>%
   ggplot() +
@@ -172,9 +175,7 @@ crashes %>%
   labs(title="Histogram for Drivers' Ages", x="Age", y="Frequency")
 ```
 
-### Frequency of Crashes by Alcohol Result Type (including Unknown and Pending results) 
-
-```{r}
+```{r, echo=FALSE}
 crashes %>% 
   filter(AlcoholResultType != "NA", AlcoholResultType != "", 
          AlcoholResultType != "NaN", AlcoholResultType != "Contaminated sample/unusable") %>%
@@ -190,24 +191,7 @@ crashes %>%
        y = "Count (log10 Scale)")
 ```
 
-### Frequency of Crashes by Alcohol Result Type and Crash Date DOW 
-
-```{r}
-crashes %>%
-  filter(AlcoholResultType != "NA", AlcoholResultType != "Unknown", 
-         Crash_Date_DOW != "NA", Crash_Date_DOW != "NaN", Crash_Date_DOW != "") %>%
-  group_by(AlcoholResultType) %>%
-  ggplot(aes(fill=AlcoholResultType, x=Crash_Date_DOW)) + 
-  geom_bar(position="fill", stat="count") + 
-  coord_flip() + 
-  labs(title = "Alcohol Result Type Frequency by Crash Date DOW",
-       x = "Crash Date DOW",
-       y = "Percentage")
-```
-
-### Frequency of Crashes by Alcohol Result Type (excluding Unknown and Pending results)
-
-```{r}
+```{r, echo=FALSE}
 crashes %>% 
   filter(AlcoholResultType != "NA", AlcoholResultType != "", 
          AlcoholResultType != "NaN", AlcoholResultType != 
@@ -225,9 +209,7 @@ crashes %>%
        y = "Count (log10 Scale)")
 ```
 
-### Frequency of Crashes by Day of Week
-
-```{r}
+```{r, echo=FALSE}
 crashes %>% 
   filter(Crash_Date_DOW != "NA") %>%
   mutate(Crash_Date_DOW = factor(Crash_Date_DOW, levels = c("Sunday","Monday", "Tuesday", "Wednesday", 
@@ -240,9 +222,7 @@ crashes %>%
        y = "Count")
 ```
 
-### Frequency of Crashes by Month 
-
-```{r}
+```{r, echo=FALSE}
 crashes %>% 
   filter(Crash_Date_Month != "NA") %>%
   mutate(Crash_Date_Month = factor(Crash_Date_Month, 
@@ -261,9 +241,7 @@ crashes %>%
        y = "Count")
 ```
 
-### Frequency of Crashes by Hour
-
-```{r}
+```{r, echo=FALSE, eval=FALSE}
 crashes %>%
   filter(Crash_Date_Hour != "NA", Crash_Date_Hour != "") %>%
   ggplot() +
@@ -271,9 +249,7 @@ crashes %>%
   labs(title="Frequency of Crashes by Hour", x="Hour", y="Count")
 ```
 
-### Frequency of Crashes by Shift
-
-```{r}
+```{r, echo=FALSE}
 crashes %>%
   filter(Crash_Date_Hour != "NA", Crash_Date_Hour != "") %>%
   mutate(shift = case_when(
@@ -288,11 +264,9 @@ crashes %>%
   labs(title="Frequency of Crashes by Shift", x="Shift", y="Count")
 ```
 
-### Frequency of Crashes by Drivers' v. Passengers' Age
-
 The range of drivers' ages is from about 16 to 100. The range of passengers' ages is from about 0 to 100. The range of drivers' ages is slightly larger due to the age restrictions for getting a license. 
 
-```{r}
+```{r, echo=FALSE}
 crashes %>% 
   filter(PersonType == "Driver" | PersonType == "Passenger", Age != "", Age != "NA") %>% 
   ggplot() +
@@ -302,11 +276,9 @@ crashes %>%
   facet_wrap(~PersonType, dir = "v")
 ```
 
-### Frequency of Crashes by Drivers' v. Passengers' Gender
-
 There are slighlty more male drivers in Wake County getting in crashes than female drivers. Additionally, there are slightly more female passengers in Wake County car crashes than male passengers. 
 
-```{r}
+```{r, echo=FALSE}
 crashes %>% 
   filter(PersonType == "Driver" | PersonType == "Passenger", 
          Gender != "NA", Gender != "Unknown") %>% 
@@ -317,11 +289,9 @@ crashes %>%
   facet_wrap(~PersonType)
 ```
 
-### Frequency of Crashes by Vehicle Seizure
-
 About half as many vehicles were seized compared to vehicles not seized. 
 
-```{r} 
+```{r, echo=FALSE} 
 crashes %>% 
   filter(VehicleSeizure != "NA") %>%
   count(VehicleSeizure) %>% 
@@ -334,12 +304,10 @@ crashes %>%
        y = "Count (log10 Scale)")
 ```
 
-### Frequency of Crashes by Airbag Deployed 
-
 The highest frequency of crashes occured where the airbags were not deployed. It is interesting to note that the second highest frequency of crashes occured where the car(s) did not have airbags to begin with. 
 Airbags did not deploy during most crashes, therefore many accidents logged were minor. 
 
-```{r}
+```{r, echo=FALSE}
 crashes %>% 
   filter(AirbagDeployed != "NA", AirbagDeployed != "Unknown") %>%
   count(AirbagDeployed) %>% 
@@ -354,11 +322,9 @@ crashes %>%
        y = "Count (log10 Scale)")
 ```
 
-### Frequency of Crashes by Ejection
-
 Most car crashes resulted in drivers and passengers not being ejected. More people were totally ejected from the vehicle than partially ejected. 
 
-```{r}
+```{r, echo=FALSE}
 crashes %>% 
   filter(Ejection != "NA", Ejection != "Unknown") %>%
   count(Ejection) %>% 
@@ -373,11 +339,9 @@ crashes %>%
        y = "Count (log10 Scale)")
 ```
 
-### Frequency of Crashes by Gender 
-
 About 3 more percent of people that get in crashes are men than women. 
 
-```{r}
+```{r, echo=FALSE}
 crashes %>% 
   filter(Gender != "NA", Gender != "Unknown", Gender != "") %>%
   count(Gender) %>% 
@@ -392,8 +356,6 @@ crashes %>%
        y = "Percent")
 ```
 
-### Frequency of Crashes by Race
-
 According to census.gov...
 
 In the United States, 76.3 % of people are White, 13.4% of people are Black or African American, 18.5% are Hispanic or Latina, 0.2 are Native Hawaiian and Other Pacific Islander, 2.8% are two or more races, 5.9% are Asian, 1.3% are American Indian and Alaska Native, . 
@@ -404,7 +366,7 @@ In Wake County, North Carolina, 67.9 % of people are White, 21.0% of people are 
 
 This is interesting because, despite the percentage of Black people being less than a third of the percentage of White people, the percentage of Black people in car crashes is not far behind the percentage of White people in car crashes. 
 
-```{r}
+```{r, echo=FALSE}
 crashes %>% 
   filter(Race != "NA", Race != "Unknown", Race != "") %>%
   count(Race) %>% 
@@ -419,11 +381,9 @@ crashes %>%
        y = "Percent")
 ```
 
-### Frequency of Crashes by Injury
-
 The highest frequency of crashes did not result in any injury. Following the highest frequency, the more serious the injury, the less crashes occured. 
 
-```{r}
+```{r, echo=FALSE}
 crashes %>% 
   filter(Injury != "NA", Injury != "Unknown") %>%
   count(Injury) %>% 
@@ -438,431 +398,9 @@ crashes %>%
        y = "Percent")
 ```
 
-### Frequency of Injuries by Contributing Circumstance 
-
-```{r}
-crashes %>%
-  filter(Injury != "NA", Injury != "Unknown", ContributingCircumstance1 != "NA", 
-         ContributingCircumstance1 != "NaN", 
-         ContributingCircumstance1 != "Unable to determine", 
-         ContributingCircumstance1 != "Unknown") %>%
-  group_by(Injury) %>%
-  ggplot(aes(fill=Injury, x=ContributingCircumstance1)) + 
-  geom_bar(position="fill", stat="count") + 
-  coord_flip() + 
-  labs(title = "Injury Frequency by Contributing Circumstance",
-       x = "Contributing Circumstance",
-       y = "Percentage") + 
-  scale_x_discrete(labels = c("Alcohol use", 
-                              "Going wrong way",
-                              "Disregarded other traffic signs",
-                              "Disregarded road markings",
-                              "Disregarded stop sign",
-                              "Disregarded traffic signals",
-                              "Disregarded yield sign", 
-                              "Driver distracted",
-                              "Driver distracted by communication device",
-                              "Driver distracted by external distraction", 
-                              "Driver distracted by electronic",
-                              "Driver distracted by passenger", 
-                              "Drug use", 
-                              "Exceeded speed limit",
-                              "Exceeded safe speed", 
-                              "Failed to yield", 
-                              "Failure to reduce speed",
-                              "Followed too closely",
-                              "Improper backing",
-                              "Improper lane change", 
-                              "Improper or no signal",
-                              "Improper parking",
-                              "Improper turn",
-                              "Inattention",
-                              "No contributing circumstance",
-                              "Operated defective equipment", 
-                              "Erratic, reckless, negligent", 
-                              "Other improper passing", 
-                              "Other*",
-                              "Overcorrected/oversteered",
-                              "Passed on curve",  
-                              "Passed on hill",
-                              "Passed stopped school bus", 
-                              "Right turn on red",
-                              "Swerved or avoided",  
-                              "Use of improper lane",
-                              "Visibility obstructed"))
-```
-
-### Frequency of Injuries by Person Type 
-
-Pedestrians are most likely to die, followed by pedalcyclists most likely due to lack of protection and high exposure to the environment. Driver's are slightly less likely to be injured than passengers. 
-
-```{r}
-crashes %>%
-  filter(Injury != "NA", Injury != "Unknown", PersonType != "NA", 
-        PersonType != "NaN", PersonType != "Unknown") %>%
-  group_by(Injury) %>%
-  ggplot(aes(fill=Injury, x=PersonType)) + 
-  geom_bar(position="fill", stat="count") + 
-  coord_flip() + 
-  labs(title = "Injury Frequency by Person Type",
-       x = "Person Type",
-       y = "Percentage")
-```
-
-### Frequency of Injury by Ejection 
-
-Total ejection leads to the most deaths and injuries, followed by partial ejection, and not being ejection leads to the least amount of injury. Ejection most likely leads to more severe injuries due to the car crash being significant enough to lead to ejection as well the injuries that occur from being ejected as well. 
-
-```{r}
-crashes %>%
-  filter(Injury != "NA", Injury != "Unknown", Ejection != "NA", 
-         Ejection != "NaN", Ejection != "Unknown") %>%
-  group_by(Injury) %>%
-  ggplot(aes(fill=Injury, x=Ejection)) + 
-  geom_bar(position="fill", stat="count") + 
-  coord_flip() + 
-  labs(title = "Injury Frequency by Ejection",
-       x = "Ejection",
-       y = "Percentage")
-```
-
-### Frequency of Injury by Road Feature 
-
-Driveways tend to lead to the least amount of injuries probably due to the slow speed that people are going when in driveways. 
-
-```{r}
-crashes %>%
-  filter(Injury != "NA", Injury != "Unknown", RoadFeature != "NA", 
-         RoadFeature != "NaN", RoadFeature != "") %>%
-  group_by(Injury) %>%
-  ggplot(aes(fill=Injury, x=RoadFeature)) + 
-  geom_bar(position="fill", stat="count") + 
-  coord_flip() + 
-  labs(title = "Injury Frequency by Road Feature",
-       x = "Road Feature",
-       y = "Percentage")
-```
-
-### Frequency of Injury by Road Classification 
-
-Public vehicular areas and private roads/driveways lead to the least amount of injuries. This may be because these areas are minimally trafficked and are usually at slower speeds than other roads. 
-
-```{r}
-crashes %>%
-  filter(Injury != "NA", Injury != "Unknown", RoadClassification != "NA", 
-         RoadClassification != "NaN", RoadClassification != "") %>%
-  group_by(Injury) %>%
-  ggplot(aes(fill=Injury, x=RoadClassification)) + 
-  geom_bar(position="fill", stat="count") + 
-  coord_flip() + 
-  labs(title = "Injury Frequency by Road Classification",
-       x = "Road Classification",
-       y = "Percentage")
-```
-
-### Frequency of Injury by Weather Condition
-
-Rain and sleet, hail, freezing rain/drizzle leads to the most disabling type injuries. 
-
-```{r}
-crashes %>%
-  filter(Injury != "NA", Injury != "Unknown", WeatherCondition1 != "NA", 
-         WeatherCondition1 != "NaN") %>%
-  group_by(Injury) %>%
-  ggplot(aes(fill=Injury, x=WeatherCondition1)) + 
-  geom_bar(position="fill", stat="count") + 
-  coord_flip() + 
-  labs(title = "Injury Frequency by Weather Condition",
-       x = "Weather Condition",
-       y = "Percentage")
-```
-
-### Frequency of Rain and Statistical Analyses
-
-```{r}
-crashes_rain = crashes %>%
-  filter(WeatherCondition1 != "Unknown", 
-         WeatherCondition1 != "NA", 
-         WeatherCondition1 != "") %>%
-  mutate(WeatherCondition1 = case_when(
-    WeatherCondition1 == "Rain" ~ "Rain", 
-    TRUE ~ "Not Rain")) %>%
-  group_by(key_crash,WeatherCondition1) %>%
-  summarize(count = length(key_crash))
-
-crashes_rain <- mutate(crashes_rain, 
-                       rain = WeatherCondition1 == "Rain")
-
-t.test(x=crashes_rain$rain)
-
-crashes_rain %>%
-  ggplot(aes(fill=WeatherCondition1, x=WeatherCondition1)) + 
-  geom_bar(show.legend = FALSE) + 
-  geom_text(stat="count", aes(x=WeatherCondition1, label=..count..), vjust=-0.25)
-```
-
-### Frequency of Injury by Alcohol Result Type 
-
-The most people are killed when there are no alcohol or other drugs. This is slightly surprising, however, it may be because when people are driving with drugs or alcohol in their system, they may attempt to be more cautious so that they do not get pulled over by police. 
-
-```{r}
-crashes %>%
-  filter(Injury != "NA", Injury != "Unknown", AlcoholResultType != "NA", 
-         AlcoholResultType != "NaN", AlcoholResultType != "Unknown",
-         AlcoholResultType != "Contaminated sample/unusable", 
-         AlcoholResultType != "Pending") %>%
-  group_by(Injury) %>%
-  ggplot(aes(fill=Injury, x=AlcoholResultType)) + 
-  geom_bar(position="fill", stat="count") + 
-  coord_flip() + 
-  labs(title = "Injury Frequency by Alcohol Result Type",
-       x = "Alcohol Result Type",
-       y = "Percentage")
-```
-
-### Frequency of Injury by Traffic Control Type
-
-Places where warning signs are post led to the post injuries including people killed. This may be because the signs are not taken as seriously and are less common to see, therefore, more people may disregard the warnings. Not many injuries occur near Railroad crossings. 
-
-```{r}
-crashes %>%
-  filter(Injury != "NA", Injury != "Unknown", TrafficControlType != "NA", 
-         TrafficControlType != "NaN") %>%
-  group_by(Injury) %>%
-  ggplot(aes(fill=Injury, x=TrafficControlType)) + 
-  geom_bar(position="fill", stat="count") + 
-  coord_flip() +
-  labs(title = "Injury Frequency by Traffic Control Type",
-       x = "Traffic Control Type",
-       y = "Percentage")
-```
-
-### Frequency of Injury by Vehicle Type
-
-Pedestrian were the most killed, followed by motorcycles and motor scooters. This makes sense because these people are more exposed to conditions as well as generally having less protection than people in enclosed vehicles. Large vehicles like buses, trucks, and military vehicles, had the leaast amount of injuries most likely due to their large size. 
-
-```{r}
-crashes %>%
-  filter(Injury != "NA", Injury != "Unknown", VehicleType != "NA", 
-         VehicleType != "NaN", VehicleType != "Unknown", VehicleType != "") %>%
-  group_by(Injury) %>%
-  ggplot(aes(fill=Injury, x=VehicleType)) + 
-  geom_bar(position="fill", stat="count") + 
-  coord_flip() + 
-  labs(title = "Injury Frequency by Vehicle Type",
-       x = "Vehicle Type",
-       y = "Percentage")
-```
-
-### Frequency of Injury by Protection
-
-The most injuries occurred when people were using reflective clothing, lighting, and a helmet as protection. This makes sense because people using this would most likely be pedestrians or bikers, both of which are more exposed to danger and to having more significant injuries. Shoulder belts, lap belts, and the combination between the two appear to help decrease the amount of injuries that occur. 
-
-```{r}
-crashes %>%
-  filter(Injury != "NA", Injury != "Unknown", Protection != "NA", 
-         Protection != "NaN", Protection != "Unable to determine") %>%
-  group_by(Injury) %>%
-  ggplot(aes(fill=Injury, x=Protection)) + 
-  geom_bar(position="fill", stat="count") + 
-  coord_flip() + 
-  labs(title = "Injury Frequency by Protection",
-       x = "Protection",
-       y = "Percentage")
-```
-
-### Frequency of Injury by Vision Obstruction 
-
-Signs and embankment led to the most people being killed. This may be because these are both stationary opaque objects that will continuously block people's views of the road and conditions. Also being blinded by other lights led to the most disabling injuries. 
-
-```{r}
-crashes %>%
-  filter(Injury != "NA", Injury != "Unknown", VisionObstruction != "NA", 
-         VisionObstruction != "NaN") %>%
-  group_by(Injury) %>%
-  ggplot(aes(fill=Injury, x=VisionObstruction)) + 
-  geom_bar(position="fill", stat="count") + 
-  coord_flip() + 
-  labs(title = "Injury Frequncy by Vision Obstruction",
-       x = "Vision Obstruction",
-       y = "Percentage")
-```
-
-### Frequency of Injury by Airbag Deployed 
-
-When airbags were not deployed, there was a smaller amount of injuries. This may be because the crashes were not significant enough to cause the airbags to deploy, therefore, if the crash is not significant enough to cause airbags to deploy, the people in the crash were less likely to be harmed. When there were no airbags, there was not many injuries. This may be because cars without airbags tend to be older cars which may mean they cannot go fast enough to lead to an extremely dangerous car crash. When both front and side airbags deploy, there are a significant amount of injuries including disabling injuries. This may be due to the crash being bad enough to deploy the airbags, therefore, if the crash is bad enough, the people are more likely to be injured. 
-
-```{r}
-crashes %>%
-  filter(Injury != "NA", Injury != "Unknown", AirbagDeployed != "NA", 
-         AirbagDeployed != "NaN", AirbagDeployed != "Unknown") %>%
-  group_by(Injury) %>%
-  ggplot(aes(fill=Injury, x=AirbagDeployed)) + 
-  geom_bar(position="fill", stat="count") + 
-  coord_flip() + 
-  labs(title = "Injury Frequncy by Airbag Deployed",
-       x = "Airbag Deployed",
-       y = "Percentage")
-```
-
-### Frequency of Injury by First Harmful Event
-
-The first harmful event that led to the second most people killed and disabling injuries was with pedestrians. This would make sense because pedestrians often do not have protection from cars. Overturn/rollover harmful events had the most amount of injuries. Backing up had the least amount of injuries which would make sense because when backing a car up, people tend to be going a slower speed than if they were accelerating forward.
-
-```{r}
-crashes %>%
-  filter(Injury != "NA", Injury != "Unknown", FirstHarmfulEvent != "NA", 
-         FirstHarmfulEvent != "NaN", FirstHarmfulEvent != "Unknown") %>%
-  group_by(Injury) %>%
-  ggplot(aes(fill=Injury, x=FirstHarmfulEvent)) + 
-  geom_bar(position="fill", stat="count") + 
-  coord_flip() + 
-  labs(title = "Injury Frequency by First Harmful Event",
-       x = "First Harmful Event",
-       y = "Percentage")
-```
-
-### Frequency of Injury by Most Harmful Event 
-
-The most harmful event that led to most people killed and disabling injuries was with pedestrians. This would make sense because pedestrians often do not have protection from cars. Overturn/rollover harmful events also had a significant amount of injuries. Backing up had the least amount of injuries which would make sense because when backing a car up, people tend to be going a slower speed than if they were accelerating forward. 
-
-```{r}
-crashes %>%
-  filter(Injury != "NA", Injury != "Unknown", MostHarmfulEvent != "NA", 
-         MostHarmfulEvent != "NaN", MostHarmfulEvent != "Unknown") %>%
-  group_by(Injury) %>%
-  ggplot(aes(fill=Injury, x=MostHarmfulEvent)) + 
-  geom_bar(position="fill", stat="count") + 
-  coord_flip() + 
-  labs(title = "Injury Frequency by Most Harmful Event",
-       x = "Most Harmful Event",
-       y = "Percentage")
-```
-
-### Frequency of Injury by Driver Age
-
-```{r}
-# Comparing Injury to Driver Age
-crashes %>%
-  filter(Injury != "NA", Injury != "Unknown", Injury != "", PersonType == "Driver", Age != "NA",
-         Age != "", Age != "Unknown", Age >= 5) %>%
-  group_by(Injury) %>%
-  mutate(shift = case_when(
-    Age >= 5 & Age < 15 ~ "5-14",
-    Age >= 15 & Age < 25 ~ "15-24",
-    Age >= 25 & Age < 35 ~ "25-34",
-    Age >= 35 & Age < 45 ~ "35-44",
-    Age >= 45 & Age < 55 ~ "45-54",
-    Age >= 55 & Age < 65 ~ "55-64",
-    Age >= 65 & Age < 75 ~ "65-74",
-    Age >= 75 & Age < 85 ~ "75-84",
-    Age >= 85 & Age < 95 ~ "85-94",
-    Age >= 95 & Age < 105 ~ "95-104",
-    Age >= 105 & Age < 115 ~ "105-114",
-    TRUE ~ "115-124")) %>%
-  ggplot(aes(fill=Injury, x=shift)) + 
-  geom_bar(position="fill", stat="count") + 
-  coord_flip() + 
-  labs(title = "Injury Frequency by Driver Age",
-       x = "Age",
-       y = "Percentage")
-```
-
-### Frequency of Driver Age 
-```{r}
-crashes %>%
-  filter(PersonType == "Driver", Age != "NA",
-         Age != "", Age != "Unknown", Age >= 5) %>%
-  mutate(age = case_when(
-    Age >= 5 & Age < 15 ~ "5-14",
-    Age >= 15 & Age < 25 ~ "15-24",
-    Age >= 25 & Age < 35 ~ "25-34",
-    Age >= 35 & Age < 45 ~ "35-44",
-    Age >= 45 & Age < 55 ~ "45-54",
-    Age >= 55 & Age < 65 ~ "55-64",
-    Age >= 65 & Age < 75 ~ "65-74",
-    Age >= 75 & Age < 85 ~ "75-84",
-    Age >= 85 & Age < 95 ~ "85-94",
-    Age >= 95 & Age < 105 ~ "95-104",
-    Age >= 105 & Age < 115 ~ "105-114",
-    TRUE ~ "115-124")) %>%
-  mutate(age = factor(age, levels = c("5-14", "15-24", "25-34", "35-44", "45-54",
-                                      "55-64", "65-74", "75-84", "85-94", 
-                                      "95-104", "105-114", "115-124"))) %>%
-  ggplot(aes(fill=age, x=age)) + 
-  geom_bar(show.legend = FALSE) + 
-  labs(title = "Frequency of Driver Age",
-       x = "Age",
-       y = "Count") + 
-  theme(axis.text.x = element_text(angle = 90))
-```
-
-### Frequncy of Injury by Passenger Age
-
-```{r}
-crashes %>%
-  filter(Injury != "NA", Injury != "Unknown", Injury != "", PersonType == "Passenger", Age != "NA",
-         Age != "", Age != "Unknown") %>%
-  group_by(Injury) %>%
-  mutate(shift = case_when(
-    Age >= 0 & Age < 10 ~ "0-9",
-    Age >= 10 & Age < 20 ~ "10-19",
-    Age >= 20 & Age < 30 ~ "20-29",
-    Age >= 30 & Age < 40 ~ "30-39",
-    Age >= 40 & Age < 50 ~ "40-49",
-    Age >= 50 & Age < 60 ~ "50-59",
-    Age >= 60 & Age < 70 ~ "60-69",
-    Age >= 70 & Age < 80 ~ "70-79",
-    Age >= 80 & Age < 90 ~ "80-89",
-    Age >= 90 & Age < 100 ~ "90-99",
-    Age >= 100 & Age < 110 ~ "100-109",
-    Age >= 110 & Age < 120 ~ "110-119",
-    TRUE ~ "120-129")) %>%
-  ggplot(aes(fill=Injury, x=shift)) + 
-  geom_bar(position="fill", stat="count") + 
-  coord_flip() + 
-  labs(title = "Injury Frequency by Passenger Age",
-       x = "Age",
-       y = "Percentage")
-```
-
-### Frequency of Passenger Age 
-
-```{r}
-crashes %>%
-  filter(PersonType == "Passenger", Age != "NA",
-         Age != "", Age != "Unknown") %>%
-  mutate(age = case_when(
-    Age >= 0 & Age < 10 ~ "0-9",
-    Age >= 10 & Age < 20 ~ "10-19",
-    Age >= 20 & Age < 30 ~ "20-29",
-    Age >= 30 & Age < 40 ~ "30-39",
-    Age >= 40 & Age < 50 ~ "40-49",
-    Age >= 50 & Age < 60 ~ "50-59",
-    Age >= 60 & Age < 70 ~ "60-69",
-    Age >= 70 & Age < 80 ~ "70-79",
-    Age >= 80 & Age < 90 ~ "80-89",
-    Age >= 90 & Age < 100 ~ "90-99",
-    Age >= 100 & Age < 110 ~ "100-109",
-    Age >= 110 & Age < 120 ~ "110-119",
-    TRUE ~ "120-129")) %>%
-  mutate(age = factor(age, levels = c("0-9", "10-19", "20-29", "30-39", "40-49", 
-                                      "50-59", "60-69", "70-79", "80-89", 
-                                      "90-99", "100-109", "110-119",
-                                      "120-129"))) %>%
-  ggplot(aes(fill=age, x=age)) + 
-  geom_bar(show.legend = FALSE) + 
-  labs(title = "Frequency of Passenger Age",
-       x = "Age",
-       y = "Percentage") + 
-  theme(axis.text.x = element_text(angle = 90))
-```
-
-### Frequency of Crashes by Protection
-
 The highest frequency of crashes occured when drivers and passengers wore a shoulder and lap belt protection which are common protections in more recent vehicles. However, the second highest frequency of crashes occured when drivers and passengers had used no protection. Could this be because the vehicles they were driving didn't provide protection or that the vehicles had protection, the people just chose not to use any. 
 
-```{r}
+```{r, echo=FALSE}
 crashes %>% 
   filter(Protection != "NA", Protection != "Unable to determine") %>%
   count(Protection) %>% 
@@ -877,11 +415,9 @@ crashes %>%
        y = "Count (log10 Scale)")
 ```
 
-### Frequency of Crashes by Trapped
-
 More crashes resulted in people in the vehicle not being trapped than people in the vehicle being trapped. 
 
-```{r}
+```{r, echo=FALSE}
 crashes %>% 
   filter(Trapped != "NA", Trapped != "Unknown") %>%
   count(Trapped) %>% 
@@ -896,11 +432,9 @@ crashes %>%
        y = "Count (log10 Scale)")
 ```
 
-### Frequency of Crashes by Vision Obstruction 
-
 The highest frequency of crashes occured when there was was no vision obstruction. It is interesting to note, that "Blinded, sunlight" led to a significant amount of crashes. When looking at the variable Weather Condition, most of the time the Weather Condition was clear. The weather was clear, however, this may have led to the sun being brighter and more likely to cause a car crash due to vision obstruction. 
 
-```{r}
+```{r, echo=FALSE}
 crashes %>% 
   filter(VisionObstruction != "NA", VisionObstruction != "Unknown") %>%
   count(VisionObstruction) %>% 
@@ -915,11 +449,9 @@ crashes %>%
        y = "Count (log10 Scale)")
 ```
 
-### Frequency of Crashes by Contributing Circumstance 1 
-
 The highest frequency of crashes had no contributing circumstances indicated. 
 
-```{r}
+```{r, echo=FALSE}
 crashes %>% 
   filter(ContributingCircumstance1 != "NA", ContributingCircumstance1 != "Unknown", 
          ContributingCircumstance1 != "Unable to determine") %>%
@@ -972,11 +504,9 @@ crashes %>%
                               "No contributing circumstance"))
 ```
 
-### Frequency of Crashes by Contributing Circumstance 2
-
 The highest frequency of crashes had inattention as a contributing circumstance 2. 
 
-```{r}
+```{r, echo=FALSE}
 crashes %>% 
   filter(ContributingCircumstance2 != "NA", 
          ContributingCircumstance2 != "Unknown", 
@@ -1032,11 +562,8 @@ crashes %>%
                               "Inattention"))
 ```
 
-### Frequency of Crashes by Contributing Circumstance 3
-
 The higest frequency of crashes had inattention as a contributing circumstance 3. 
-
-```{r}
+```{r, echo=FALSE}
 crashes %>% 
   filter(ContributingCircumstance3 != "NA", 
          ContributingCircumstance3 != "Unknown", 
@@ -1091,11 +618,9 @@ crashes %>%
                               "Inattention"))
 ```
 
-### Frequency of Crashes by Location Relation to Road 
-
 Most of the crashes on the roadway. This means it includes accidents on highways, streets, and where there is a lot of traffic. 
 
-```{r}
+```{r, echo=FALSE}
 crashes %>% 
   filter(LocationRelationToRoad != "NA", LocationRelationToRoad != "Unknown") %>%
   count(LocationRelationToRoad) %>% 
@@ -1110,9 +635,7 @@ crashes %>%
        y = "Count (log10 Scale)")
 ```
 
-### Frequency of Crashes by Location In Near Indicator
-
-```{r}
+```{r, echo=FALSE}
 crashes %>% 
   filter(LocationInNearIndicator != "NA", LocationInNearIndicator != "Unknown") %>%
   count(LocationInNearIndicator) %>% 
@@ -1127,9 +650,7 @@ crashes %>%
        y = "Count (log10 Scale)")
 ```
 
-### Frequency of Crashes by Location Ramp Indicator 
-
-```{r}
+```{r, echo=FALSE}
 crashes %>% 
   filter(LocationRampIndicator != "NA", LocationRampIndicator != "Unknown") %>%
   count(LocationRampIndicator) %>% 
@@ -1144,11 +665,9 @@ crashes %>%
        y = "Count (log10 Scale)")
 ```
 
-### Histogram of Crash Location Feet From Road 
-
 The data for the location of crashes from a road shows that most crashes happen at most popular roadways. These roadways tend to be the busiest roads. 
 
-```{r}
+```{r, echo=FALSE}
 crashes %>%
   filter(LocationFeetFromRoad != "NA", LocationFeetFromRoad != "Unknown", 
          LocationFeetFromRoad != "") %>%
@@ -1157,11 +676,9 @@ crashes %>%
   labs(title="Histogram for Location Feet From Road")
 ```
 
-### Frequency of Crashes by Location Direction From Road
-
 Most direction of crashes were North, South, East, and West. This shows that there is no specific direction where crashes were most common. This data implies that there is the same amount of crashes in every direction of the road. 
 
-```{r}
+```{r, echo=FALSE}
 crashes %>% 
   filter(LocationDirectionFromRoad != "NA", LocationDirectionFromRoad != "Unknown",
          LocationDirectionFromRoad != "") %>%
@@ -1177,11 +694,9 @@ crashes %>%
        y = "Count (log10 Scale)")
 ```
 
-### Frequency of Crashes by Location From Indicator
-
 More crashes tend to occur from and indicator then from the indicator. This means that most common crashes are known to happen near busy streets/roads. 
 
-```{r}
+```{r, echo=FALSE}
 crashes %>% 
   filter(LocationAtFromIndicator != "NA", LocationAtFromIndicator != "Unknown") %>%
   count(LocationAtFromIndicator) %>% 
@@ -1196,11 +711,9 @@ crashes %>%
        y = "Count (log10 Scale)")
 ```
 
-### Frequency of Crashes by Location Direction to Road
-
 When it comes to the location direction of the crash to the road the data is like location direction of crashes from road. Most crashes happen North, South, East, and West. 
 
-```{r}
+```{r, echo=FALSE}
 crashes %>% 
   filter(LocationDirectionToRoad != "NA", LocationDirectionToRoad != "Unknown") %>%
   count(LocationDirectionToRoad) %>% 
@@ -1215,11 +728,9 @@ crashes %>%
        y = "Count (log10 Scale)")
 ```
 
-### Frequency of Crashes by First Harmful Event 
-
 The data shows us that the (First Harmful Crash Event) is from a rear end, slow or stop. This implies that some drivers might be driving under the speed limit or not paying attention to what is in front of them on the road. 
 
-```{r}
+```{r, echo=FALSE}
 crashes %>% 
   filter(FirstHarmfulEvent != "NA", FirstHarmfulEvent != "Unknown") %>%
   count(FirstHarmfulEvent) %>% 
@@ -1234,11 +745,9 @@ crashes %>%
        y = "Count (log10 Scale)")
 ```
 
-### Frequency of Crashes by Most Harmful Event
-
 The most harmful event is also a rear end, slow or stop accident just like the fist harmful event. Side swiped accidents and hitting parked vehicles are also pretty common accidents. This informs us that drivers are not paying attention to the road and are being distracted. 
 
-```{r}
+```{r, echo=FALSE}
 crashes %>% 
   filter(MostHarmfulEvent != "NA", MostHarmfulEvent != "Unknown") %>%
   count(MostHarmfulEvent) %>% 
@@ -1253,11 +762,9 @@ crashes %>%
        y = "Count (log10 Scale)")
 ```
 
-### Frequency of Crashes by Road Classification
-
 Local streets are the most common places where there are accidents. This is because local streets tend to be busy. There is usually traffic in both directions. There are also many people walking around. This causes the driver to get distracted easily. 
 
-```{r}
+```{r, echo=FALSE}
 crashes %>% 
   filter(RoadClassification != "NA", RoadClassification != "Unknown", 
          RoadClassification != "") %>%
@@ -1273,8 +780,6 @@ crashes %>%
        y = "Count (log10 Scale)")
 ```
 
-### Frequency of Crashes by Crash Date Year
-
 We included a horizontal dashed line to indicate where the yearly average lies 
 and we can see that only the years 202 and 2021 fall below this yearly average. 
 The year with the most crashes in 2019 but not by many. The full year with the
@@ -1283,7 +788,7 @@ place to try and mitigate the spread of Covid-19. 2021 also looks to be on track
 to be another low crash year but we do not have a perfect explanation for that 
 seeing as things are beginning to open and "return to normal" again.
 
-```{r}
+```{r, echo=FALSE}
 crashes %>% 
   filter(Crash_Date_Year != "Unknown", Crash_Date_Year != "2011") %>%
   ggplot(aes(Crash_Date_Year, fill=as.factor(Crash_Date_Year))) +
@@ -1296,8 +801,6 @@ crashes %>%
        y = "Count")
 ```
 
-### Number of Drivers per Crash
-
 This bar plot represents how many drivers were involved in each crash. We can 
 see that the majority of crashes involved 2 drivers, which was to be expected 
 since two car accidents seem to be the most common. In a distant second was 1 
@@ -1306,7 +809,7 @@ other kinds of crashes that are most common. The rest of the crashes had a
 decreasing number of drivers involved in crashes as the number of drivers 
 ranged from 3 to 18.
 
-```{r}
+```{r, echo=FALSE}
 crashes %>% 
   filter(PersonType == "Driver") %>%
   group_by(key_crash) %>%
@@ -1324,14 +827,12 @@ crashes %>%
        y = "Count")
 ```
 
-### Number of Passengers per Crash
-
 This data involved a much larger range of numbers than drivers involved per 
 crash. However, despite this fact, we can still follow a pretty regular 
 decreasing trend with the majority of crashes involved 1 passenger which 
 trickles all the way to a crash involving a maximum of 88 passengers. 
 
-```{r}
+```{r, echo=FALSE}
 crashes %>% 
   filter(PersonType == "Passenger") %>%
   group_by(key_crash) %>%
@@ -1349,13 +850,11 @@ crashes %>%
        y = "Count")
 ```
 
-### Number of Pedestrians per Crash
-
 There is little variety in the number of pedestrians involved in crashes. When 
 pedestrians were involved, there was a majority of it only being 1 with a 
 distant second and third being 2 and 3 pedestrians.
 
-```{r}
+```{r, echo=FALSE}
 crashes %>% 
   filter(PersonType == "Pedestrian") %>%
   group_by(key_crash) %>%
@@ -1373,15 +872,13 @@ crashes %>%
        y = "Count")
 ```
 
-### Number of Pedalcyclists per Crash
-
 Similar to the number of pedestrians involved in crashes, the number of 
 pedalcyclists involved in crashes has little variety and is very low. Compared 
 to the total amount of data we are working with, very few crashes involve
 pedalcyclists anf if they do, it is only 1 with a singular exception for a 
 crash involving 2.
 
-```{r}
+```{r, echo=FALSE}
 crashes %>% 
   filter(PersonType == "Pedalcyclist") %>%
   group_by(key_crash) %>%
@@ -1399,15 +896,13 @@ crashes %>%
        y = "Count")
 ```
 
-### Number of Other People per Crash
-
 Although there is more variety than both number of pedestriand and pedalcyclists 
 involved per crash, there is still a very small proportion of other people that 
 are involved in crashes. This category encompasses those who do not fit into the categories of driver, passenger, pedestiran, or pedalcyclist. There is a 
 majority of 1 other person being involved with a decreasing amount as it goes 
 up to a maximum of 5 other people involved. 
 
-```{r}
+```{r, echo=FALSE}
 crashes %>% 
   filter(PersonType == "Other*") %>%
   group_by(key_crash) %>%
@@ -1425,15 +920,13 @@ crashes %>%
        y = "Count")
 ```
 
-### Number of Unknown People per Crash
-
 This data is likely not going to be useful to any of our analyses because it is
 fairly likely that the number of unknown people involved in crashes is much 
 higher than it realistically was due to poor data entry. This plot included 
 many more observations than pedestrians, pedalcyclists, and others combined
 with a majority of crashes involving only 1 unknown person and a few involving 2.
 
-```{r}
+```{r, echo=FALSE}
 crashes %>% 
   filter(PersonType == "Unknown") %>%
   group_by(key_crash) %>%
@@ -1451,14 +944,12 @@ crashes %>%
        y = "Count")
 ```
 
-### Number of People Killed per Crash
-
 Fortunately, the number of people killed in crashes was low. Therefore, we only 
 have a small distribution of number of people killed per crash ranging from 1 
 to three with one being the majority and taking a large jump to 2 and 3 killed 
 per crash.
 
-```{r}
+```{r, echo=FALSE}
 crashes %>% 
   filter(Injury == "Killed") %>%
   group_by(key_crash) %>%
@@ -1476,15 +967,13 @@ crashes %>%
        y = "Count")
 ```
 
-### Number of Type A Injuries per Crash
-
 There were many more Type A injuries than people killed which represent all of 
 the disabling injuries. Once again, we can see a trend of decreasing number of 
 type A injuries per crash as the number of those injuries increases with the 
 majority if type A injuries per crash is one and the fewest was 5 type A 
 injuries per crash with a frequency of only 1.
 
-```{r}
+```{r, echo=FALSE}
 crashes %>% 
   filter(Injury == "A type injury (disabling)") %>%
   group_by(key_crash) %>%
@@ -1502,15 +991,13 @@ crashes %>%
        y = "Count")
 ```
 
-### Number of Type B Injuries per Crash 
-
 Type B injuries represent all of the injuries that occurred that were evident. 
 We can see a higher variety in the number of these type of injuries per crash 
 as well as more of them total. A majority of the type B injuries per crash is 
 one and the frequency decreases as the number of type B injuries per crash 
 increases up to 11.
 
-```{r}
+```{r, echo=FALSE}
 crashes %>% 
   filter(Injury == "B type injury (evident)") %>%
   group_by(key_crash) %>%
@@ -1528,15 +1015,13 @@ crashes %>%
        y = "Count")
 ```
 
-### Number of Type C Injuries per Crash
-
 Type C injuries are all of the most minor injuries and, fortunately, is the
 injury type that contains the most observations. Following the same trend as 
 the other type of injuries, the majority of crashes that involved type C 
 injuries only had 1 and there was a decreasing frequency as the number of type 
 C injuries per crash increased up to a maximum of 26.
 
-```{r}
+```{r, echo=FALSE}
 crashes %>% 
   filter(Injury == "C type injury (possible)") %>%
   group_by(key_crash) %>%
@@ -1554,15 +1039,13 @@ crashes %>%
        y = "Count")
 ```
 
-### Number of People with No Injuries per Crash 
-
 This plot looks similar to the plot that represents the number of passengers 
 involved per crash. There is a wide range of possible numbers of uninjured 
 people per crash spanning from 1 to 90. Despite this wide range of values, we 
 can still see that the data follows the trend of decreasing frequency as the 
 number of uninjured people per crash increases. 
 
-```{r}
+```{r, echo=FALSE}
 crashes %>% 
   filter(Injury == "No injury") %>%
   group_by(key_crash) %>%
@@ -1580,11 +1063,9 @@ crashes %>%
        y = "Count")
 ```
 
-### Number of Unknown Injuries per Crash
-
 Once again, I do not think that this data will be useful for our analysis since it is likely that these unknown injuries are likely due to poor data entry but we can follow the same trend of a decreasing frequency as the number of unknown injuries per crash in creases from 1 all the way up to 16, with 1 having a very clear majority.
 
-```{r}
+```{r, echo=FALSE}
 crashes %>% 
   filter(Injury == "Unknown") %>%
   group_by(key_crash) %>%
@@ -1602,11 +1083,387 @@ crashes %>%
        y = "Count")
 ```
 
-## Visualizing data using maps 
+### Bivariate Explorations
+
+```{r, echo=FALSE}
+crashes %>%
+  filter(Injury != "NA", Injury != "Unknown", ContributingCircumstance1 != "NA", 
+         ContributingCircumstance1 != "NaN", 
+         ContributingCircumstance1 != "Unable to determine", 
+         ContributingCircumstance1 != "Unknown") %>%
+  group_by(Injury) %>%
+  ggplot(aes(fill=Injury, x=ContributingCircumstance1)) + 
+  geom_bar(position="fill", stat="count") + 
+  coord_flip() + 
+  labs(title = "Injury Frequency by Contributing Circumstance",
+       x = "Contributing Circumstance",
+       y = "Percentage") + 
+  scale_x_discrete(labels = c("Alcohol use", 
+                              "Going wrong way",
+                              "Disregarded other traffic signs",
+                              "Disregarded road markings",
+                              "Disregarded stop sign",
+                              "Disregarded traffic signals",
+                              "Disregarded yield sign", 
+                              "Driver distracted",
+                              "Driver distracted by communication device",
+                              "Driver distracted by external distraction", 
+                              "Driver distracted by electronic",
+                              "Driver distracted by passenger", 
+                              "Drug use", 
+                              "Exceeded speed limit",
+                              "Exceeded safe speed", 
+                              "Failed to yield", 
+                              "Failure to reduce speed",
+                              "Followed too closely",
+                              "Improper backing",
+                              "Improper lane change", 
+                              "Improper or no signal",
+                              "Improper parking",
+                              "Improper turn",
+                              "Inattention",
+                              "No contributing circumstance",
+                              "Operated defective equipment", 
+                              "Erratic, reckless, negligent", 
+                              "Other improper passing", 
+                              "Other*",
+                              "Overcorrected/oversteered",
+                              "Passed on curve",  
+                              "Passed on hill",
+                              "Passed stopped school bus", 
+                              "Right turn on red",
+                              "Swerved or avoided",  
+                              "Use of improper lane",
+                              "Visibility obstructed"))
+```
+
+Pedestrians are most likely to die, followed by pedalcyclists most likely due to lack of protection and high exposure to the environment. Driver's are slightly less likely to be injured than passengers. 
+
+```{r, echo=FALSE}
+crashes %>%
+  filter(Injury != "NA", Injury != "Unknown", PersonType != "NA", 
+        PersonType != "NaN", PersonType != "Unknown") %>%
+  group_by(Injury) %>%
+  ggplot(aes(fill=Injury, x=PersonType)) + 
+  geom_bar(position="fill", stat="count") + 
+  coord_flip() + 
+  labs(title = "Injury Frequency by Person Type",
+       x = "Person Type",
+       y = "Percentage")
+```
+
+Total ejection leads to the most deaths and injuries, followed by partial ejection, and not being ejection leads to the least amount of injury. Ejection most likely leads to more severe injuries due to the car crash being significant enough to lead to ejection as well the injuries that occur from being ejected as well. 
+
+```{r, echo=FALSE}
+crashes %>%
+  filter(Injury != "NA", Injury != "Unknown", Ejection != "NA", 
+         Ejection != "NaN", Ejection != "Unknown") %>%
+  group_by(Injury) %>%
+  ggplot(aes(fill=Injury, x=Ejection)) + 
+  geom_bar(position="fill", stat="count") + 
+  coord_flip() + 
+  labs(title = "Injury Frequency by Ejection",
+       x = "Ejection",
+       y = "Percentage")
+```
+
+Driveways tend to lead to the least amount of injuries probably due to the slow speed that people are going when in driveways. 
+
+```{r, echo=FALSE}
+crashes %>%
+  filter(Injury != "NA", Injury != "Unknown", RoadFeature != "NA", 
+         RoadFeature != "NaN", RoadFeature != "") %>%
+  group_by(Injury) %>%
+  ggplot(aes(fill=Injury, x=RoadFeature)) + 
+  geom_bar(position="fill", stat="count") + 
+  coord_flip() + 
+  labs(title = "Injury Frequency by Road Feature",
+       x = "Road Feature",
+       y = "Percentage")
+```
+
+Public vehicular areas and private roads/driveways lead to the least amount of injuries. This may be because these areas are minimally trafficked and are usually at slower speeds than other roads. 
+
+```{r, echo=FALSE}
+crashes %>%
+  filter(Injury != "NA", Injury != "Unknown", RoadClassification != "NA", 
+         RoadClassification != "NaN", RoadClassification != "") %>%
+  group_by(Injury) %>%
+  ggplot(aes(fill=Injury, x=RoadClassification)) + 
+  geom_bar(position="fill", stat="count") + 
+  coord_flip() + 
+  labs(title = "Injury Frequency by Road Classification",
+       x = "Road Classification",
+       y = "Percentage")
+```
+
+Rain and sleet, hail, freezing rain/drizzle leads to the most disabling type injuries. 
+
+```{r, echo=FALSE}
+crashes %>%
+  filter(Injury != "NA", Injury != "Unknown", WeatherCondition1 != "NA", 
+         WeatherCondition1 != "NaN") %>%
+  group_by(Injury) %>%
+  ggplot(aes(fill=Injury, x=WeatherCondition1)) + 
+  geom_bar(position="fill", stat="count") + 
+  coord_flip() + 
+  labs(title = "Injury Frequency by Weather Condition",
+       x = "Weather Condition",
+       y = "Percentage")
+```
+
+```{r, echo=FALSE}
+crashes %>%
+  filter(AlcoholResultType != "NA", AlcoholResultType != "Unknown", 
+         Crash_Date_DOW != "NA", Crash_Date_DOW != "NaN", Crash_Date_DOW != "") %>%
+  group_by(AlcoholResultType) %>%
+  ggplot(aes(fill=AlcoholResultType, x=Crash_Date_DOW)) + 
+  geom_bar(position="fill", stat="count") + 
+  coord_flip() + 
+  labs(title = "Alcohol Result Type Frequency by Crash Date DOW",
+       x = "Crash Date DOW",
+       y = "Percentage")
+```
+
+The most people are killed when there are no alcohol or other drugs. This is slightly surprising, however, it may be because when people are driving with drugs or alcohol in their system, they may attempt to be more cautious so that they do not get pulled over by police. 
+
+```{r, echo=FALSE}
+crashes %>%
+  filter(Injury != "NA", Injury != "Unknown", AlcoholResultType != "NA", 
+         AlcoholResultType != "NaN", AlcoholResultType != "Unknown",
+         AlcoholResultType != "Contaminated sample/unusable", 
+         AlcoholResultType != "Pending") %>%
+  group_by(Injury) %>%
+  ggplot(aes(fill=Injury, x=AlcoholResultType)) + 
+  geom_bar(position="fill", stat="count") + 
+  coord_flip() + 
+  labs(title = "Injury Frequency by Alcohol Result Type",
+       x = "Alcohol Result Type",
+       y = "Percentage")
+```
+
+Places where warning signs are post led to the post injuries including people killed. This may be because the signs are not taken as seriously and are less common to see, therefore, more people may disregard the warnings. Not many injuries occur near Railroad crossings. 
+
+```{r, echo=FALSE}
+crashes %>%
+  filter(Injury != "NA", Injury != "Unknown", TrafficControlType != "NA", 
+         TrafficControlType != "NaN") %>%
+  group_by(Injury) %>%
+  ggplot(aes(fill=Injury, x=TrafficControlType)) + 
+  geom_bar(position="fill", stat="count") + 
+  coord_flip() +
+  labs(title = "Injury Frequency by Traffic Control Type",
+       x = "Traffic Control Type",
+       y = "Percentage")
+```
+
+Pedestrian were the most killed, followed by motorcycles and motor scooters. This makes sense because these people are more exposed to conditions as well as generally having less protection than people in enclosed vehicles. Large vehicles like buses, trucks, and military vehicles, had the leaast amount of injuries most likely due to their large size. 
+
+```{r, echo=FALSE}
+crashes %>%
+  filter(Injury != "NA", Injury != "Unknown", VehicleType != "NA", 
+         VehicleType != "NaN", VehicleType != "Unknown", VehicleType != "") %>%
+  group_by(Injury) %>%
+  ggplot(aes(fill=Injury, x=VehicleType)) + 
+  geom_bar(position="fill", stat="count") + 
+  coord_flip() + 
+  labs(title = "Injury Frequency by Vehicle Type",
+       x = "Vehicle Type",
+       y = "Percentage")
+```
+
+The most injuries occurred when people were using reflective clothing, lighting, and a helmet as protection. This makes sense because people using this would most likely be pedestrians or bikers, both of which are more exposed to danger and to having more significant injuries. Shoulder belts, lap belts, and the combination between the two appear to help decrease the amount of injuries that occur. 
+
+```{r, echo=FALSE}
+crashes %>%
+  filter(Injury != "NA", Injury != "Unknown", Protection != "NA", 
+         Protection != "NaN", Protection != "Unable to determine") %>%
+  group_by(Injury) %>%
+  ggplot(aes(fill=Injury, x=Protection)) + 
+  geom_bar(position="fill", stat="count") + 
+  coord_flip() + 
+  labs(title = "Injury Frequency by Protection",
+       x = "Protection",
+       y = "Percentage")
+```
+
+Signs and embankment led to the most people being killed. This may be because these are both stationary opaque objects that will continuously block people's views of the road and conditions. Also being blinded by other lights led to the most disabling injuries. 
+
+```{r, echo=FALSE}
+crashes %>%
+  filter(Injury != "NA", Injury != "Unknown", VisionObstruction != "NA", 
+         VisionObstruction != "NaN") %>%
+  group_by(Injury) %>%
+  ggplot(aes(fill=Injury, x=VisionObstruction)) + 
+  geom_bar(position="fill", stat="count") + 
+  coord_flip() + 
+  labs(title = "Injury Frequncy by Vision Obstruction",
+       x = "Vision Obstruction",
+       y = "Percentage")
+```
+
+When airbags were not deployed, there was a smaller amount of injuries. This may be because the crashes were not significant enough to cause the airbags to deploy, therefore, if the crash is not significant enough to cause airbags to deploy, the people in the crash were less likely to be harmed. When there were no airbags, there was not many injuries. This may be because cars without airbags tend to be older cars which may mean they cannot go fast enough to lead to an extremely dangerous car crash. When both front and side airbags deploy, there are a significant amount of injuries including disabling injuries. This may be due to the crash being bad enough to deploy the airbags, therefore, if the crash is bad enough, the people are more likely to be injured. 
+
+```{r, echo=FALSE}
+crashes %>%
+  filter(Injury != "NA", Injury != "Unknown", AirbagDeployed != "NA", 
+         AirbagDeployed != "NaN", AirbagDeployed != "Unknown") %>%
+  group_by(Injury) %>%
+  ggplot(aes(fill=Injury, x=AirbagDeployed)) + 
+  geom_bar(position="fill", stat="count") + 
+  coord_flip() + 
+  labs(title = "Injury Frequncy by Airbag Deployed",
+       x = "Airbag Deployed",
+       y = "Percentage")
+```
+
+The first harmful event that led to the second most people killed and disabling injuries was with pedestrians. This would make sense because pedestrians often do not have protection from cars. Overturn/rollover harmful events had the most amount of injuries. Backing up had the least amount of injuries which would make sense because when backing a car up, people tend to be going a slower speed than if they were accelerating forward.
+
+```{r, echo=FALSE}
+crashes %>%
+  filter(Injury != "NA", Injury != "Unknown", FirstHarmfulEvent != "NA", 
+         FirstHarmfulEvent != "NaN", FirstHarmfulEvent != "Unknown") %>%
+  group_by(Injury) %>%
+  ggplot(aes(fill=Injury, x=FirstHarmfulEvent)) + 
+  geom_bar(position="fill", stat="count") + 
+  coord_flip() + 
+  labs(title = "Injury Frequency by First Harmful Event",
+       x = "First Harmful Event",
+       y = "Percentage")
+```
+
+The most harmful event that led to most people killed and disabling injuries was with pedestrians. This would make sense because pedestrians often do not have protection from cars. Overturn/rollover harmful events also had a significant amount of injuries. Backing up had the least amount of injuries which would make sense because when backing a car up, people tend to be going a slower speed than if they were accelerating forward. 
+
+```{r, echo=FALSE}
+crashes %>%
+  filter(Injury != "NA", Injury != "Unknown", MostHarmfulEvent != "NA", 
+         MostHarmfulEvent != "NaN", MostHarmfulEvent != "Unknown") %>%
+  group_by(Injury) %>%
+  ggplot(aes(fill=Injury, x=MostHarmfulEvent)) + 
+  geom_bar(position="fill", stat="count") + 
+  coord_flip() + 
+  labs(title = "Injury Frequency by Most Harmful Event",
+       x = "Most Harmful Event",
+       y = "Percentage")
+```
+
+```{r, echo=FALSE}
+# Comparing Injury to Driver Age
+crashes %>%
+  filter(Injury != "NA", Injury != "Unknown", Injury != "", PersonType == "Driver", Age != "NA",
+         Age != "", Age != "Unknown", Age >= 5) %>%
+  group_by(Injury) %>%
+  mutate(shift = case_when(
+    Age >= 5 & Age < 15 ~ "5-14",
+    Age >= 15 & Age < 25 ~ "15-24",
+    Age >= 25 & Age < 35 ~ "25-34",
+    Age >= 35 & Age < 45 ~ "35-44",
+    Age >= 45 & Age < 55 ~ "45-54",
+    Age >= 55 & Age < 65 ~ "55-64",
+    Age >= 65 & Age < 75 ~ "65-74",
+    Age >= 75 & Age < 85 ~ "75-84",
+    Age >= 85 & Age < 95 ~ "85-94",
+    Age >= 95 & Age < 105 ~ "95-104",
+    Age >= 105 & Age < 115 ~ "105-114",
+    TRUE ~ "115-124")) %>%
+  ggplot(aes(fill=Injury, x=shift)) + 
+  geom_bar(position="fill", stat="count") + 
+  coord_flip() + 
+  labs(title = "Injury Frequency by Driver Age",
+       x = "Age",
+       y = "Percentage")
+```
+
+```{r, echo=FALSE}
+crashes %>%
+  filter(PersonType == "Driver", Age != "NA",
+         Age != "", Age != "Unknown", Age >= 5) %>%
+  mutate(age = case_when(
+    Age >= 5 & Age < 15 ~ "5-14",
+    Age >= 15 & Age < 25 ~ "15-24",
+    Age >= 25 & Age < 35 ~ "25-34",
+    Age >= 35 & Age < 45 ~ "35-44",
+    Age >= 45 & Age < 55 ~ "45-54",
+    Age >= 55 & Age < 65 ~ "55-64",
+    Age >= 65 & Age < 75 ~ "65-74",
+    Age >= 75 & Age < 85 ~ "75-84",
+    Age >= 85 & Age < 95 ~ "85-94",
+    Age >= 95 & Age < 105 ~ "95-104",
+    Age >= 105 & Age < 115 ~ "105-114",
+    TRUE ~ "115-124")) %>%
+  mutate(age = factor(age, levels = c("5-14", "15-24", "25-34", "35-44", "45-54",
+                                      "55-64", "65-74", "75-84", "85-94", 
+                                      "95-104", "105-114", "115-124"))) %>%
+  ggplot(aes(fill=age, x=age)) + 
+  geom_bar(show.legend = FALSE) + 
+  labs(title = "Frequency of Driver Age",
+       x = "Age",
+       y = "Count") + 
+  theme(axis.text.x = element_text(angle = 90))
+```
+
+```{r, echo=FALSE}
+crashes %>%
+  filter(Injury != "NA", Injury != "Unknown", Injury != "", PersonType == "Passenger", Age != "NA",
+         Age != "", Age != "Unknown") %>%
+  group_by(Injury) %>%
+  mutate(shift = case_when(
+    Age >= 0 & Age < 10 ~ "0-9",
+    Age >= 10 & Age < 20 ~ "10-19",
+    Age >= 20 & Age < 30 ~ "20-29",
+    Age >= 30 & Age < 40 ~ "30-39",
+    Age >= 40 & Age < 50 ~ "40-49",
+    Age >= 50 & Age < 60 ~ "50-59",
+    Age >= 60 & Age < 70 ~ "60-69",
+    Age >= 70 & Age < 80 ~ "70-79",
+    Age >= 80 & Age < 90 ~ "80-89",
+    Age >= 90 & Age < 100 ~ "90-99",
+    Age >= 100 & Age < 110 ~ "100-109",
+    Age >= 110 & Age < 120 ~ "110-119",
+    TRUE ~ "120-129")) %>%
+  ggplot(aes(fill=Injury, x=shift)) + 
+  geom_bar(position="fill", stat="count") + 
+  coord_flip() + 
+  labs(title = "Injury Frequency by Passenger Age",
+       x = "Age",
+       y = "Percentage")
+```
+
+```{r, echo=FALSE}
+crashes %>%
+  filter(PersonType == "Passenger", Age != "NA",
+         Age != "", Age != "Unknown") %>%
+  mutate(age = case_when(
+    Age >= 0 & Age < 10 ~ "0-9",
+    Age >= 10 & Age < 20 ~ "10-19",
+    Age >= 20 & Age < 30 ~ "20-29",
+    Age >= 30 & Age < 40 ~ "30-39",
+    Age >= 40 & Age < 50 ~ "40-49",
+    Age >= 50 & Age < 60 ~ "50-59",
+    Age >= 60 & Age < 70 ~ "60-69",
+    Age >= 70 & Age < 80 ~ "70-79",
+    Age >= 80 & Age < 90 ~ "80-89",
+    Age >= 90 & Age < 100 ~ "90-99",
+    Age >= 100 & Age < 110 ~ "100-109",
+    Age >= 110 & Age < 120 ~ "110-119",
+    TRUE ~ "120-129")) %>%
+  mutate(age = factor(age, levels = c("0-9", "10-19", "20-29", "30-39", "40-49", 
+                                      "50-59", "60-69", "70-79", "80-89", 
+                                      "90-99", "100-109", "110-119",
+                                      "120-129"))) %>%
+  ggplot(aes(fill=age, x=age)) + 
+  geom_bar(show.legend = FALSE) + 
+  labs(title = "Frequency of Passenger Age",
+       x = "Age",
+       y = "Percentage") + 
+  theme(axis.text.x = element_text(angle = 90))
+```
+
+## Identifying Hot Spots of Crashes in Wake County, North Carolina 
 
 ### Map of Crash Locations (North Carolina)
 
-```{r}
+```{r, echo=FALSE, eval=FALSE}
 crashes %>% 
   filter(LocationLatitude != "0", LocationLongitude != "0",
          LocationLatitude != "NA", LocationLatitude != "",
@@ -1616,24 +1473,20 @@ crashes %>%
   ggplot(aes(LocationLongitude, LocationLatitude)) +
   borders('county', 'north carolina', fill = "light blue") +
   geom_point(size=0.5, col = 'black', show.legend = F) +
-  coord_quickmap()
+  coord_quickmap() + 
+  ggtitle("North Carolina Map of Crash Locations") + 
+  xlab("Longitude") + ylab("Latitude")
 ```
 
-### Map of Crash Locations (Wake County)
-
-#### Install necessaary packages
-
-```{r}
+```{r, echo=FALSE, message=FALSE}
 library(maps)
 #install.packages("sf")
 library(sf)
 ```
 
-#### Create map 
-
 From the map, we can see that many crashes occur near the center of Wake County. This makes sense because in the center of Wake County sits Raleigh, the capital of North Carolina. 
 
-```{r}
+```{r, echo=FALSE, eval=FALSE}
 nc_counties <- map_data("county", "north carolina") %>%
   select(lon = long, lat, group, id = subregion)
 head(nc_counties)
@@ -1653,24 +1506,22 @@ crashes_filter <- crashes %>%
          LocationLongitude < -78, LocationLongitude > -79)
 
 wake_map <- wake_map + 
-  geom_point(data = crashes_filter, aes(x=LocationLongitude, y= LocationLatitude), colour = "blue", alpha = 1/10)
+  geom_point(data = crashes_filter, aes(x=LocationLongitude, y= LocationLatitude), colour = "blue", alpha = 1/10) + 
+  ggtitle("Wake County Map of Crashes ") + 
+  xlab("Longitude") + ylab("Latitude")
 
 wake_map
 ```
 
-### Heat Map of Crash Locations (Wake County)
-
-#### Load necessary packages
-```{r, message=FALSE}
+```{r, message=FALSE, echo=FALSE}
 library(ggplot2)
 #install.packages("ggmap")
 library(ggmap)
 library(RColorBrewer)
+library(plotly)
 ```
 
-#### Create map (zoomed-out version)
-
-```{r, message=FALSE, warning=FALSE}
+```{r, message=FALSE, warning=FALSE, echo=FALSE}
 map_bounds <- c(-78.98, 35.51, -78.24, 36.06)
 
 coords.map <- get_stamenmap(map_bounds, zoom = 10, maptype = "toner-lite")
@@ -1684,16 +1535,20 @@ coords.map <- coords.map + stat_density2d(data=crashes_filter,
                                           geom="polygon")
 coords.map <- coords.map +   scale_fill_gradientn(colours=rev(brewer.pal(7, "RdBu")))
 
-coords.map <- coords.map + theme_bw()
+coords.map <- coords.map + theme_bw() + 
+  ggtitle("Interactive Heat Map of Crashes in North Carolina (Zoomed-Out)") + 
+  xlab("Longitude") + ylab("Latitude")
 
-coords.map
+ggplotly(coords.map) %>%
+  highlight(
+    "plotly_hover",
+    selected = attrs_selected(line = list(color = "black"))
+  )
 ```
-
-#### Create map (zoomed-in version)
 
 From the Wake County heat map, we can see that crashes are much more likely to occur in the center of the city. We see that as more streets populate an area, more crashes occur. 
 
-```{r, message=FALSE, warning=FALSE}
+```{r, message=FALSE, warning=FALSE, echo=FALSE, eval=FALSE}
 crashes_filter <- crashes %>%
   filter(LocationLatitude != "0", LocationLongitude != "0",
          LocationLatitude != "NA", LocationLatitude != "",
@@ -1722,16 +1577,11 @@ coords.map <- coords.map + theme_bw() +
 coords.map
 ```
 
-## Interactive Heat Map of Crash Locations 
-
-### Loading necessary packages 
-```{r, message=FALSE}
+```{r, message=FALSE, echo=FALSE}
 library(plotly)
 ```
 
-### Create map 
-
-```{r, message=FALSE, warning=FALSE}
+```{r, message=FALSE, warning=FALSE, echo=FALSE}
 ggplotly(coords.map) %>%
   highlight(
     "plotly_hover",
@@ -1739,37 +1589,29 @@ ggplotly(coords.map) %>%
   )
 ```
 
-## Visualizing text data using word clouds 
-
-### Installing and loading necessary packages 
-
-```{r, message=FALSE}
+```{r, message=FALSE, echo=FALSE}
 devtools::install_github("gaospecial/wordcloud2")
 ```
 
-```{r, message=FALSE}
+```{r, message=FALSE, echo=FALSE}
 #install.packages('wordcloud2')
 library(wordcloud2)
 ```
 
-### Word Cloud for Location Road Name On  
-
 From the word cloud, we can see many crashes occur on 440, 40, and Capital Blvd. This makes sense because 440 and 40 are major interstates that connect to several major junctions and Capital Blvd is a main road in North Carolina as well. 
 
-```{r}
+```{r, echo=FALSE}
 location_road_name_on_freq <- crashes %>%
   count(LocationRoadNameOn)
 
 set.seed(101)
 location_road_name_on_freq %>%
-  wordcloud2(shape = 'circle', backgroundColor = "black", minSize = 5)
+  wordcloud2(shape = 'circle', backgroundColor = "black", minSize = 5) 
 ```
-
-### Word cloud for location road name at
 
 From the word cloud, we can see that 440, Capital Blvd, 40, and Blue Ridge Rd frequently have crashes that are near by. This would make sense because most of these streets are highly trafficked and populated. 
 
-```{r}
+```{r, echo=FALSE}
 location_road_name_at_freq <- crashes %>%
   count(LocationRoadNameAt)
 
@@ -1778,9 +1620,7 @@ location_road_name_at_freq %>%
   wordcloud2(shape = 'circle', backgroundColor = "black", minSize = 5)
 ```
 
-## Visualizing Data Using Time Series Plots
-
-### Time Series Plot for Frequency of Daily Crashes (With Pandemic Data)
+## Time Series Plots and Forecasts
 
 From the plot, we see that there are major spikes around March 2015, late October 2015, and December 2016. The two latter spikes may be related to the popular holidays, Halloween and Christmas. 
 
@@ -1962,6 +1802,8 @@ plot(fitted(covid), main = "Box Jenkins Decomposition of Daily Crashes (With Pan
 
 fcast <- forecast::forecast(covid, 214)
 
+fcast$method
+
 daily_forecast_values_covid_HW <- summary(fcast)
 
 rownames(daily_forecast_values_covid_HW) <- seq(as.Date("2021/06/01"), 
@@ -2049,16 +1891,23 @@ daily_forecast_values_noncovid_STLF
 ### HoltWinters Model (With Covid)
 
 ```{r}
-training_HW <- subset(crashests2, end=length(crashests2)-214)
-test_HW <- subset(crashests2, start=length(crashests2)-213)
+training_HW <- subset(crashests2, end=length(crashests2)-151)
+test_HW <- subset(crashests2, start=length(crashests2)-150)
 crashes.train_HW <- HoltWinters(training_HW)
 crashes.train_HW %>%
-  forecast::forecast(h=214) %>%
-  autoplot() + autolayer(test_HW, alpha=0.7)
+  forecast::forecast(h=151) %>%
+  autoplot() + autolayer(test_HW, alpha=0.7) + 
+  theme(legend.position = "bottom") + 
+  ggtitle("Multi-Step HoltWinters Forecasts of Crashes (With Pandemic Data)") + 
+  xlab("Date") + ylab("Crashes")
 
 autoplot(training_HW, series="Training data") +
   autolayer(fitted(crashes.train_HW, h=12),
-            series="12-step fitted values")
+            series="12-step fitted values") + 
+  theme(legend.position = "bottom") + 
+  ggtitle("Jenkins Box Decomposition of Crashes (With Pandemic Data)") + 
+  xlab("Date") + ylab("Crashes")
+  
 
 crashes.test_HW <- Arima(test_HW)
 accuracy(crashes.test_HW)
@@ -2067,16 +1916,23 @@ accuracy(crashes.test_HW)
 ### STLF (With Covid)
 
 ```{r}
-training_STLF <- subset(crashests2, end=length(crashests2)-214)
-test_STLF <- subset(crashests2, start=length(crashests2)-213)
-crashes.train_STLF <- stlf(training_STLF, lambda = 0, h = 214)
+training_STLF <- subset(crashests2, end=length(crashests2)-151)
+test_STLF <- subset(crashests2, start=length(crashests2)-150)
+crashes.train_STLF <- stlf(training_STLF, lambda = 0, h = 151)
 crashes.train_STLF %>%
-  forecast::forecast(h=214) %>%
-  autoplot() + autolayer(test_STLF, alpha = 0.6)
+  forecast::forecast(h=151) %>%
+  autoplot() + autolayer(test_STLF, alpha = 0.6) + 
+  theme(legend.position = "bottom") + 
+  ggtitle("Multi-Step STLF Forecasts of Crashes (With Pandemic Data)") + 
+  xlab("Date") + ylab("Crashes")
 
 autoplot(training_STLF, series="Training data") +
   autolayer(fitted(crashes.train_STLF, h=12),
-            series="12-step fitted values")
+            series="12-step fitted values") + 
+  theme(legend.position = "bottom") + 
+  ggtitle("12-Step Fitted Values STLF Model") + 
+  xlab("Date") + ylab("Crashes")
+  
 
 crashes.test_STLF <- Arima(test_STLF)
 accuracy(crashes.test_STLF)
@@ -2085,19 +1941,50 @@ accuracy(crashes.test_STLF)
 #HoltWinters (Noncovid)
 
 ```{r}
-training_HW_noncovid <- subset(crashests.noncovid , end=length(crashests.noncovid)-671)
-test_HW_noncovid <- subset(crashests.noncovid, start=length(crashests.noncovid)-670)
+training_HW_noncovid <- subset(crashests.noncovid , end=length(crashests.noncovid)-427)
+test_HW_noncovid <- subset(crashests.noncovid, start=length(crashests.noncovid)-426)
 crashes.train_HW_noncovid <- HoltWinters(training_HW_noncovid)
 crashes.train_HW_noncovid %>%
-  forecast::forecast(h=671) %>%
-  autoplot() + autolayer(test_HW_noncovid, alpha=0.7)
+  forecast::forecast(h=427) %>%
+  autoplot() + autolayer(test_HW_noncovid, alpha=0.7) + 
+  theme(legend.position = "bottom") + 
+  ggtitle("Multi-Step HoltWinters Forecasts of Crashes (Without Pandemic Data)") + 
+  xlab("Date") + ylab("Crashes")
 
 autoplot(training_HW_noncovid, series="Training data") +
   autolayer(fitted(crashes.train_HW_noncovid, h=12),
-            series="12-step fitted values")
+            series="12-step fitted values") + 
+  theme(legend.position = "bottom") + 
+  ggtitle("Jenkins Decomposition") + 
+  xlab("Date") + ylab("Crashes")
+  
 
 crashes.test_HW_noncovid <- Arima(test_HW_noncovid)
 accuracy(crashes.test_HW_noncovid)
+```
+
+### STLF (non covid)
+
+```{r}
+training_STLF_noncovid <- subset(crashests.noncovid, end=length(crashests.noncovid)-427)
+test_STLF_noncovid <- subset(crashests.noncovid, start=length(crashests.noncovid)-426)
+crashes.train_STLF_noncovid <- stlf(training_STLF_noncovid, lambda = 0, h = 427)
+crashes.train_STLF_noncovid %>%
+  forecast(h=427) %>%
+  autoplot() + autolayer(test_STLF_noncovid, alpha = 0.6) + 
+  theme(legend.position = "bottom") + 
+  ggtitle("Multi-Step STLF Forecasts of Crashes (Without Pandemic Data)") + 
+  xlab("Date") + ylab("Crashes")
+
+autoplot(training_STLF_noncovid, series="Training data") +
+  autolayer(fitted(crashes.train_STLF_noncovid, h=12),
+            series="12-step fitted values") + 
+  theme(legend.position = "bottom") + 
+  ggtitle("12-Step Fitted Values STLF Model") + 
+  xlab("Date") + ylab("Crashes")
+
+crashes.test_STLF_noncovid <- Arima(test_STLF_noncovid)
+accuracy(crashes.test_STLF_noncovid)
 ```
 
 ## Time Series Forecast of Monthly Crashes (With Pandemic Data)
@@ -2139,6 +2026,8 @@ fit.crashes <- tslm(crashes_mts4 ~ trend + season)
 summary(fit.crashes)
 
 fcast <- forecast::forecast(fit.crashes, h=8)
+
+summary(fcast$model)
 
 monthly_forecast_values_covid_lin <- summary(fcast)
 
@@ -2319,16 +2208,29 @@ monthly_forecast_values_noncovid_STLF
 ### HoltWinters (with Covid)
 
 ```{r}
-training_HW_monthly <- subset(crashes_mts4, end=length(crashes_mts4)-8)
-test_HW_monthly <- subset(crashes_mts4, start=length(crashes_mts4)-7)
+training_HW_monthly <- subset(crashes_mts4, end=length(crashes_mts4)-5)
+test_HW_monthly <- subset(crashes_mts4, start=length(crashes_mts4)-4)
 crashes.train_HW_monthly <- HoltWinters(training_HW_monthly)
 crashes.train_HW_monthly %>%
-  forecast::forecast(h=8) %>%
-  autoplot() + autolayer(test_HW_monthly)
+  forecast::forecast(h=5) %>%
+  autoplot() + autolayer(test_HW_monthly) + 
+  ggtitle("Multi-Step HoltWinters Monthly Forecasts of Crashes (Pandemic)") + 
+  xlab("Date") + ylab("Crashes") + 
+  scale_x_continuous(breaks = c(1,2,3,4,5,6,7), 
+                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
+                                "Jan 2019", "Jan 2020", "Jan 2021")) + 
+  theme(axis.text.x = element_text(angle = 90), legend.position = "bottom")
 
 autoplot(training_HW_monthly, series="Training data") +
   autolayer(fitted(crashes.train_HW_monthly, h=12),
-            series="12-step fitted values")
+            series="12-step fitted values") + 
+  theme(legend.position = "bottom") + 
+  ggtitle("Box Decomposition") + 
+  xlab("Date") + ylab("Crashes") + 
+  scale_x_continuous(breaks = c(1,2,3,4,5,6,7), 
+                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
+                                "Jan 2019", "Jan 2020", "Jan 2021")) + 
+  theme(axis.text.x = element_text(angle = 90), legend.position = "bottom")
 
 crashes.test_HW_monthly <- Arima(test_HW_monthly)
 accuracy(crashes.test_HW_monthly)
@@ -2337,34 +2239,60 @@ accuracy(crashes.test_HW_monthly)
 ### STLF (with Covid)
 
 ```{r}
-training_STLF_monthly <- subset(crashes_mts4, end=length(crashes_mts4)-8)
-test_STLF_monthly <- subset(crashes_mts4, start=length(crashes_mts4)-7)
-crashes.train_STLF_monthly <- stlf(training_STLF_monthly, lambda = 0, h = 8)
+training_STLF_monthly <- subset(crashes_mts4, end=length(crashes_mts4)-5)
+test_STLF_monthly <- subset(crashes_mts4, start=length(crashes_mts4)-4)
+crashes.train_STLF_monthly <- stlf(training_STLF_monthly, lambda = 0, h = 5)
 crashes.train_STLF_monthly %>%
-  forecast::forecast(h=8) %>%
-  autoplot() + autolayer(test_STLF_monthly)
+  forecast::forecast(h=5) %>%
+  autoplot() + autolayer(test_STLF_monthly) + 
+  ggtitle("Multi-Step STLF Monthly Forecasts of Crashes (Pandemic)") + 
+  xlab("Date") + ylab("Crashes") + 
+  scale_x_continuous(breaks = c(1,2,3,4,5,6,7), 
+                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
+                                "Jan 2019", "Jan 2020", "Jan 2021")) + 
+  theme(axis.text.x = element_text(angle = 90), legend.position = "bottom")
 
 autoplot(training_STLF_monthly, series="Training data") +
   autolayer(fitted(crashes.train_STLF_monthly, h=12),
-            series="12-step fitted values")
+            series="12-step fitted values") + 
+  theme(legend.position = "bottom") + 
+  ggtitle("12-Step Fitted Values") + 
+  xlab("Date") + ylab("Crashes") + 
+  scale_x_continuous(breaks = c(1,2,3,4,5,6,7), 
+                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
+                                "Jan 2019", "Jan 2020", "Jan 2021")) + 
+  theme(axis.text.x = element_text(angle = 90), legend.position = "bottom")
 
 crashes.test_STLF_monthly <- Arima(test_STLF_monthly)
 accuracy(crashes.test_STLF_monthly)
 ```
 
-###HoltWinters (Noncovid)
+### HoltWinters (Noncovid)
 
 ```{r}
-training_HW_noncovid_monthly <- subset(crashes_mts4.noncovid, end=length(crashes_mts4.noncovid)-23)
-test_HW_noncovid_monthly <- subset(crashes_mts4.noncovid, start=length(crashes_mts4.noncovid)-22)
+training_HW_noncovid_monthly <- subset(crashes_mts4.noncovid, end=length(crashes_mts4.noncovid)-13)
+test_HW_noncovid_monthly <- subset(crashes_mts4.noncovid, start=length(crashes_mts4.noncovid)-12)
 crashes.train_HW_noncovid_monthly <- HoltWinters(training_HW_noncovid_monthly)
 crashes.train_HW_noncovid_monthly %>%
-  forecast::forecast(h=23) %>%
-  autoplot() + autolayer(test_HW_noncovid_monthly)
+  forecast::forecast(h=13) %>%
+  autoplot() + autolayer(test_HW_noncovid_monthly) + 
+  ggtitle("Multi-Step HW Monthly Forecasts of Crashes (NonPandemic)") + 
+  xlab("Date") + ylab("Crashes") + 
+  scale_x_continuous(breaks = c(1,2,3,4,5,6,7), 
+                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
+                                "Jan 2019", "Jan 2020", "Jan 2021")) + 
+  theme(axis.text.x = element_text(angle = 90), legend.position = "bottom")
 
 autoplot(training_HW_noncovid_monthly, series="Training data") +
   autolayer(fitted(crashes.train_HW_noncovid_monthly, h=12),
-            series="12-step fitted values")
+            series="12-step fitted values") + 
+  theme(legend.position = "bottom") + 
+  ggtitle("Box Decomposition") + 
+  xlab("Date") + ylab("Crashes") + 
+  scale_x_continuous(breaks = c(1,2,3,4,5,6,7), 
+                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
+                                "Jan 2019", "Jan 2020", "Jan 2021")) + 
+  theme(axis.text.x = element_text(angle = 90), legend.position = "bottom")
 
 crashes.test_HW_noncovid_monthly <- Arima(test_HW_noncovid_monthly)
 accuracy(crashes.test_HW_noncovid_monthly)
@@ -2373,16 +2301,28 @@ accuracy(crashes.test_HW_noncovid_monthly)
 ### STLF (Noncovid)
 
 ```{r}
-training_STLF_noncovid_monthly <- subset(crashes_mts4.noncovid, end=length(crashes_mts4.noncovid)-23)
-test_STLF_noncovid_monthly <- subset(crashes_mts4.noncovid, start=length(crashes_mts4.noncovid)-22)
-crashes.train_STLF_noncovid_monthly <- stlf(training_STLF_noncovid_monthly, lambda = 0, h = 23)
+training_STLF_noncovid_monthly <- subset(crashes_mts4.noncovid, end=length(crashes_mts4.noncovid)-13)
+test_STLF_noncovid_monthly <- subset(crashes_mts4.noncovid, start=length(crashes_mts4.noncovid)-12)
+crashes.train_STLF_noncovid_monthly <- stlf(training_STLF_noncovid_monthly, lambda = 0, h = 13)
 crashes.train_STLF_noncovid_monthly %>%
-  forecast::forecast(h=23) %>%
-  autoplot() + autolayer(test_STLF_noncovid_monthly)
+  forecast::forecast(h=13) %>%
+  autoplot() + autolayer(test_STLF_noncovid_monthly) + 
+  ggtitle("Multi-Step STLF Monthly Forecasts of Crashes (NonPandemic)") + 
+  xlab("Date") + ylab("Crashes") + 
+  scale_x_continuous(breaks = c(1,2,3,4,5,6,7), 
+                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
+                                "Jan 2019", "Jan 2020", "Jan 2021")) + 
+  theme(axis.text.x = element_text(angle = 90), legend.position = "bottom")
 
 autoplot(training_STLF_noncovid_monthly, series="Training data") +
   autolayer(fitted(crashes.train_STLF_noncovid_monthly, h=12),
-            series="12-step fitted values")
+            series="12-step fitted values") + 
+  ggtitle("12-Step Fitted Values") + 
+  xlab("Date") + ylab("Crashes") + 
+  scale_x_continuous(breaks = c(1,2,3,4,5,6,7), 
+                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
+                                "Jan 2019", "Jan 2020", "Jan 2021")) + 
+  theme(axis.text.x = element_text(angle = 90), legend.position = "bottom")
 
 crashes.test_STLF_noncovid_monthly <- Arima(test_STLF_noncovid_monthly)
 accuracy(crashes.test_STLF_noncovid_monthly)

@@ -1632,23 +1632,30 @@ crashes.test_STLF_noncovid <- Arima(test_STLF_noncovid)
 accuracy(crashes.test_STLF_noncovid)
 
 ##Forecast Combinations (daily covid)
-train <- length(crashests2) - 214
+train <- window(crashests2, end=c(2019,12))
 h <- length(crashests2) - length(train)
-ETS <- forecast(ets(train), h=h)
-ARIMA <- forecast(auto.arima(train, lambda=0, biasadj=TRUE),h=h)
-#STL <- stlf(train, lambda=0, h=h, biasadj=TRUE)
-#NNAR <- forecast(nnetar(train), h=h)
+#ETS <- forecast(ets(train), h=h)
+ARIMA <- forecast(auto.arima(train, lambda=0, biasadj=TRUE), h=h)
+STL <- stlf(train, lambda=0, h=h, biasadj=TRUE)
+NNAR <- forecast(nnetar(train), h=h)
 TBATS <- forecast(tbats(train, biasadj=TRUE), h=h)
 Combination <- (ETS[["mean"]] + ARIMA[["mean"]] + TBATS[["mean"]])/3
 
-#plot does not work ??
 autoplot(crashests2) +
-  autolayer(ETS, series="ETS") +
-  autolayer(ARIMA, series="ARIMA") +
-  autolayer(TBATS, series="TBATS") +
-  autolayer(Combination, series="Combination") +
+  autolayer(NNAR, series="NNAR", alpha=0.7) +
+  autolayer(ARIMA, series="ARIMA", PI=F) +
+  autolayer(TBATS, series="TBATS", PI=F) +
+  autolayer(STL, series="STL", PI=F) +
+  autolayer(Combination, series="Combination", PI=F) +
   xlab("Year") + ylab("Crashes") +
   ggtitle("Crashes")
+
+c(ARIMA = accuracy(ARIMA, crashests2)["Test set", "RMSE"],
+  TBATS = accuracy(TBATS, crashests2)["Test set", "RMSE"],
+  NNAR = accuracy(NNAR, crashests2)["Test set", "RMSE"],
+  STL = accuracy(STL, crashests2)["Test set", "RMSE"],
+  Combination =
+    accuracy(Combination, crashests2)["Test set", "RMSE"])
 
 ##Different attempt at forecasting for monthly (THIS WORKS)
 #install.packages("Mcomp")
