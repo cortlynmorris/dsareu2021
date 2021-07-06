@@ -1622,11 +1622,13 @@ location_road_name_at_freq %>%
 
 ## Time Series Plots and Forecasts
 
+### Basic Time Series Plots
+
 From the plot, we see that there are major spikes around March 2015, late October 2015, and December 2016. The two latter spikes may be related to the popular holidays, Halloween and Christmas. 
 
 From the time series plot, we can see that there is a significant drop in car crashes in March 2020. This can be explained by the stay-at-home-orders due to the COVID-19 pandemic. After the stay at home orders, the frequency of crashes seems to be slightly lower throughout May 2021. There will likely be an increase in the next few month due to stay-at-home-orders and COVID-19 regulations being lifted now that the vaccination is available. 
 
-```{r}
+```{r, echo=FALSE}
 crashes_ts = crashes %>%
   separate(crash_date, 
            into = c("Date", "Hour"), sep = 11) %>%
@@ -1643,13 +1645,11 @@ crashes_ts %>%
   theme(axis.text.x = element_text(angle = 90))
 ```
 
-### Time Series Plot for Frequency of Daily Crashes With 7 Day Moving Average (With Pandemic Data)
-
-```{r}
+```{r, echo=FALSE, message=FALSE}
 library(zoo)
 ```
 
-```{r}
+```{r, echo=FALSE}
 crashes_ts %>%
   filter(as.Date(Date) >= "2015/01/01") %>%
   ggplot(aes(x = as.Date(Date), y = count)) + 
@@ -1660,9 +1660,7 @@ crashes_ts %>%
   ggtitle("Time Series Plot for Frequency of Daily Crashes With 7 Day Moving Average (With Pandemic Data)")
 ```
 
-### Time Series Plot for Frequency of Daily Crashes With 30 Day Moving Average (With Pandemic Data)
-
-```{r}
+```{r, echo=FALSE, eval=FALSE}
 crashes_ts %>%
   filter(as.Date(Date) >= "2015/01/01") %>%
   ggplot(aes(x = as.Date(Date), y = count)) + 
@@ -1673,9 +1671,7 @@ crashes_ts %>%
   ggtitle("Time Series Plot for Frequency of Daily Crashes With 30 Day Moving Average (With Pandemic Data)")
 ```
 
-### Time Series Plot for Frequency of Daily Crashes With 100 Day Moving Average (With Pandemic Data)
-
-```{r}
+```{r, echo=FALSE, eval=FALSE}
 crashes_ts %>%
   filter(as.Date(Date) >= "2015/01/01") %>%
   ggplot(aes(x = as.Date(Date), y = count)) + 
@@ -1686,9 +1682,7 @@ crashes_ts %>%
   ggtitle("Time Series Plot for Frequency of Daily Crashes with 100 Day Moving Average (with Pandemic Data)")
 ```
 
-### Time Series Plot for Frequency of Daily Crashes (Without Pandemic Data)
-
-```{r}
+```{r, echo=FALSE}
 crashes_ts.noncovid = crashes %>%
   filter(as.Date(crash_date) >= "2015/01/01" & as.Date(crash_date) <= "2020/03/01") %>%
   separate(crash_date, 
@@ -1705,19 +1699,13 @@ crashes_ts.noncovid %>%
   theme(axis.text.x = element_text(angle = 90))
 ```
 
-### Time Series Plot for Frequency of Daily Crashes From January 2015 to May 2021 and Regression Line (With Pandemic Data)
-
-#### Loading necessary libraries
-
-```{r, message=FALSE}
+```{r, message=FALSE, echo=FALSE}
 library(forecast)
 library(fpp2)
 library(TTR)
 ```
 
-#### Plotting
-
-```{r, message=FALSE}
+```{r, message=FALSE, echo=FALSE}
 #Converting crashes_ts to a time series object 
 crashests2 <- ts(crashes_ts$count, start = c(2015,1), end = c(2021,153),
                 frequency = 365)
@@ -1741,9 +1729,7 @@ autoplot(crashests[,'count'], series="Data") +
   theme(axis.text.x = element_text(angle = 90))
 ```
 
-### Time Series Plot for Frequency of Daily Crashes From January 2015 to May 2021 and Regression Line (Without Pandemic Data)
-
-```{r, message=FALSE}
+```{r, message=FALSE, echo=FALSE}
 #Converting crashes_ts to a time series object using ts
 crashests.noncovid <- ts(crashes_ts.noncovid$count, start = c(2015,1), 
                          end = c(2020,59), frequency = 365)
@@ -1768,9 +1754,7 @@ autoplot(crashests.noncovid2[,'count'], series="Data") +
   theme(axis.text.x = element_text(angle = 90))
 ```
 
-### Time Series Plot for Frequency of Daily Crashes Organized by Year From January 2015 to May 2021 (With Pandemic Data)
-
-```{r}
+```{r, echo=FALSE}
 crashes_annual = crashes_ts %>%
   separate(Date, 
            into = c("Year", "Month"), sep = 4, remove = FALSE) %>%
@@ -1789,11 +1773,7 @@ crashes_annual %>%
 
 ## Forecasting Using Time Series Plots
 
-### Time Series Forecast of Daily Crashes (With Pandemic Data)
-
-#### HoltWinters Forecasting and Time Series (With Pandemic Data)
-
-```{r}
+```{r, echo=FALSE}
 covid <- HoltWinters(crashests2)
 
 summary(covid)
@@ -1812,13 +1792,11 @@ rownames(daily_forecast_values_covid_HW) <- seq(as.Date("2021/06/01"),
 daily_forecast_values_covid_HW
 
 autoplot(fcast) +
-  ggtitle("Forecasts of Daily Car Crashes Using Holt Winters (With Pandemic Data)") +
+  ggtitle("Forecasts of Daily Car Crashes Using HoltWinters (With Pandemic Data)") +
   xlab("Year") + ylab("Crashes")
 ```
 
-#### STLF Forecasting and Time Series (With Pandemic Data) 
-
-```{r}
+```{r, echo=FALSE}
 crashests2 %>% mstl() %>%
   autoplot()
 
@@ -1827,7 +1805,7 @@ m <- crashests2 %>%
 
 m %>%
   autoplot() + 
-  ggtitle("Seasonal and Trend Decomposition Using Loess Forecasting Model for Daily Car Crashes (With Pandemic Data)") +
+  ggtitle("STLF Model for Daily Car Crashes (With Pandemic Data)") +
   xlab("Year") + ylab("Crashes")
 
 daily_forecast_values_covid_STLF <- summary(m)
@@ -1838,11 +1816,7 @@ rownames(daily_forecast_values_covid_STLF) <- seq(as.Date("2021/06/01"),
 daily_forecast_values_covid_STLF
 ```
 
-### Time Series Forecast of Daily Crashes (Without Pandemic Data)
-
-#### HoltWinters Forecast and Time Series (Without Pandemic Data)
-
-```{r}
+```{r, echo=FALSE}
 noncovid <- HoltWinters(crashests.noncovid)
 
 summary(noncovid)
@@ -1864,9 +1838,7 @@ autoplot(fcast.noncovid) +
 
 ```
 
-#### STLF Forecast and Time Series (Without Pandemic Data)
-
-```{r}
+```{r, echo=FALSE}
 crashests.noncovid %>% mstl() %>%
   autoplot()
 
@@ -1875,7 +1847,7 @@ p <- crashests.noncovid %>%
 
 p %>%
   autoplot() + 
-  ggtitle("Seasonal and Trend Decomposition Using Loess Forecasting Model for Daily Car Crashes (Without Pandemic Data)") +
+  ggtitle("STLF Model for Daily Car Crashes (Without Pandemic Data)") +
   xlab("Year") + ylab("Daily Crashes")
 
 daily_forecast_values_noncovid_STLF <- summary(p)
@@ -1886,11 +1858,7 @@ rownames(daily_forecast_values_noncovid_STLF) <- seq(as.Date("2020/03/01"),
 daily_forecast_values_noncovid_STLF
 ```
 
-## Multi-Step Forecasts on Training Data (Daily)
-
-### HoltWinters Model (With Covid)
-
-```{r}
+```{r, echo=FALSE}
 training_HW <- subset(crashests2, end=length(crashests2)-151)
 test_HW <- subset(crashests2, start=length(crashests2)-150)
 crashes.train_HW <- HoltWinters(training_HW)
@@ -1913,9 +1881,7 @@ crashes.test_HW <- Arima(test_HW)
 accuracy(crashes.test_HW)
 ```
 
-### STLF (With Covid)
-
-```{r}
+```{r, echo=FALSE}
 training_STLF <- subset(crashests2, end=length(crashests2)-151)
 test_STLF <- subset(crashests2, start=length(crashests2)-150)
 crashes.train_STLF <- stlf(training_STLF, lambda = 0, h = 151)
@@ -1938,9 +1904,7 @@ crashes.test_STLF <- Arima(test_STLF)
 accuracy(crashes.test_STLF)
 ```
 
-#HoltWinters (Noncovid)
-
-```{r}
+```{r, echo=FALSE}
 training_HW_noncovid <- subset(crashests.noncovid , end=length(crashests.noncovid)-427)
 test_HW_noncovid <- subset(crashests.noncovid, start=length(crashests.noncovid)-426)
 crashes.train_HW_noncovid <- HoltWinters(training_HW_noncovid)
@@ -1963,9 +1927,7 @@ crashes.test_HW_noncovid <- Arima(test_HW_noncovid)
 accuracy(crashes.test_HW_noncovid)
 ```
 
-### STLF (non covid)
-
-```{r}
+```{r, echo=FALSE}
 training_STLF_noncovid <- subset(crashests.noncovid, end=length(crashests.noncovid)-427)
 test_STLF_noncovid <- subset(crashests.noncovid, start=length(crashests.noncovid)-426)
 crashes.train_STLF_noncovid <- stlf(training_STLF_noncovid, lambda = 0, h = 427)
@@ -1987,18 +1949,12 @@ crashes.test_STLF_noncovid <- Arima(test_STLF_noncovid)
 accuracy(crashes.test_STLF_noncovid)
 ```
 
-## Time Series Forecast of Monthly Crashes (With Pandemic Data)
-
-### Loading Necessary Packages
-
-```{r, message=FALSE}
+```{r, message=FALSE, echo=FALSE}
 library(Mcomp)
 library(smooth)
 ```
 
-### Time Series Forecast of Monthly Crashes Using Linear Model (With Pandemic Data)
-
-```{r, message=FALSE}
+```{r, message=FALSE, echo=FALSE}
 crashes_mts = crashes %>%
   filter(as.Date(crash_date) >= "2015/01/01" & as.Date(crash_date) <= "2021/05/31") %>%
   separate(crash_date, 
@@ -2045,9 +2001,7 @@ autoplot(fcast) +
   theme(axis.text.x = element_text(angle = 90))
 ```
 
-### Time Series Forecast of Monthly Crashes Using Linear Model (Without Pandemic Data)
-
-```{r, message=FALSE}
+```{r, message=FALSE, echo=FALSE}
 crashes_mts.noncovid = crashes %>%
   filter(as.Date(crash_date) >= "2015/01/01" & as.Date(crash_date) <= "2020/02/29") %>%
   separate(crash_date, 
@@ -2095,9 +2049,7 @@ autoplot(fcast.noncovid) +
   theme(axis.text.x = element_text(angle = 90))
 ```
 
-### Time Series Forecast of Monthly Crashes Using HoltWinters (With Pandemic Data)
-
-```{r}
+```{r, echo=FALSE}
 covid.monthly <- HoltWinters(crashes_mts4)
 
 summary(covid.monthly)
@@ -2123,9 +2075,7 @@ autoplot(fcast.covid.monthly) +
   theme(axis.text.x = element_text(angle = 90))
 ```
 
-### Time Series Forecast of Monthly Crashes Using HoltWinters (Without Pandemic Data)
-
-```{r}
+```{r, echo=FALSE}
 noncovid.monthly <- HoltWinters(crashes_mts4.noncovid)
 
 summary(noncovid.monthly)
@@ -2151,9 +2101,7 @@ autoplot(fcast.noncovid.monthly) +
   theme(axis.text.x = element_text(angle = 90))
 ```
 
-### Seasonal and Trend Decomposition Using Loess Forecasting Model of Monthly Crashes (With Pandemic Data)
-
-```{r}
+```{r, echo=FALSE}
 crashes_mts4 %>% mstl() %>%
   autoplot()
 
@@ -2177,9 +2125,7 @@ rownames(monthly_forecast_values_covid_STLF) <- seq(as.Date("2021/05/31"),
 monthly_forecast_values_covid_STLF
 ```
 
-### Seasonal and Trend Decomposition Using Loess Forecasting Model of Monthly Crashes (Without Pandemic Data)
-
-```{r}
+```{r, echo=FALSE}
 crashes_mts4.noncovid %>% mstl() %>%
   autoplot()
 
@@ -2203,11 +2149,7 @@ rownames(monthly_forecast_values_noncovid_STLF) <- seq(as.Date("2020/02/29"),
 monthly_forecast_values_noncovid_STLF
 ```
 
-## Multi-step Forecasts on Training Data (Monthly)
-
-### HoltWinters (with Covid)
-
-```{r}
+```{r, echo=FALSE}
 training_HW_monthly <- subset(crashes_mts4, end=length(crashes_mts4)-5)
 test_HW_monthly <- subset(crashes_mts4, start=length(crashes_mts4)-4)
 crashes.train_HW_monthly <- HoltWinters(training_HW_monthly)
@@ -2236,9 +2178,7 @@ crashes.test_HW_monthly <- Arima(test_HW_monthly)
 accuracy(crashes.test_HW_monthly)
 ```
 
-### STLF (with Covid)
-
-```{r}
+```{r, echo=FALSE}
 training_STLF_monthly <- subset(crashes_mts4, end=length(crashes_mts4)-5)
 test_STLF_monthly <- subset(crashes_mts4, start=length(crashes_mts4)-4)
 crashes.train_STLF_monthly <- stlf(training_STLF_monthly, lambda = 0, h = 5)
@@ -2267,9 +2207,7 @@ crashes.test_STLF_monthly <- Arima(test_STLF_monthly)
 accuracy(crashes.test_STLF_monthly)
 ```
 
-### HoltWinters (Noncovid)
-
-```{r}
+```{r, echo=FALSE}
 training_HW_noncovid_monthly <- subset(crashes_mts4.noncovid, end=length(crashes_mts4.noncovid)-13)
 test_HW_noncovid_monthly <- subset(crashes_mts4.noncovid, start=length(crashes_mts4.noncovid)-12)
 crashes.train_HW_noncovid_monthly <- HoltWinters(training_HW_noncovid_monthly)
@@ -2298,9 +2236,7 @@ crashes.test_HW_noncovid_monthly <- Arima(test_HW_noncovid_monthly)
 accuracy(crashes.test_HW_noncovid_monthly)
 ```
 
-### STLF (Noncovid)
-
-```{r}
+```{r, echo=FALSE}
 training_STLF_noncovid_monthly <- subset(crashes_mts4.noncovid, end=length(crashes_mts4.noncovid)-13)
 test_STLF_noncovid_monthly <- subset(crashes_mts4.noncovid, start=length(crashes_mts4.noncovid)-12)
 crashes.train_STLF_noncovid_monthly <- stlf(training_STLF_noncovid_monthly, lambda = 0, h = 13)
