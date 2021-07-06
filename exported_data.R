@@ -1675,7 +1675,31 @@ crashes_mts = crashes %>%
   summarise(mcount = sum(count)) %>%
   tidyr::spread(key=Month, value=mcount)
 
+crashes_mts_test = crashes %>%
+  filter(as.Date(crash_date) >= "2015/01/01" & as.Date(crash_date) <= "2021/05/31") %>%
+  separate(crash_date, 
+           into = c("Date", "Hour"), sep = 11) %>%
+  group_by(Date) %>%
+  summarize(count = length(unique(key_crash))) %>%
+  separate(Date, into = c("Year", "Month", "Day"), sep = "/") %>%
+  group_by(Year, Month) %>%
+  summarise(mcount = sum(count))
+
+crashes_mts_test %>%
+  mutate(date = seq(as.Date(2015/01/01), as.Date(2021/05/01), Month))
+
+crashes_mts_test %>%
+  ggplot(aes(x = Month, y = mcount)) + 
+  geom_line() +
+  geom_line(aes(y=rollmean(mcount, 2, na.pad = TRUE)), color = "red") +
+  scale_x_date(date_labels = "%m-%Y", date_breaks = "6 month") + 
+  theme(axis.text.x = element_text(angle = 90)) + 
+  ggtitle("Time Series Plot for Frequency of Daily Crashes With 7 Day Moving Average (With Pandemic Data)")
+
+
 crashes_mts = as.data.frame(crashes_mts)
+
+plot(crashes_mts)
 
 rownames(crashes_mts) = seq(2015, 2021)
 
