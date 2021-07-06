@@ -35,7 +35,18 @@ library(zoo)
 
 ### Reading and Merging the Data
 
-```{r, message=FALSE, echo=FALSE}
+```{r, message=FALSE}
+#Code for Cortlyns computer (Mac)
+setwd("/Users/cmorris/Desktop/dsreu2021/rstudiodirectory/ResearchProject")
+persons <- read.csv(file="Persons_Involved_in_Crashes.csv")
+glimpse(persons)
+   
+locations <- read.csv(file="Reported_Crash_Locations.csv")
+glimpse(locations)
+   
+crashes <- persons %>% left_join(locations, by="key_crash")
+
+#Code for Kellys computer (Windows)
  ##Code for Cortlyn's computer (Mac)
 # setwd("/Users/cmorris/Desktop/dsreu2021/rstudiodirectory/ResearchProject")
 # persons <- read.csv(file="Persons_Involved_in_Crashes.csv")
@@ -48,11 +59,11 @@ library(zoo)
 
 #Code for Kelly's computer (Windows)
 #library(readr)
-persons <- read_csv("~/NCAT REU/Mostafa/Data/Persons_Involved_in_Crashes.csv")
+# persons <- read_csv("~/NCAT REU/Mostafa/Data/Persons_Involved_in_Crashes.csv")
 
-locations <- read_csv("~/NCAT REU/Mostafa/Data/Reported_Crash_Locations.csv")
+# locations <- read_csv("~/NCAT REU/Mostafa/Data/Reported_Crash_Locations.csv")
 
-crashes <- persons %>% left_join(locations, by="key_crash")
+# crashes <- persons %>% left_join(locations, by="key_crash")
 
 # Code for Ayan's computer (Window)
 #library(readr)

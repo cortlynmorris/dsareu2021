@@ -1714,15 +1714,15 @@ fit.crashes <- tslm(crashes_mts4 ~ trend + season)
 
 summary(fit.crashes)
 
-fcast <- forecast::forecast(fit.crashes, h=8)
+fcast2 <- forecast::forecast(fit.crashes, h=8)
 
-monthly_forecast_values_covid_lin <- summary(fcast)
+monthly_forecast_values_covid_lin <- summary(fcast2)
 
 rownames(monthly_forecast_values_covid_lin) <- seq(as.Date("2021/05/31"), 
                                                      as.Date("2021/12/31"), 
                                                    "month")
 
-autoplot(fcast) +
+autoplot(fcast2) +
   ggtitle("Forecasts of Monthly Car Crashes Using Linear Model (With Pandemic Data)") +
   xlab("Year") + ylab("Monthly Crashes") + 
   scale_x_continuous(breaks = c(1,2,3,4,5,6,7,8), 
