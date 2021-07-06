@@ -1840,9 +1840,9 @@ crashes.test_STLF_monthly <- Arima(test_STLF_monthly)
 accuracy(crashes.test_STLF_monthly)
 
 #HW (noncovid)
-training_HW_noncovid_monthly <- subset(crashes_mts4.noncovid, end=length(crashes_mts4.noncovid)-24)
-test_HW_noncovid_monthly <- subset(crashes_mts4.noncovid, start=length(crashes_mts4.noncovid)-23)
-crashes.train_HW_noncovid_monthly <- HoltWinters(crashes_mts4.noncovid)
+training_HW_noncovid_monthly <- subset(crashes_mts4.noncovid, end=length(crashes_mts4.noncovid)-23)
+test_HW_noncovid_monthly <- subset(crashes_mts4.noncovid, start=length(crashes_mts4.noncovid)-22)
+crashes.train_HW_noncovid_monthly <- HoltWinters(training_HW_noncovid_monthly)
 crashes.train_HW_noncovid_monthly %>%
   forecast(h=23) %>%
   autoplot() + autolayer(test_HW_noncovid_monthly)
