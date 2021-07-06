@@ -2311,6 +2311,80 @@ rownames(monthly_forecast_values_noncovid_STLF) <- seq(as.Date("2020/02/29"),
 monthly_forecast_values_noncovid_STLF
 ```
 
+## Multi-step Forecasts on Training Data (Monthly)
+
+### HoltWinters (with Covid)
+
+```{r}
+training_HW_monthly <- subset(crashes_mts4, end=length(crashes_mts4)-8)
+test_HW_monthly <- subset(crashes_mts4, start=length(crashes_mts4)-7)
+crashes.train_HW_monthly <- HoltWinters(training_HW_monthly)
+crashes.train_HW_monthly %>%
+  forecast(h=8) %>%
+  autoplot() + autolayer(test_HW_monthly)
+
+autoplot(training_HW_monthly, series="Training data") +
+  autolayer(fitted(crashes.train_HW_monthly, h=12),
+            series="12-step fitted values")
+
+crashes.test_HW_monthly <- Arima(test_HW_monthly)
+accuracy(crashes.test_HW_monthly)
+```
+
+### STLF (with Covid)
+
+```{r}
+training_STLF_monthly <- subset(crashes_mts4, end=length(crashes_mts4)-8)
+test_STLF_monthly <- subset(crashes_mts4, start=length(crashes_mts4)-7)
+crashes.train_STLF_monthly <- stlf(training_STLF_monthly, lambda = 0, h = 8)
+crashes.train_STLF_monthly %>%
+  forecast(h=8) %>%
+  autoplot() + autolayer(test_STLF_monthly)
+
+autoplot(training_STLF_monthly, series="Training data") +
+  autolayer(fitted(crashes.train_STLF_monthly, h=12),
+            series="12-step fitted values")
+
+crashes.test_STLF_monthly <- Arima(test_STLF_monthly)
+accuracy(crashes.test_STLF_monthly)
+```
+
+###HoltWinters (Noncovid)
+
+```{r}
+training_HW_noncovid_monthly <- subset(crashes_mts4.noncovid, end=length(crashes_mts4.noncovid)-24)
+test_HW_noncovid_monthly <- subset(crashes_mts4.noncovid, start=length(crashes_mts4.noncovid)-23)
+crashes.train_HW_noncovid_monthly <- HoltWinters(crashes_mts4.noncovid)
+crashes.train_HW_noncovid_monthly %>%
+  forecast(h=23) %>%
+  autoplot() + autolayer(test_HW_noncovid_monthly)
+
+autoplot(training_HW_noncovid_monthly, series="Training data") +
+  autolayer(fitted(crashes.train_HW_noncovid_monthly, h=12),
+            series="12-step fitted values")
+
+crashes.test_HW_noncovid_monthly <- Arima(test_HW_noncovid_monthly)
+accuracy(crashes.test_HW_noncovid_monthly)
+```
+
+### STLF (Noncovid)
+
+```{r}
+training_STLF_noncovid_monthly <- subset(crashes_mts4.noncovid, end=length(crashes_mts4.noncovid)-23)
+test_STLF_noncovid_monthly <- subset(crashes_mts4.noncovid, start=length(crashes_mts4.noncovid)-22)
+crashes.train_STLF_noncovid_monthly <- stlf(training_STLF_noncovid_monthly, lambda = 0, h = 23)
+crashes.train_STLF_noncovid_monthly %>%
+  forecast(h=23) %>%
+  autoplot() + autolayer(test_STLF_noncovid_monthly)
+
+autoplot(training_STLF_noncovid_monthly, series="Training data") +
+  autolayer(fitted(crashes.train_STLF_noncovid_monthly, h=12),
+            series="12-step fitted values")
+
+crashes.test_STLF_noncovid_monthly <- Arima(test_STLF_noncovid_monthly)
+accuracy(crashes.test_STLF_noncovid_monthly)
+```
+
 ## Advanced Forecasting Methods 
 
 ### Neural Network Autoregression Forecasting Model of Daily Crashes (With Pandemic Data)
