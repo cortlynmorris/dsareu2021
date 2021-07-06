@@ -1570,6 +1570,67 @@ daily_forecast_values_noncovid_STLF <- summary(p)
 rownames(daily_forecast_values_noncovid_STLF) <- seq(as.Date("2020/03/01"), 
                                                    as.Date("2021/12/31"), "day")
 
+##Multi-step forecasts on training data (daily)
+#HW (with covid)
+training_HW <- subset(crashests2, end=length(crashests2)-214)
+test_HW <- subset(crashests2, start=length(crashests2)-213)
+crashes.train_HW <- HoltWinters(training_HW)
+crashes.train_HW %>%
+  forecast(h=214) %>%
+  autoplot() + autolayer(test_HW, alpha=0.7)
+
+autoplot(training_HW, series="Training data") +
+  autolayer(fitted(crashes.train_HW, h=12),
+            series="12-step fitted values")
+
+crashes.test_HW <- Arima(test_HW)
+accuracy(crashes.test_HW)
+
+#STLF (with covid)
+training_STLF <- subset(crashests2, end=length(crashests2)-214)
+test_STLF <- subset(crashests2, start=length(crashests2)-213)
+crashes.train_STLF <- stlf(training_STLF, lambda = 0, h = 214)
+crashes.train_STLF %>%
+  forecast(h=214) %>%
+  autoplot() + autolayer(test_STLF, alpha = 0.6)
+
+autoplot(training_STLF, series="Training data") +
+  autolayer(fitted(crashes.train_STLF, h=12),
+            series="12-step fitted values")
+
+crashes.test_STLF <- Arima(test_STLF)
+accuracy(crashes.test_STLF)
+
+#HW (noncovid)
+training_HW_noncovid <- subset(crashests.noncovid , end=length(crashests.noncovid)-671)
+test_HW_noncovid <- subset(crashests.noncovid, start=length(crashests.noncovid)-670)
+crashes.train_HW_noncovid <- HoltWinters(training_HW_noncovid)
+crashes.train_HW_noncovid %>%
+  forecast(h=671) %>%
+  autoplot() + autolayer(test_HW_noncovid, alpha=0.7)
+
+autoplot(training_HW_noncovid, series="Training data") +
+  autolayer(fitted(crashes.train_HW_noncovid, h=12),
+            series="12-step fitted values")
+
+crashes.test_HW_noncovid <- Arima(test_HW_noncovid)
+accuracy(crashes.test_HW_noncovid)
+
+#STLF (non covid)
+training_STLF_noncovid <- subset(crashests.noncovid, end=length(crashests.noncovid)-671)
+test_STLF_noncovid <- subset(crashests.noncovid, start=length(crashests.noncovid)-670)
+crashes.train_STLF_noncovid <- stlf(training_STLF_noncovid, lambda = 0, h = 671)
+crashes.train_STLF_noncovid %>%
+  forecast(h=671) %>%
+  autoplot() + autolayer(test_STLF_noncovid, alpha = 0.6)
+
+autoplot(training_STLF_noncovid, series="Training data") +
+  autolayer(fitted(crashes.train_STLF_noncovid, h=12),
+            series="12-step fitted values")
+
+crashes.test_STLF_noncovid <- Arima(test_STLF_noncovid)
+accuracy(crashes.test_STLF_noncovid)
+
 ##Different attempt at forecasting for monthly (THIS WORKS)
 #install.packages("Mcomp")
 #install.packages("smooth")
