@@ -5,7 +5,7 @@ date: "6/11/2021"
 output: 
   html_document:
     toc: true
-    theme: united
+    toc_float: true
 ---
 
 ```{r setup, include=FALSE}
@@ -2100,16 +2100,16 @@ crashes.test_HW_noncovid <- Arima(test_HW_noncovid)
 accuracy(crashes.test_HW_noncovid)
 ```
 
-### Time Series Forecast of Monthly Crashes (With Pandemic Data)
+## Time Series Forecast of Monthly Crashes (With Pandemic Data)
 
-#### Loading Necessary Packages
+### Loading Necessary Packages
 
 ```{r, message=FALSE}
 library(Mcomp)
 library(smooth)
 ```
 
-#### Time Series Forecast of Monthly Crashes Using Linear Model (With Pandemic Data)
+### Time Series Forecast of Monthly Crashes Using Linear Model (With Pandemic Data)
 
 ```{r, message=FALSE}
 crashes_mts = crashes %>%
