@@ -2053,7 +2053,7 @@ training_HW <- subset(crashests2, end=length(crashests2)-214)
 test_HW <- subset(crashests2, start=length(crashests2)-213)
 crashes.train_HW <- HoltWinters(training_HW)
 crashes.train_HW %>%
-  forecast(h=214) %>%
+  forecast::forecast(h=214) %>%
   autoplot() + autolayer(test_HW, alpha=0.7)
 
 autoplot(training_HW, series="Training data") +
@@ -2071,7 +2071,7 @@ training_STLF <- subset(crashests2, end=length(crashests2)-214)
 test_STLF <- subset(crashests2, start=length(crashests2)-213)
 crashes.train_STLF <- stlf(training_STLF, lambda = 0, h = 214)
 crashes.train_STLF %>%
-  forecast(h=214) %>%
+  forecast::forecast(h=214) %>%
   autoplot() + autolayer(test_STLF, alpha = 0.6)
 
 autoplot(training_STLF, series="Training data") +
@@ -2089,7 +2089,7 @@ training_HW_noncovid <- subset(crashests.noncovid , end=length(crashests.noncovi
 test_HW_noncovid <- subset(crashests.noncovid, start=length(crashests.noncovid)-670)
 crashes.train_HW_noncovid <- HoltWinters(training_HW_noncovid)
 crashes.train_HW_noncovid %>%
-  forecast(h=671) %>%
+  forecast::forecast(h=671) %>%
   autoplot() + autolayer(test_HW_noncovid, alpha=0.7)
 
 autoplot(training_HW_noncovid, series="Training data") +
@@ -2323,7 +2323,7 @@ training_HW_monthly <- subset(crashes_mts4, end=length(crashes_mts4)-8)
 test_HW_monthly <- subset(crashes_mts4, start=length(crashes_mts4)-7)
 crashes.train_HW_monthly <- HoltWinters(training_HW_monthly)
 crashes.train_HW_monthly %>%
-  forecast(h=8) %>%
+  forecast::forecast(h=8) %>%
   autoplot() + autolayer(test_HW_monthly)
 
 autoplot(training_HW_monthly, series="Training data") +
@@ -2341,7 +2341,7 @@ training_STLF_monthly <- subset(crashes_mts4, end=length(crashes_mts4)-8)
 test_STLF_monthly <- subset(crashes_mts4, start=length(crashes_mts4)-7)
 crashes.train_STLF_monthly <- stlf(training_STLF_monthly, lambda = 0, h = 8)
 crashes.train_STLF_monthly %>%
-  forecast(h=8) %>%
+  forecast::forecast(h=8) %>%
   autoplot() + autolayer(test_STLF_monthly)
 
 autoplot(training_STLF_monthly, series="Training data") +
@@ -2359,7 +2359,7 @@ training_HW_noncovid_monthly <- subset(crashes_mts4.noncovid, end=length(crashes
 test_HW_noncovid_monthly <- subset(crashes_mts4.noncovid, start=length(crashes_mts4.noncovid)-22)
 crashes.train_HW_noncovid_monthly <- HoltWinters(training_HW_noncovid_monthly)
 crashes.train_HW_noncovid_monthly %>%
-  forecast(h=23) %>%
+  forecast::forecast(h=23) %>%
   autoplot() + autolayer(test_HW_noncovid_monthly)
 
 autoplot(training_HW_noncovid_monthly, series="Training data") +
@@ -2377,7 +2377,7 @@ training_STLF_noncovid_monthly <- subset(crashes_mts4.noncovid, end=length(crash
 test_STLF_noncovid_monthly <- subset(crashes_mts4.noncovid, start=length(crashes_mts4.noncovid)-22)
 crashes.train_STLF_noncovid_monthly <- stlf(training_STLF_noncovid_monthly, lambda = 0, h = 23)
 crashes.train_STLF_noncovid_monthly %>%
-  forecast(h=23) %>%
+  forecast::forecast(h=23) %>%
   autoplot() + autolayer(test_STLF_noncovid_monthly)
 
 autoplot(training_STLF_noncovid_monthly, series="Training data") +
