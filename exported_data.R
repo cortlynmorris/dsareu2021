@@ -2365,4 +2365,58 @@ crashes_rain %>%
   ggplot(aes(fill=WeatherCondition1, x=WeatherCondition1)) + 
   geom_bar(show.legend = FALSE) + 
   geom_text(stat="count", aes(x=WeatherCondition1, label=..count..), vjust=-0.25)
+
+### Modeling Injury Outcome
+
+crashes_pm = crashes %>%
+  filter(Injury != "", Injury != "Unknown", VehicleType != "Unknown") %>%
+  mutate(Injury = as.factor(Injury)) %>%
+  mutate(Injury2 = if_else(Injury == "No injury", "No injury", "Injury"), 
+         Injury2 = as.factor(Injury2)) %>%
+  mutate(VehicleType = as.factor(VehicleType))
+  
+summary(crashes_pm$Injury)
+summary(crashes_pm$Injury2)
+
+Injury2.fit <- glm(Injury2~Age+VehicleType, data=crashes_pm, family = "binomial")
+summary(Injury2.fit)
+
+#Model coefficients
+coef(Injury2.fit) #extract coefficients
+round(coef(Injury2.fit), digits = 4) #get rounded coefficients
+round(confint(Injury2.fit), digits = 4) #get confidence intervals (CI) for coefs
+
+#Odds ratios
+round(exp(coef(Injury2.fit)), digits = 4) #OR=exp(coef)
+(round(exp(coef(Injury2.fit)), digits = 4)-1)*100 #percent change in odds
+round(exp(confint(Injury2.fit)), digits = 4) #confidence intervals for ORs
+round(data.frame(OR=exp(coef(Injury2.fit)), exp(confint(Injury2.fit))), digits = 4) #ORs & their CIs
+
+#Model selection based on AIC
+#install.packages("MASS") #run once: installing package needed for the `stepAIC` function
+library(MASS) 
+Injury2.select <- stepAIC(Injury2.fit)
+summary(Injury2.select)
+
+#Get a pseudo R^2 
+install.packages("pscl") #package for computing the McFadden R^2
+library(pscl)
+pR2(Injury2.select)
+
+#Prediction accuracy on test data
+set.seed(101) #for reproducibility of results
+sample <- sample(c(TRUE, FALSE), nrow(crashes_pm), replace = T, prob = c(0.7,0.3)) #70/30% training/test sets
+crashes_pm.train <- crashes_pm[sample, ]
+crashes_pm.test <- crashes_pm[!sample, ]
+crashes_pm.fit.train <- glm(Injury2~Age+VehicleType, data=crashes_pm.train, family="binomial") #fitting model on training set
+crashes_pm.pred.prob <- predict(crashes_pm.fit.train, newdata=crashes_pm.test, type="response") #predicting prob. of default=1 for test set
+crashes_pm.pred <- ifelse(crashes_pm.pred.prob>0.5, "Injury", "No injury") #predicting `default` based on prob estimates
+(tab <- table(pred=crashes_pm.pred, actual=crashes_pm.test$Injury2)) #confusion matrix: cross-tab of predictions vs actual class
+(accuracy=mean(crashes_pm.pred==crashes_pm.test$Injury2, na.rm=T)*100) #percent of correct predictions in test data
+
+
+
+
+
+
   
