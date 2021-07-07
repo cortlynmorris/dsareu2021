@@ -1718,9 +1718,12 @@ autoplot(crashests[,'count'], series="Data") +
   xlab("Date") + ylab("Count") +
   ggtitle("Number of Daily Car Crashes (With Pandemic Data)") +
   guides(colour=guide_legend(title=" ")) + 
-  scale_x_continuous(breaks = c(0, 365, 731, 1096, 1461, 1826, 2192), 
-                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
-                                "Jan 2019", "Jan 2020", "Jan 2021")) + 
+  scale_x_continuous(breaks = c(0, 181, 365, 547, 731, 912, 1096, 1277, 
+                                1461, 1642, 1826, 2008, 2192), 
+                     labels = c("01-2015", "07-2015", "01-2016", "07-2016", 
+                                "01-2017", "07-2017", "01-2018", "07-2018", 
+                                "01-2019", "07-2019", "01-2020", "07-2020", 
+                                "01-2021")) + 
   theme(axis.text.x = element_text(angle = 90))
 ```
 
@@ -1743,9 +1746,11 @@ autoplot(crashests.noncovid2[,'count'], series="Data") +
   xlab("Date") + ylab("Count") +
   ggtitle("Number of Daily Car Crashes (Without Pandemic Data)") +
   guides(colour=guide_legend(title=" ")) + 
-  scale_x_continuous(breaks = c(0, 365, 731, 1096, 1461, 1826, 2192), 
-                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
-                                "Jan 2019", "Jan 2020", "Jan 2021")) + 
+  scale_x_continuous(breaks = c(0, 181, 365, 547, 731, 912, 1096, 1277, 
+                                1461, 1642, 1826), 
+                     labels = c("01-2015", "07-2015", "01-2016", "07-2016", 
+                                "01-2017", "07-2017", "01-2018", "07-2018", 
+                                "01-2019", "07-2019", "01-2020")) + 
   theme(axis.text.x = element_text(angle = 90))
 ```
 
@@ -1768,12 +1773,12 @@ rownames(daily_forecast_values_covid_HW) <- seq(as.Date("2021/06/01"),
                                                 as.Date("2021/12/31"), "day")
 ```
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, message=FALSE}
 daily_forecast_values_covid_HW
 
 autoplot(fcast) +
   ggtitle("Forecasts of Daily Car Crashes Using HoltWinters (With Pandemic Data)") +
-  xlab("Year") + ylab("Crashes")
+  xlab("Year") + ylab("Crashes") 
 ```
 
 ```{r, echo=FALSE}
@@ -1786,7 +1791,7 @@ m <- crashests2 %>%
 m %>%
   autoplot() + 
   ggtitle("STLF Model for Daily Car Crashes (With Pandemic Data)") +
-  xlab("Year") + ylab("Crashes")
+  xlab("Year") + ylab("Crashes") 
 ```
 
 ```{r, echo=FALSE, include=FALSE}
