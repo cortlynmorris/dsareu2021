@@ -2113,7 +2113,13 @@ autoplot(fcast.noncovid.monthly) +
 
 ```{r, echo=FALSE, message=FALSE}
 crashes_mts4 %>% mstl() %>%
-  autoplot()
+  autoplot() + 
+  ggtitle("Box Jenkins Decomposition") + 
+  xlab("Date") + 
+  scale_x_continuous(breaks = c(1,2,3,4,5,6,7,8), 
+                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
+                                "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022")) + 
+  theme(axis.text.x = element_text(angle = 90))
 
 t <- crashes_mts4 %>%
   stlf(lambda = 0, h = 8) 
@@ -2141,7 +2147,13 @@ monthly_forecast_values_covid_STLF
 
 ```{r, echo=FALSE, message=FALSE}
 crashes_mts4.noncovid %>% mstl() %>%
-  autoplot()
+  autoplot() + 
+  ggtitle("Box Jenkins Decomposition") + 
+  xlab("Date") + 
+  scale_x_continuous(breaks = c(1,2,3,4,5,6,7,8), 
+                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
+                                "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022")) + 
+  theme(axis.text.x = element_text(angle = 90))
 
 q <- crashes_mts4.noncovid %>%
   stlf(lambda = 0, h = 23) 
@@ -2150,7 +2162,7 @@ q %>%
   autoplot() + 
   ggtitle("STLF Model for Monthly Car Crashes (Without Pandemic Data)") +
   xlab("Year") + ylab("Crashes") + 
-  scale_x_continuous(breaks = c(1,2,3,4,5,6,7, 8), 
+  scale_x_continuous(breaks = c(1,2,3,4,5,6,7,8), 
                      labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
                                 "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022")) + 
   theme(axis.text.x = element_text(angle = 90))
@@ -2418,9 +2430,11 @@ autoplot(crashests.2019.2[,'count'], series="Data") +
   xlab("Date") + ylab("") +
   ggtitle("2015-2019 Number of Daily Car Crashes") +
   guides(colour=guide_legend(title=" ")) + 
-  scale_x_continuous(breaks = c(0, 365, 731, 1096, 1461, 1826), 
-                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
-                                "Jan 2019", "Jan 2020")) + 
+  scale_x_continuous(breaks = c(0, 181, 365, 547, 731, 912, 1096, 1277, 
+                                1461, 1642, 1826), 
+                     labels = c("01-2015", "07-2015", "01-2016", "07-2016", 
+                                "01-2017", "07-2017", "01-2018", "07-2018", 
+                                "01-2019", "07-2019", "01-2020")) + 
   theme(axis.text.x = element_text(angle = 90))
 ```
 
@@ -2452,7 +2466,7 @@ twenty_nineteen_daily_forecast_values_HW
 
 autoplot(fcast.2019) +
   ggtitle("2015-2019 Forecasts of Daily Car Crashes Using HoltWinters") +
-  xlab("Year") + ylab("Crashes")
+  xlab("Year") + ylab("Crashes") 
 ```
 
 ```{r, echo=FALSE}
@@ -2563,7 +2577,11 @@ autoplot(fcast.covid.monthly.2019) +
 crashes_mts4.2019 %>% mstl() %>%
   autoplot() + 
   ggtitle("Box Jenkins Decomposition") + 
-  xlab("Date") + ylab("Count")
+  xlab("Date") +
+  scale_x_continuous(breaks = c(1,2,3,4,5,6,7), 
+                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
+                                "Jan 2019", "Jan 2020", "Jan 2021")) + 
+  theme(axis.text.x = element_text(angle = 90))
 
 t <- crashes_mts4.2019 %>%
   stlf(lambda = 0, h = 3) 
