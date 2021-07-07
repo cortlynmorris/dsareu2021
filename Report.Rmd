@@ -12,9 +12,7 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-### Loading Necessary Packages
-
-```{r, message=FALSE, warning=FALSE, echo=FALSE}
+```{r, message=FALSE, warning=FALSE, echo=FALSE, include=FALSE}
 library(reshape2)
 library(tidyverse)
 library(ggplot2)
@@ -27,15 +25,11 @@ library(scales)
 library(zoo)
 ```
 
-### Setting Working Directory
-
-```{r, echo=FALSE}
+```{r, echo=FALSE, include=FALSE}
 #setwd("/Users/cmorris/Desktop/dsreu2021/rstudiodirectory/ResearchProject")
 ```
 
-### Reading and Merging the Data
-
-```{r, message=FALSE}
+```{r, message=FALSE, echo=FALSE, include=FALSE}
 #Code for Cortlyns computer (Mac)
 # setwd("/Users/cmorris/Desktop/dsreu2021/rstudiodirectory/ResearchProject")
 # persons <- read.csv(file="Persons_Involved_in_Crashes.csv")
@@ -230,7 +224,7 @@ crashes %>%
        y = "Count")
 ```
 
-```{r, echo=FALSE, eval=FALSE}
+```{r, echo=FALSE, include=FALSE}
 crashes %>%
   filter(Crash_Date_Hour != "NA", Crash_Date_Hour != "") %>%
   ggplot() +
@@ -1450,7 +1444,7 @@ crashes %>%
 
 ## Identifying Hot Spots of Crashes in Wake County, North Carolina 
 
-```{r, echo=FALSE, eval=FALSE}
+```{r, echo=FALSE, include=FALSE}
 crashes %>% 
   filter(LocationLatitude != "0", LocationLongitude != "0",
          LocationLatitude != "NA", LocationLatitude != "",
@@ -1473,7 +1467,7 @@ library(sf)
 
 From the map, we can see that many crashes occur near the center of Wake County. This makes sense because in the center of Wake County sits Raleigh, the capital of North Carolina. 
 
-```{r, echo=FALSE, eval=FALSE}
+```{r, echo=FALSE, include=FALSE}
 nc_counties <- map_data("county", "north carolina") %>%
   select(lon = long, lat, group, id = subregion)
 head(nc_counties)
@@ -1542,7 +1536,7 @@ ggplotly(coords.map.nc) %>%
 
 From the Wake County heat map, we can see that crashes are much more likely to occur in the center of the city. We see that as more streets populate an area, more crashes occur. 
 
-```{r, message=FALSE, warning=FALSE, echo=FALSE, eval=FALSE}
+```{r, message=FALSE, warning=FALSE, echo=FALSE}
 crashes_filter <- crashes %>%
   filter(LocationLatitude != "0", LocationLongitude != "0",
          LocationLatitude != "NA", LocationLatitude != "",
@@ -1568,14 +1562,6 @@ coords.map.wake <- coords.map.wake + theme_bw() +
   ggtitle("Heat Map of Crash Locations") + 
   xlab("Latitude") + ylab("Longitude")
 
-coords.map.wake
-```
-
-```{r, message=FALSE, echo=FALSE}
-library(plotly)
-```
-
-```{r, message=FALSE, warning=FALSE, echo=FALSE}
 ggplotly(coords.map.wake) %>%
   highlight(
     "plotly_hover",
@@ -1614,9 +1600,7 @@ location_road_name_at_freq %>%
   wordcloud2(shape = 'circle', backgroundColor = "black", minSize = 5)
 ```
 
-## Time Series Plots and Forecasts
-
-### Basic Time Series Plots
+## Time Series Plots 
 
 From the plot, we see that there are major spikes around March 2015, late October 2015, and December 2016. The two latter spikes may be related to the popular holidays, Halloween and Christmas. 
 
@@ -1671,7 +1655,7 @@ crashes_ts %>%
   ggtitle("Time Series Plot for Frequency of Daily Crashes With 7 Day Moving Average (With Pandemic Data)")
 ```
 
-```{r, echo=FALSE, eval=FALSE}
+```{r, echo=FALSE, include=FALSE}
 crashes_ts %>%
   filter(as.Date(Date) >= "2015/01/01") %>%
   ggplot(aes(x = as.Date(Date), y = count)) + 
@@ -1682,7 +1666,7 @@ crashes_ts %>%
   ggtitle("Time Series Plot for Frequency of Daily Crashes With 30 Day Moving Average (With Pandemic Data)")
 ```
 
-```{r, echo=FALSE, eval=FALSE}
+```{r, echo=FALSE, include=FALSE}
 crashes_ts %>%
   filter(as.Date(Date) >= "2015/01/01") %>%
   ggplot(aes(x = as.Date(Date), y = count)) + 
@@ -1777,7 +1761,7 @@ plot(fitted(covid), main = "Box Jenkins Decomposition of Daily Crashes (With Pan
 fcast <- forecast::forecast(covid, 214)
 ```
 
-```{r, echo=FALSE, eval=FALSE}
+```{r, echo=FALSE, include=FALSE}
 daily_forecast_values_covid_HW <- summary(fcast)
 
 rownames(daily_forecast_values_covid_HW) <- seq(as.Date("2021/06/01"), 
@@ -1805,7 +1789,7 @@ m %>%
   xlab("Year") + ylab("Crashes")
 ```
 
-```{r, echo=FALSE, eval=FALSE}
+```{r, echo=FALSE, include=FALSE}
 daily_forecast_values_covid_STLF <- summary(m)
 
 rownames(daily_forecast_values_covid_STLF) <- seq(as.Date("2021/06/01"), 
@@ -1826,7 +1810,7 @@ plot(fitted(noncovid), main = "Box Jenkins Decomposition of Daily Crashes (Witho
 fcast.noncovid <- forecast(noncovid, 671)
 ```
 
-```{r, echo=FALSE, eval=FALSE}
+```{r, echo=FALSE, include=FALSE}
 daily_forecast_values_noncovid_HW <- summary(fcast.noncovid)
 
 rownames(daily_forecast_values_noncovid_HW) <- seq(as.Date("2020/03/01"), 
@@ -1854,7 +1838,7 @@ p %>%
   xlab("Year") + ylab("Daily Crashes")
 ```
 
-```{r, echo=FALSE, eval=FALSE}
+```{r, echo=FALSE, include=FALSE}
 daily_forecast_values_noncovid_STLF <- summary(p)
 
 rownames(daily_forecast_values_noncovid_STLF) <- seq(as.Date("2020/03/01"), 
@@ -1991,7 +1975,7 @@ summary(fit.crashes)
 fcast <- forecast::forecast(fit.crashes, h=8)
 ```
 
-```{r, echo=FALSE, eval=FALSE}
+```{r, echo=FALSE, include=FALSE}
 monthly_forecast_values_covid_lin <- summary(fcast)
 
 rownames(monthly_forecast_values_covid_lin) <- seq(as.Date("2021/06/01"), 
@@ -2040,7 +2024,7 @@ summary(fit.crashes.noncovid)
 fcast.noncovid <- forecast::forecast(fit.crashes.noncovid, h=23)
 ```
 
-```{r, echo=FALSE, eval=FALSE}
+```{r, echo=FALSE, include=FALSE}
 monthly_forecast_values_noncovid_lin <- summary(fcast.noncovid)
 
 rownames(monthly_forecast_values_noncovid_lin) <- seq(as.Date("2020/03/01"), 
@@ -2072,7 +2056,7 @@ plot(fitted(covid.monthly), main = "Box Jenkins Decomposition of Monthly Crashes
 fcast.covid.monthly <- forecast::forecast(covid.monthly, 8)
 ```
 
-```{r, echo=FALSE, eval=FALSE}
+```{r, echo=FALSE, include=FALSE}
 monthly_forecast_values_covid_HW <- summary(fcast.covid.monthly)
 
 rownames(monthly_forecast_values_covid_HW) <- seq(as.Date("2021/06/01"), 
@@ -2102,7 +2086,7 @@ plot(fitted(noncovid.monthly), main = "Box Jenkins Decomposition of Monthly Cras
 fcast.noncovid.monthly <- forecast::forecast(noncovid.monthly, 23)
 ```
 
-```{r, echo=FALSE, eval=FALSE}
+```{r, echo=FALSE, include=FALSE}
 monthly_forecast_values_noncovid_HW <- summary(fcast.noncovid.monthly)
 
 rownames(monthly_forecast_values_noncovid_HW) <- seq(as.Date("2020/03/01"), 
@@ -2139,7 +2123,7 @@ t %>%
   theme(axis.text.x = element_text(angle = 90))
 ```
 
-```{r, echo=FALSE, eval=FALSE}
+```{r, echo=FALSE, include=FALSE}
 monthly_forecast_values_covid_STLF <- summary(t)
 
 rownames(monthly_forecast_values_covid_STLF) <- seq(as.Date("2021/06/01"), 
@@ -2167,7 +2151,7 @@ q %>%
   theme(axis.text.x = element_text(angle = 90))
 ```
 
-```{r, echo=FALSE, eval=FALSE}
+```{r, echo=FALSE, include=FALSE}
 monthly_forecast_values_noncovid_STLF <- summary(q)
 
 rownames(monthly_forecast_values_noncovid_STLF) <- seq(as.Date("2020/03/01"), 
@@ -2319,7 +2303,7 @@ fit.nnetar <- nnetar(crashests2, lambda=0)
 summary(fit.nnetar)
 ```
 
-```{r, echo=FALSE, eval=FALSE}
+```{r, echo=FALSE, include=FALSE}
 fcast.nnetar.summary <- summary(forecast::forecast(fit.nnetar, h=214))
 
 rownames(fcast.nnetar.summary) <- seq(as.Date("2021/06/01"), 
@@ -2340,7 +2324,7 @@ fit.nnetar.noncovid <- nnetar(crashests.noncovid, lambda=0)
 summary(fit.nnetar.noncovid)
 ```
 
-```{r, echo=FALSE, eval=FALSE}
+```{r, echo=FALSE, include=FALSE}
 fcast.nnetar.noncovid.summary <- summary(forecast::forecast(fit.nnetar.noncovid, h=671))
 
 rownames(fcast.nnetar.noncovid.summary) <- seq(as.Date("2020/03/01"), 
@@ -2445,7 +2429,7 @@ plot(fitted(twentynineteen), main = "Box Jenkins Decomposition of Daily Crashes"
 fcast.2019 <- forecast::forecast(twentynineteen, 61)
 ```
 
-```{r, echo=FALSE, eval=FALSE}
+```{r, echo=FALSE, include=FALSE}
 twenty_nineteen_daily_forecast_values_HW <- summary(fcast.2019)
 
 rownames(twenty_nineteen_daily_forecast_values_HW) <- seq(as.Date("2020/01/01"),
@@ -2481,7 +2465,7 @@ p %>%
   xlab("Date") + ylab("Daily Crashes")
 ```
 
-```{r, echo=FALSE, eval=FALSE}
+```{r, echo=FALSE, include=FALSE}
 twenty_nineteen_daily_forecast_values_STLF <- summary(p)
 
 rownames(twenty_nineteen_daily_forecast_values_STLF) <- seq(as.Date("2020/01/01"), as.Date("2020/03/01"), "day")
