@@ -2406,7 +2406,8 @@ crashes_pm = crashes %>%
 summary(crashes_pm$Injury)
 summary(crashes_pm$Injury2)
 
-Injury2.fit <- glm(Injury2~Age+VehicleType, data=crashes_pm, family = "binomial")
+Injury2.fit <- glm(Injury2~Age+VehicleType+ContributingCircumstance1+Protection, 
+                   data=crashes_pm, family = "binomial")
 summary(Injury2.fit)
 
 #Model coefficients
@@ -2436,8 +2437,10 @@ set.seed(101) #for reproducibility of results
 sample <- sample(c(TRUE, FALSE), nrow(crashes_pm), replace = T, prob = c(0.7,0.3)) #70/30% training/test sets
 crashes_pm.train <- crashes_pm[sample, ]
 crashes_pm.test <- crashes_pm[!sample, ]
-crashes_pm.fit.train <- glm(Injury2~Age+VehicleType, data=crashes_pm.train, family="binomial") #fitting model on training set
-crashes_pm.pred.prob <- predict(crashes_pm.fit.train, newdata=crashes_pm.test, type="response") #predicting prob. of default=1 for test set
+crashes_pm.fit.train <- glm(Injury2~Age+VehicleType+ContributingCircumstance1+Protection, 
+                            data=crashes_pm.train, family="binomial") #fitting model on training set
+crashes_pm.pred.prob <- predict(crashes_pm.fit.train, newdata=crashes_pm.test, 
+                                type="response") #predicting prob. of default=1 for test set
 crashes_pm.pred <- ifelse(crashes_pm.pred.prob>0.5, "Injury", "No injury") #predicting `default` based on prob estimates
 (tab <- table(pred=crashes_pm.pred, actual=crashes_pm.test$Injury2)) #confusion matrix: cross-tab of predictions vs actual class
 (accuracy=mean(crashes_pm.pred==crashes_pm.test$Injury2, na.rm=T)*100) #percent of correct predictions in test data
