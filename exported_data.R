@@ -1462,7 +1462,7 @@ summary(covid)
 
 plot(fitted(covid), main = "Box Jenkins Decomposition of Daily Crashes (With Pandemic Data)")
 
-fcast <- forecast::forecast(covid, 214)
+fcast <- forecast::forecast(covid, h=214)
 
 daily_forecast_values_covid_HW <- summary(fcast)
 
@@ -1656,6 +1656,20 @@ c(ARIMA = accuracy(ARIMA, crashests2)["Test set", "RMSE"],
   STL = accuracy(STL, crashests2)["Test set", "RMSE"],
   Combination =
     accuracy(Combination, crashests2)["Test set", "RMSE"])
+
+##Working with ets() daily (THIS GETS RID OF SEASONALITY DUE TO TOO HIGH OF FREQUENCY)
+fit.ets.daily.covid <- ets(y=crashests2)
+
+summary(fit.ets.daily.covid)
+
+autoplot(fit.ets.daily.covid)
+
+cbind('Residuals' = residuals(fit.ets.daily.covid),
+      'Forecast errors' = residuals(fit.ets.daily.covid,type='response')) %>%
+  autoplot(facet=TRUE) + xlab("Year") + ylab("")
+
+fit.ets.daily.covid %>% forecast(h=214) %>%
+  autoplot()
 
 ##Different attempt at forecasting for monthly (THIS WORKS)
 #install.packages("Mcomp")
@@ -1918,6 +1932,20 @@ autoplot(training_STLF_noncovid_monthly, series="Training data") +
 
 crashes.test_STLF_noncovid_monthly <- Arima(test_STLF_noncovid_monthly)
 accuracy(crashes.test_STLF_noncovid_monthly)
+
+##Working with ets() monthly covid (THIS GETS RID OF SEASONALITY DUE TO TOO HIGH OF FREQUENCY)
+fit.ets.monthly.covid <- ets(y=crashes_mts4)
+
+summary(fit.ets.monthly.covid)
+
+autoplot(fit.ets.monthly.covid)
+
+cbind('Residuals' = residuals(fit.ets.monthly.covid),
+      'Forecast errors' = residuals(fit.ets.monthly.covid,type='response')) %>%
+  autoplot(facet=TRUE) + xlab("Year") + ylab("")
+
+fit.ets.monthly.covid %>% forecast(h=8) %>%
+  autoplot()
 
 ##Advanced Forecasting Methods
 
