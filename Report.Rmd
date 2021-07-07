@@ -12,7 +12,7 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-```{r, message=FALSE, warning=FALSE, echo=FALSE, include=FALSE}
+```{r loading-libraries, message=FALSE, warning=FALSE, echo=FALSE, include=FALSE}
 library(reshape2)
 library(tidyverse)
 library(ggplot2)
@@ -25,11 +25,11 @@ library(scales)
 library(zoo)
 ```
 
-```{r, echo=FALSE, include=FALSE}
+```{r set-directory, echo=FALSE, include=FALSE}
 #setwd("/Users/cmorris/Desktop/dsreu2021/rstudiodirectory/ResearchProject")
 ```
 
-```{r, message=FALSE, echo=FALSE, include=FALSE}
+```{r read-data, message=FALSE, echo=FALSE, include=FALSE}
 #Code for Cortlyns computer (Mac)
 # setwd("/Users/cmorris/Desktop/dsreu2021/rstudiodirectory/ResearchProject")
 # persons <- read.csv(file="Persons_Involved_in_Crashes.csv")
@@ -63,7 +63,7 @@ crashes <- persons %>% left_join(locations, by="key_crash")
 
 The highest frequency of crashes occur in a passenger car. However, this is not very surprising because passenger cars are relatively common. An interesting note is that sport utility vehicles have the second highest frequency of crashes, however, sport utility vehicles are not nearly as common of a car.
 
-```{r, echo=FALSE}
+```{r vehicle-type, echo=FALSE}
 crashes %>% 
   filter(VehicleType != "Unknown", VehicleType != "") %>%
   count(VehicleType) %>% 
@@ -80,7 +80,7 @@ crashes %>%
 
 The highest frequency of crashes occur when the weather conditions are clear. This is not very surprising because in North Carolina, the majority of the time the weather is clear. An interesting note is that snow still has a relatively high frequency despite it snowing minimally in North Carolina. 
 
-```{r, echo=FALSE}
+```{r weather-condition, echo=FALSE}
 crashes %>% 
   filter(WeatherCondition1 != "NA") %>%
   count(WeatherCondition1) %>% 
@@ -97,7 +97,7 @@ crashes %>%
 
 When looking at the weather conditions for only those crashes where it was believed that weather was a contribution factor in the crash, we can see that rain jumps from third most frequent to first. This is not something unexpected because heavy rain conditions make driving much harder and can cause things such as hydroplaning to happen. Clear weather is now the second most common which is slightly surprising because clear weather is not typically associated with causing car crashes but since it is the most common weather type, we can better understand this conclusion. Although the order of which weather conditions are the most frequent when looking only at the crashes where the weather contributed, there is still the same number of weather types.
 
-```{r, echo=FALSE}
+```{r weather, echo=FALSE}
 crashes %>% 
   filter(WeatherCondition1 != "NA", WeatherContributedToCrash == "Yes") %>%
   count(WeatherCondition1) %>% 
@@ -115,7 +115,7 @@ crashes %>%
 
 The highest frequency of crashes occur when there is no traffic control present. Without a control present, drivers may be less confident in their actions. 
 
-```{r, echo=FALSE}
+```{r traffic-control, echo=FALSE}
 crashes %>% 
   filter(TrafficControlType != "NA", TrafficControlType != "", 
          TrafficControlType != "NaN") %>%
@@ -133,7 +133,7 @@ crashes %>%
 
 The highest frequency of crashes occur when there is no special road feature present. Without a road feature present, drivers may be less confident in their actions. 
 
-```{r, echo=FALSE}
+```{r road-feat, echo=FALSE}
 crashes %>% 
   filter(RoadFeature != "NA", RoadFeature != "", RoadFeature != "NaN") %>%
   count(RoadFeature) %>% 
@@ -150,7 +150,7 @@ crashes %>%
 
 We were surprised to see that the ages of drivers had such a wide range with the maximum age of a driver being 120 years old. 
 
-```{r, echo=FALSE}
+```{r person-type, echo=FALSE}
 crashes %>%
   filter(PersonType == "Driver", Age != "NA", Age != "NaN", Age != "") %>%
   ggplot() +
@@ -158,7 +158,7 @@ crashes %>%
   labs(title="Histogram for Drivers' Ages", x="Age", y="Frequency")
 ```
 
-```{r, echo=FALSE}
+```{r alcohol-result, echo=FALSE}
 crashes %>% 
   filter(AlcoholResultType != "NA", AlcoholResultType != "", 
          AlcoholResultType != "NaN", AlcoholResultType != "Contaminated sample/unusable") %>%
@@ -174,7 +174,7 @@ crashes %>%
        y = "Count (log10 Scale)")
 ```
 
-```{r, echo=FALSE}
+```{r alcohol-result-filter, echo=FALSE}
 crashes %>% 
   filter(AlcoholResultType != "NA", AlcoholResultType != "", 
          AlcoholResultType != "NaN", AlcoholResultType != 
@@ -192,7 +192,7 @@ crashes %>%
        y = "Count (log10 Scale)")
 ```
 
-```{r, echo=FALSE}
+```{r crash-dow, echo=FALSE}
 crashes %>% 
   filter(Crash_Date_DOW != "NA") %>%
   mutate(Crash_Date_DOW = factor(Crash_Date_DOW, levels = c("Sunday","Monday", "Tuesday", "Wednesday", 
@@ -205,7 +205,7 @@ crashes %>%
        y = "Count")
 ```
 
-```{r, echo=FALSE}
+```{r crash-month, echo=FALSE}
 crashes %>% 
   filter(Crash_Date_Month != "NA") %>%
   mutate(Crash_Date_Month = factor(Crash_Date_Month, 
@@ -224,7 +224,7 @@ crashes %>%
        y = "Count")
 ```
 
-```{r, echo=FALSE, include=FALSE}
+```{r crash-hour, echo=FALSE, include=FALSE}
 crashes %>%
   filter(Crash_Date_Hour != "NA", Crash_Date_Hour != "") %>%
   ggplot() +
@@ -232,7 +232,7 @@ crashes %>%
   labs(title="Frequency of Crashes by Hour", x="Hour", y="Count")
 ```
 
-```{r, echo=FALSE}
+```{r crash-shift, echo=FALSE}
 crashes %>%
   filter(Crash_Date_Hour != "NA", Crash_Date_Hour != "") %>%
   mutate(shift = case_when(
@@ -249,7 +249,7 @@ crashes %>%
 
 The range of drivers' ages is from about 16 to 100. The range of passengers' ages is from about 0 to 100. The range of drivers' ages is slightly larger due to the age restrictions for getting a license. 
 
-```{r, echo=FALSE}
+```{r driver-passenger-age, echo=FALSE}
 crashes %>% 
   filter(PersonType == "Driver" | PersonType == "Passenger", Age != "", Age != "NA") %>% 
   ggplot() +
@@ -261,7 +261,7 @@ crashes %>%
 
 There are slighlty more male drivers in Wake County getting in crashes than female drivers. Additionally, there are slightly more female passengers in Wake County car crashes than male passengers. 
 
-```{r, echo=FALSE}
+```{r driver-passenger-gender, echo=FALSE}
 crashes %>% 
   filter(PersonType == "Driver" | PersonType == "Passenger", 
          Gender != "NA", Gender != "Unknown") %>% 
@@ -274,7 +274,7 @@ crashes %>%
 
 About half as many vehicles were seized compared to vehicles not seized. 
 
-```{r, echo=FALSE} 
+```{r vehicle-seize, echo=FALSE} 
 crashes %>% 
   filter(VehicleSeizure != "NA") %>%
   count(VehicleSeizure) %>% 
@@ -290,7 +290,7 @@ crashes %>%
 The highest frequency of crashes occured where the airbags were not deployed. It is interesting to note that the second highest frequency of crashes occured where the car(s) did not have airbags to begin with. 
 Airbags did not deploy during most crashes, therefore many accidents logged were minor. 
 
-```{r, echo=FALSE}
+```{r airbag-deploy, echo=FALSE}
 crashes %>% 
   filter(AirbagDeployed != "NA", AirbagDeployed != "Unknown") %>%
   count(AirbagDeployed) %>% 
@@ -307,7 +307,7 @@ crashes %>%
 
 Most car crashes resulted in drivers and passengers not being ejected. More people were totally ejected from the vehicle than partially ejected. 
 
-```{r, echo=FALSE}
+```{r ejection, echo=FALSE}
 crashes %>% 
   filter(Ejection != "NA", Ejection != "Unknown") %>%
   count(Ejection) %>% 
@@ -324,7 +324,7 @@ crashes %>%
 
 About 3 more percent of people that get in crashes are men than women. 
 
-```{r, echo=FALSE}
+```{r gender, echo=FALSE}
 crashes %>% 
   filter(Gender != "NA", Gender != "Unknown", Gender != "") %>%
   count(Gender) %>% 
@@ -349,7 +349,7 @@ In Wake County, North Carolina, 67.9 % of people are White, 21.0% of people are 
 
 This is interesting because, despite the percentage of Black people being less than a third of the percentage of White people, the percentage of Black people in car crashes is not far behind the percentage of White people in car crashes. 
 
-```{r, echo=FALSE}
+```{r race, echo=FALSE}
 crashes %>% 
   filter(Race != "NA", Race != "Unknown", Race != "") %>%
   count(Race) %>% 
@@ -366,7 +366,7 @@ crashes %>%
 
 The highest frequency of crashes did not result in any injury. Following the highest frequency, the more serious the injury, the less crashes occured. 
 
-```{r, echo=FALSE}
+```{r injury, echo=FALSE}
 crashes %>% 
   filter(Injury != "NA", Injury != "Unknown") %>%
   count(Injury) %>% 
@@ -383,7 +383,7 @@ crashes %>%
 
 The highest frequency of crashes occured when drivers and passengers wore a shoulder and lap belt protection which are common protections in more recent vehicles. However, the second highest frequency of crashes occured when drivers and passengers had used no protection. Could this be because the vehicles they were driving didn't provide protection or that the vehicles had protection, the people just chose not to use any. 
 
-```{r, echo=FALSE}
+```{r protection, echo=FALSE}
 crashes %>% 
   filter(Protection != "NA", Protection != "Unable to determine") %>%
   count(Protection) %>% 
@@ -400,7 +400,7 @@ crashes %>%
 
 More crashes resulted in people in the vehicle not being trapped than people in the vehicle being trapped. 
 
-```{r, echo=FALSE}
+```{r trapped, echo=FALSE}
 crashes %>% 
   filter(Trapped != "NA", Trapped != "Unknown") %>%
   count(Trapped) %>% 
@@ -417,7 +417,7 @@ crashes %>%
 
 The highest frequency of crashes occured when there was was no vision obstruction. It is interesting to note, that "Blinded, sunlight" led to a significant amount of crashes. When looking at the variable Weather Condition, most of the time the Weather Condition was clear. The weather was clear, however, this may have led to the sun being brighter and more likely to cause a car crash due to vision obstruction. 
 
-```{r, echo=FALSE}
+```{r vision-obstruction, echo=FALSE}
 crashes %>% 
   filter(VisionObstruction != "NA", VisionObstruction != "Unknown") %>%
   count(VisionObstruction) %>% 
@@ -434,7 +434,7 @@ crashes %>%
 
 The highest frequency of crashes had no contributing circumstances indicated. 
 
-```{r, echo=FALSE}
+```{r contrib-circum-1, echo=FALSE}
 crashes %>% 
   filter(ContributingCircumstance1 != "NA", ContributingCircumstance1 != "Unknown", 
          ContributingCircumstance1 != "Unable to determine") %>%
@@ -489,7 +489,7 @@ crashes %>%
 
 The highest frequency of crashes had inattention as a contributing circumstance 2. 
 
-```{r, echo=FALSE}
+```{r contrib-circum-2, echo=FALSE}
 crashes %>% 
   filter(ContributingCircumstance2 != "NA", 
          ContributingCircumstance2 != "Unknown", 
@@ -546,7 +546,7 @@ crashes %>%
 ```
 
 The higest frequency of crashes had inattention as a contributing circumstance 3. 
-```{r, echo=FALSE}
+```{r contrib-cicum-3, echo=FALSE}
 crashes %>% 
   filter(ContributingCircumstance3 != "NA", 
          ContributingCircumstance3 != "Unknown", 
@@ -603,7 +603,7 @@ crashes %>%
 
 Most of the crashes on the roadway. This means it includes accidents on highways, streets, and where there is a lot of traffic. 
 
-```{r, echo=FALSE}
+```{r location-relation, echo=FALSE}
 crashes %>% 
   filter(LocationRelationToRoad != "NA", LocationRelationToRoad != "Unknown") %>%
   count(LocationRelationToRoad) %>% 
@@ -618,7 +618,7 @@ crashes %>%
        y = "Count (log10 Scale)")
 ```
 
-```{r, echo=FALSE}
+```{r location-in-near, echo=FALSE}
 crashes %>% 
   filter(LocationInNearIndicator != "NA", LocationInNearIndicator != "Unknown") %>%
   count(LocationInNearIndicator) %>% 
@@ -633,7 +633,7 @@ crashes %>%
        y = "Count (log10 Scale)")
 ```
 
-```{r, echo=FALSE}
+```{r location-ramp, echo=FALSE}
 crashes %>% 
   filter(LocationRampIndicator != "NA", LocationRampIndicator != "Unknown") %>%
   count(LocationRampIndicator) %>% 
@@ -650,7 +650,7 @@ crashes %>%
 
 The data for the location of crashes from a road shows that most crashes happen at most popular roadways. These roadways tend to be the busiest roads. 
 
-```{r, echo=FALSE}
+```{r location-feet, echo=FALSE}
 crashes %>%
   filter(LocationFeetFromRoad != "NA", LocationFeetFromRoad != "Unknown", 
          LocationFeetFromRoad != "") %>%
@@ -661,7 +661,7 @@ crashes %>%
 
 Most direction of crashes were North, South, East, and West. This shows that there is no specific direction where crashes were most common. This data implies that there is the same amount of crashes in every direction of the road. 
 
-```{r, echo=FALSE}
+```{r location-direction, echo=FALSE}
 crashes %>% 
   filter(LocationDirectionFromRoad != "NA", LocationDirectionFromRoad != "Unknown",
          LocationDirectionFromRoad != "") %>%
@@ -679,7 +679,7 @@ crashes %>%
 
 More crashes tend to occur from and indicator then from the indicator. This means that most common crashes are known to happen near busy streets/roads. 
 
-```{r, echo=FALSE}
+```{r location-at-from, echo=FALSE}
 crashes %>% 
   filter(LocationAtFromIndicator != "NA", LocationAtFromIndicator != "Unknown") %>%
   count(LocationAtFromIndicator) %>% 
@@ -696,7 +696,7 @@ crashes %>%
 
 When it comes to the location direction of the crash to the road the data is like location direction of crashes from road. Most crashes happen North, South, East, and West. 
 
-```{r, echo=FALSE}
+```{r location-direction, echo=FALSE}
 crashes %>% 
   filter(LocationDirectionToRoad != "NA", LocationDirectionToRoad != "Unknown") %>%
   count(LocationDirectionToRoad) %>% 
@@ -713,7 +713,7 @@ crashes %>%
 
 The data shows us that the (First Harmful Crash Event) is from a rear end, slow or stop. This implies that some drivers might be driving under the speed limit or not paying attention to what is in front of them on the road. 
 
-```{r, echo=FALSE}
+```{r first-harm, echo=FALSE}
 crashes %>% 
   filter(FirstHarmfulEvent != "NA", FirstHarmfulEvent != "Unknown") %>%
   count(FirstHarmfulEvent) %>% 
@@ -730,7 +730,7 @@ crashes %>%
 
 The most harmful event is also a rear end, slow or stop accident just like the fist harmful event. Side swiped accidents and hitting parked vehicles are also pretty common accidents. This informs us that drivers are not paying attention to the road and are being distracted. 
 
-```{r, echo=FALSE}
+```{r most-harm, echo=FALSE}
 crashes %>% 
   filter(MostHarmfulEvent != "NA", MostHarmfulEvent != "Unknown") %>%
   count(MostHarmfulEvent) %>% 
@@ -747,7 +747,7 @@ crashes %>%
 
 Local streets are the most common places where there are accidents. This is because local streets tend to be busy. There is usually traffic in both directions. There are also many people walking around. This causes the driver to get distracted easily. 
 
-```{r, echo=FALSE}
+```{r road-class, echo=FALSE}
 crashes %>% 
   filter(RoadClassification != "NA", RoadClassification != "Unknown", 
          RoadClassification != "") %>%
@@ -771,7 +771,7 @@ place to try and mitigate the spread of Covid-19. 2021 also looks to be on track
 to be another low crash year but we do not have a perfect explanation for that 
 seeing as things are beginning to open and "return to normal" again.
 
-```{r, echo=FALSE}
+```{r crash-year, echo=FALSE}
 crashes %>% 
   filter(Crash_Date_Year != "Unknown", Crash_Date_Year != "2011") %>%
   ggplot(aes(Crash_Date_Year, fill=as.factor(Crash_Date_Year))) +
@@ -792,7 +792,7 @@ other kinds of crashes that are most common. The rest of the crashes had a
 decreasing number of drivers involved in crashes as the number of drivers 
 ranged from 3 to 18.
 
-```{r, echo=FALSE}
+```{r driver, echo=FALSE}
 crashes %>% 
   filter(PersonType == "Driver") %>%
   group_by(key_crash) %>%
@@ -815,7 +815,7 @@ crash. However, despite this fact, we can still follow a pretty regular
 decreasing trend with the majority of crashes involved 1 passenger which 
 trickles all the way to a crash involving a maximum of 88 passengers. 
 
-```{r, echo=FALSE}
+```{r passenger, echo=FALSE}
 crashes %>% 
   filter(PersonType == "Passenger") %>%
   group_by(key_crash) %>%
@@ -837,7 +837,7 @@ There is little variety in the number of pedestrians involved in crashes. When
 pedestrians were involved, there was a majority of it only being 1 with a 
 distant second and third being 2 and 3 pedestrians.
 
-```{r, echo=FALSE}
+```{r pedestrian, echo=FALSE}
 crashes %>% 
   filter(PersonType == "Pedestrian") %>%
   group_by(key_crash) %>%
@@ -861,7 +861,7 @@ to the total amount of data we are working with, very few crashes involve
 pedalcyclists anf if they do, it is only 1 with a singular exception for a 
 crash involving 2.
 
-```{r, echo=FALSE}
+```{r pedalcyclist, echo=FALSE}
 crashes %>% 
   filter(PersonType == "Pedalcyclist") %>%
   group_by(key_crash) %>%
@@ -885,7 +885,7 @@ are involved in crashes. This category encompasses those who do not fit into the
 majority of 1 other person being involved with a decreasing amount as it goes 
 up to a maximum of 5 other people involved. 
 
-```{r, echo=FALSE}
+```{r other-person, echo=FALSE}
 crashes %>% 
   filter(PersonType == "Other*") %>%
   group_by(key_crash) %>%
@@ -909,7 +909,7 @@ higher than it realistically was due to poor data entry. This plot included
 many more observations than pedestrians, pedalcyclists, and others combined
 with a majority of crashes involving only 1 unknown person and a few involving 2.
 
-```{r, echo=FALSE}
+```{r unknown-person, echo=FALSE}
 crashes %>% 
   filter(PersonType == "Unknown") %>%
   group_by(key_crash) %>%
@@ -932,7 +932,7 @@ have a small distribution of number of people killed per crash ranging from 1
 to three with one being the majority and taking a large jump to 2 and 3 killed 
 per crash.
 
-```{r, echo=FALSE}
+```{r killed, echo=FALSE}
 crashes %>% 
   filter(Injury == "Killed") %>%
   group_by(key_crash) %>%
@@ -956,7 +956,7 @@ type A injuries per crash as the number of those injuries increases with the
 majority if type A injuries per crash is one and the fewest was 5 type A 
 injuries per crash with a frequency of only 1.
 
-```{r, echo=FALSE}
+```{r a-injury, echo=FALSE}
 crashes %>% 
   filter(Injury == "A type injury (disabling)") %>%
   group_by(key_crash) %>%
@@ -980,7 +980,7 @@ as well as more of them total. A majority of the type B injuries per crash is
 one and the frequency decreases as the number of type B injuries per crash 
 increases up to 11.
 
-```{r, echo=FALSE}
+```{r b-injury, echo=FALSE}
 crashes %>% 
   filter(Injury == "B type injury (evident)") %>%
   group_by(key_crash) %>%
@@ -1004,7 +1004,7 @@ the other type of injuries, the majority of crashes that involved type C
 injuries only had 1 and there was a decreasing frequency as the number of type 
 C injuries per crash increased up to a maximum of 26.
 
-```{r, echo=FALSE}
+```{r c-injury, echo=FALSE}
 crashes %>% 
   filter(Injury == "C type injury (possible)") %>%
   group_by(key_crash) %>%
@@ -1028,7 +1028,7 @@ people per crash spanning from 1 to 90. Despite this wide range of values, we
 can still see that the data follows the trend of decreasing frequency as the 
 number of uninjured people per crash increases. 
 
-```{r, echo=FALSE}
+```{r no-injury, echo=FALSE}
 crashes %>% 
   filter(Injury == "No injury") %>%
   group_by(key_crash) %>%
@@ -1048,7 +1048,7 @@ crashes %>%
 
 Once again, I do not think that this data will be useful for our analysis since it is likely that these unknown injuries are likely due to poor data entry but we can follow the same trend of a decreasing frequency as the number of unknown injuries per crash in creases from 1 all the way up to 16, with 1 having a very clear majority.
 
-```{r, echo=FALSE}
+```{r unknown-injury, echo=FALSE}
 crashes %>% 
   filter(Injury == "Unknown") %>%
   group_by(key_crash) %>%
@@ -1068,7 +1068,7 @@ crashes %>%
 
 ### Bivariate Explorations
 
-```{r, echo=FALSE}
+```{r contrib-circum-injury, echo=FALSE}
 crashes %>%
   filter(Injury != "NA", Injury != "Unknown", ContributingCircumstance1 != "NA", 
          ContributingCircumstance1 != "NaN", 
@@ -1122,7 +1122,7 @@ crashes %>%
 
 Pedestrians are most likely to die, followed by pedalcyclists most likely due to lack of protection and high exposure to the environment. Driver's are slightly less likely to be injured than passengers. 
 
-```{r, echo=FALSE}
+```{r person-injury, echo=FALSE}
 crashes %>%
   filter(Injury != "NA", Injury != "Unknown", PersonType != "NA", 
         PersonType != "NaN", PersonType != "Unknown") %>%
@@ -1137,7 +1137,7 @@ crashes %>%
 
 Total ejection leads to the most deaths and injuries, followed by partial ejection, and not being ejection leads to the least amount of injury. Ejection most likely leads to more severe injuries due to the car crash being significant enough to lead to ejection as well the injuries that occur from being ejected as well. 
 
-```{r, echo=FALSE}
+```{r ejection-injury, echo=FALSE}
 crashes %>%
   filter(Injury != "NA", Injury != "Unknown", Ejection != "NA", 
          Ejection != "NaN", Ejection != "Unknown") %>%
@@ -1152,7 +1152,7 @@ crashes %>%
 
 Driveways tend to lead to the least amount of injuries probably due to the slow speed that people are going when in driveways. 
 
-```{r, echo=FALSE}
+```{r road-feat-injury, echo=FALSE}
 crashes %>%
   filter(Injury != "NA", Injury != "Unknown", RoadFeature != "NA", 
          RoadFeature != "NaN", RoadFeature != "") %>%
@@ -1167,7 +1167,7 @@ crashes %>%
 
 Public vehicular areas and private roads/driveways lead to the least amount of injuries. This may be because these areas are minimally trafficked and are usually at slower speeds than other roads. 
 
-```{r, echo=FALSE}
+```{r road-class-injury, echo=FALSE}
 crashes %>%
   filter(Injury != "NA", Injury != "Unknown", RoadClassification != "NA", 
          RoadClassification != "NaN", RoadClassification != "") %>%
@@ -1182,7 +1182,7 @@ crashes %>%
 
 Rain and sleet, hail, freezing rain/drizzle leads to the most disabling type injuries. 
 
-```{r, echo=FALSE}
+```{r weather-injury, echo=FALSE}
 crashes %>%
   filter(Injury != "NA", Injury != "Unknown", WeatherCondition1 != "NA", 
          WeatherCondition1 != "NaN") %>%
@@ -1195,7 +1195,7 @@ crashes %>%
        y = "Percentage")
 ```
 
-```{r, echo=FALSE}
+```{r alcohol-injury, echo=FALSE}
 crashes %>%
   filter(AlcoholResultType != "NA", AlcoholResultType != "Unknown", 
          Crash_Date_DOW != "NA", Crash_Date_DOW != "NaN", Crash_Date_DOW != "") %>%
@@ -1210,7 +1210,7 @@ crashes %>%
 
 The most people are killed when there are no alcohol or other drugs. This is slightly surprising, however, it may be because when people are driving with drugs or alcohol in their system, they may attempt to be more cautious so that they do not get pulled over by police. 
 
-```{r, echo=FALSE}
+```{r alcohol-filter-injury, echo=FALSE}
 crashes %>%
   filter(Injury != "NA", Injury != "Unknown", AlcoholResultType != "NA", 
          AlcoholResultType != "NaN", AlcoholResultType != "Unknown",
@@ -1227,7 +1227,7 @@ crashes %>%
 
 Places where warning signs are post led to the post injuries including people killed. This may be because the signs are not taken as seriously and are less common to see, therefore, more people may disregard the warnings. Not many injuries occur near Railroad crossings. 
 
-```{r, echo=FALSE}
+```{r traffic-injury, echo=FALSE}
 crashes %>%
   filter(Injury != "NA", Injury != "Unknown", TrafficControlType != "NA", 
          TrafficControlType != "NaN") %>%
@@ -1242,7 +1242,7 @@ crashes %>%
 
 Pedestrian were the most killed, followed by motorcycles and motor scooters. This makes sense because these people are more exposed to conditions as well as generally having less protection than people in enclosed vehicles. Large vehicles like buses, trucks, and military vehicles, had the leaast amount of injuries most likely due to their large size. 
 
-```{r, echo=FALSE}
+```{r vehicle-injury, echo=FALSE}
 crashes %>%
   filter(Injury != "NA", Injury != "Unknown", VehicleType != "NA", 
          VehicleType != "NaN", VehicleType != "Unknown", VehicleType != "") %>%
@@ -1257,7 +1257,7 @@ crashes %>%
 
 The most injuries occurred when people were using reflective clothing, lighting, and a helmet as protection. This makes sense because people using this would most likely be pedestrians or bikers, both of which are more exposed to danger and to having more significant injuries. Shoulder belts, lap belts, and the combination between the two appear to help decrease the amount of injuries that occur. 
 
-```{r, echo=FALSE}
+```{r protection-injury, echo=FALSE}
 crashes %>%
   filter(Injury != "NA", Injury != "Unknown", Protection != "NA", 
          Protection != "NaN", Protection != "Unable to determine") %>%
@@ -1272,7 +1272,7 @@ crashes %>%
 
 Signs and embankment led to the most people being killed. This may be because these are both stationary opaque objects that will continuously block people's views of the road and conditions. Also being blinded by other lights led to the most disabling injuries. 
 
-```{r, echo=FALSE}
+```{r vision-obstruct-injury, echo=FALSE}
 crashes %>%
   filter(Injury != "NA", Injury != "Unknown", VisionObstruction != "NA", 
          VisionObstruction != "NaN") %>%
@@ -1287,7 +1287,7 @@ crashes %>%
 
 When airbags were not deployed, there was a smaller amount of injuries. This may be because the crashes were not significant enough to cause the airbags to deploy, therefore, if the crash is not significant enough to cause airbags to deploy, the people in the crash were less likely to be harmed. When there were no airbags, there was not many injuries. This may be because cars without airbags tend to be older cars which may mean they cannot go fast enough to lead to an extremely dangerous car crash. When both front and side airbags deploy, there are a significant amount of injuries including disabling injuries. This may be due to the crash being bad enough to deploy the airbags, therefore, if the crash is bad enough, the people are more likely to be injured. 
 
-```{r, echo=FALSE}
+```{r airbag-injury, echo=FALSE}
 crashes %>%
   filter(Injury != "NA", Injury != "Unknown", AirbagDeployed != "NA", 
          AirbagDeployed != "NaN", AirbagDeployed != "Unknown") %>%
@@ -1302,7 +1302,7 @@ crashes %>%
 
 The first harmful event that led to the second most people killed and disabling injuries was with pedestrians. This would make sense because pedestrians often do not have protection from cars. Overturn/rollover harmful events had the most amount of injuries. Backing up had the least amount of injuries which would make sense because when backing a car up, people tend to be going a slower speed than if they were accelerating forward.
 
-```{r, echo=FALSE}
+```{r first-harm-injury, echo=FALSE}
 crashes %>%
   filter(Injury != "NA", Injury != "Unknown", FirstHarmfulEvent != "NA", 
          FirstHarmfulEvent != "NaN", FirstHarmfulEvent != "Unknown") %>%
@@ -1317,7 +1317,7 @@ crashes %>%
 
 The most harmful event that led to most people killed and disabling injuries was with pedestrians. This would make sense because pedestrians often do not have protection from cars. Overturn/rollover harmful events also had a significant amount of injuries. Backing up had the least amount of injuries which would make sense because when backing a car up, people tend to be going a slower speed than if they were accelerating forward. 
 
-```{r, echo=FALSE}
+```{r most-harm-injury, echo=FALSE}
 crashes %>%
   filter(Injury != "NA", Injury != "Unknown", MostHarmfulEvent != "NA", 
          MostHarmfulEvent != "NaN", MostHarmfulEvent != "Unknown") %>%
@@ -1330,7 +1330,7 @@ crashes %>%
        y = "Percentage")
 ```
 
-```{r, echo=FALSE}
+```{r driver-age-injury, echo=FALSE}
 # Comparing Injury to Driver Age
 crashes %>%
   filter(Injury != "NA", Injury != "Unknown", Injury != "", PersonType == "Driver", Age != "NA",
@@ -1357,7 +1357,7 @@ crashes %>%
        y = "Percentage")
 ```
 
-```{r, echo=FALSE}
+```{r driver-age, echo=FALSE}
 crashes %>%
   filter(PersonType == "Driver", Age != "NA",
          Age != "", Age != "Unknown", Age >= 5) %>%
@@ -1385,7 +1385,7 @@ crashes %>%
   theme(axis.text.x = element_text(angle = 90))
 ```
 
-```{r, echo=FALSE}
+```{r passenger-age-injury, echo=FALSE}
 crashes %>%
   filter(Injury != "NA", Injury != "Unknown", Injury != "", PersonType == "Passenger", Age != "NA",
          Age != "", Age != "Unknown") %>%
@@ -1412,7 +1412,7 @@ crashes %>%
        y = "Percentage")
 ```
 
-```{r, echo=FALSE}
+```{r passenger-age, echo=FALSE}
 crashes %>%
   filter(PersonType == "Passenger", Age != "NA",
          Age != "", Age != "Unknown") %>%
@@ -1444,7 +1444,7 @@ crashes %>%
 
 ## Identifying Hot Spots of Crashes in Wake County, North Carolina 
 
-```{r, echo=FALSE, include=FALSE}
+```{r nc-map, echo=FALSE, include=FALSE}
 crashes %>% 
   filter(LocationLatitude != "0", LocationLongitude != "0",
          LocationLatitude != "NA", LocationLatitude != "",
@@ -1459,7 +1459,7 @@ crashes %>%
   xlab("Longitude") + ylab("Latitude")
 ```
 
-```{r, echo=FALSE, message=FALSE}
+```{r load-library, echo=FALSE, message=FALSE}
 library(maps)
 #install.packages("sf")
 library(sf)
@@ -1467,7 +1467,7 @@ library(sf)
 
 From the map, we can see that many crashes occur near the center of Wake County. This makes sense because in the center of Wake County sits Raleigh, the capital of North Carolina. 
 
-```{r, echo=FALSE, include=FALSE}
+```{r wake-map, echo=FALSE, include=FALSE}
 nc_counties <- map_data("county", "north carolina") %>%
   select(lon = long, lat, group, id = subregion)
 head(nc_counties)
@@ -1494,7 +1494,7 @@ wake_map <- wake_map +
 wake_map
 ```
 
-```{r, message=FALSE, echo=FALSE}
+```{r load-library, message=FALSE, echo=FALSE}
 library(ggplot2)
 #install.packages("ggmap")
 library(ggmap)
@@ -1502,7 +1502,7 @@ library(RColorBrewer)
 library(plotly)
 ```
 
-```{r, message=FALSE, warning=FALSE, echo=FALSE}
+```{r nc-interactive-map, message=FALSE, warning=FALSE, echo=FALSE}
 map_bounds <- c(-78.98, 35.51, -78.24, 36.06)
 
 crashes_filter <- crashes %>%
@@ -1536,7 +1536,7 @@ ggplotly(coords.map.nc) %>%
 
 From the Wake County heat map, we can see that crashes are much more likely to occur in the center of the city. We see that as more streets populate an area, more crashes occur. 
 
-```{r, message=FALSE, warning=FALSE, echo=FALSE}
+```{r wake-interactive-map, message=FALSE, warning=FALSE, echo=FALSE}
 crashes_filter <- crashes %>%
   filter(LocationLatitude != "0", LocationLongitude != "0",
          LocationLatitude != "NA", LocationLatitude != "",
@@ -1569,18 +1569,18 @@ ggplotly(coords.map.wake) %>%
   )
 ```
 
-```{r, message=FALSE, echo=FALSE}
+```{r tool, message=FALSE, echo=FALSE}
 devtools::install_github("gaospecial/wordcloud2")
 ```
 
-```{r, message=FALSE, echo=FALSE}
+```{r load-library, message=FALSE, echo=FALSE}
 #install.packages('wordcloud2')
 library(wordcloud2)
 ```
 
 From the word cloud, we can see many crashes occur on 440, 40, and Capital Blvd. This makes sense because 440 and 40 are major interstates that connect to several major junctions and Capital Blvd is a main road in North Carolina as well. 
 
-```{r, echo=FALSE}
+```{r location-on-word-cloud, echo=FALSE}
 location_road_name_on_freq <- crashes %>%
   count(LocationRoadNameOn)
 
@@ -1591,7 +1591,7 @@ location_road_name_on_freq %>%
 
 From the word cloud, we can see that 440, Capital Blvd, 40, and Blue Ridge Rd frequently have crashes that are near by. This would make sense because most of these streets are highly trafficked and populated. 
 
-```{r, echo=FALSE}
+```{r location-at-word-cloud, echo=FALSE}
 location_road_name_at_freq <- crashes %>%
   count(LocationRoadNameAt)
 
@@ -1606,7 +1606,7 @@ From the plot, we see that there are major spikes around March 2015, late Octobe
 
 From the time series plot, we can see that there is a significant drop in car crashes in March 2020. This can be explained by the stay-at-home-orders due to the COVID-19 pandemic. After the stay at home orders, the frequency of crashes seems to be slightly lower throughout May 2021. There will likely be an increase in the next few month due to stay-at-home-orders and COVID-19 regulations being lifted now that the vaccination is available. 
 
-```{r, echo=FALSE, warning=FALSE}
+```{r basic-ts, echo=FALSE, warning=FALSE}
 crashes_ts = crashes %>%
   separate(crash_date, 
            into = c("Date", "Hour"), sep = 11) %>%
@@ -1623,7 +1623,7 @@ crashes_ts %>%
   theme(axis.text.x = element_text(angle = 90))
 ```
 
-```{r, echo=FALSE}
+```{r annual-ts, echo=FALSE}
 crashes_annual = crashes_ts %>%
   separate(Date, 
            into = c("Year", "Month"), sep = 4, remove = FALSE) %>%
@@ -1640,11 +1640,11 @@ crashes_annual %>%
   facet_wrap(~Year, scales = "free_x")
 ```
 
-```{r, echo=FALSE, message=FALSE}
+```{r load-library, echo=FALSE, message=FALSE}
 library(zoo)
 ```
 
-```{r, echo=FALSE, warning=FALSE}
+```{r 7-day-ma-ts, echo=FALSE, warning=FALSE}
 crashes_ts %>%
   filter(as.Date(Date) >= "2015/01/01") %>%
   ggplot(aes(x = as.Date(Date), y = count)) + 
@@ -1655,7 +1655,7 @@ crashes_ts %>%
   ggtitle("Time Series Plot for Frequency of Daily Crashes With 7 Day Moving Average (With Pandemic Data)")
 ```
 
-```{r, echo=FALSE, include=FALSE}
+```{r 30-day-ma-ts, echo=FALSE, include=FALSE}
 crashes_ts %>%
   filter(as.Date(Date) >= "2015/01/01") %>%
   ggplot(aes(x = as.Date(Date), y = count)) + 
@@ -1666,7 +1666,7 @@ crashes_ts %>%
   ggtitle("Time Series Plot for Frequency of Daily Crashes With 30 Day Moving Average (With Pandemic Data)")
 ```
 
-```{r, echo=FALSE, include=FALSE}
+```{r 100-day-ma-ts, echo=FALSE, include=FALSE}
 crashes_ts %>%
   filter(as.Date(Date) >= "2015/01/01") %>%
   ggplot(aes(x = as.Date(Date), y = count)) + 
@@ -1677,7 +1677,7 @@ crashes_ts %>%
   ggtitle("Time Series Plot for Frequency of Daily Crashes with 100 Day Moving Average (with Pandemic Data)")
 ```
 
-```{r, echo=FALSE}
+```{r basic-noncovid-ts, echo=FALSE}
 crashes_ts.noncovid = crashes %>%
   filter(as.Date(crash_date) >= "2015/01/01" & as.Date(crash_date) <= "2020/03/01") %>%
   separate(crash_date, 
@@ -1694,13 +1694,13 @@ crashes_ts.noncovid %>%
   theme(axis.text.x = element_text(angle = 90))
 ```
 
-```{r, message=FALSE, echo=FALSE}
+```{r load-library, message=FALSE, echo=FALSE}
 library(forecast)
 library(fpp2)
 library(TTR)
 ```
 
-```{r, message=FALSE, echo=FALSE}
+```{r regression-ts, message=FALSE, echo=FALSE}
 #Converting crashes_ts to a time series object 
 crashests2 <- ts(crashes_ts$count, start = c(2015,1), end = c(2021,153),
                 frequency = 365)
@@ -1727,7 +1727,7 @@ autoplot(crashests[,'count'], series="Data") +
   theme(axis.text.x = element_text(angle = 90))
 ```
 
-```{r, message=FALSE, echo=FALSE}
+```{r noncovid-regression-ts, message=FALSE, echo=FALSE}
 #Converting crashes_ts to a time series object using ts
 crashests.noncovid <- ts(crashes_ts.noncovid$count, start = c(2015,1), 
                          end = c(2020,59), frequency = 365)
@@ -1756,7 +1756,7 @@ autoplot(crashests.noncovid2[,'count'], series="Data") +
 
 ## Forecasting Using Time Series Plots
 
-```{r, echo=FALSE}
+```{r HW-fcast-box-decomp, echo=FALSE}
 covid <- HoltWinters(crashests2)
 
 summary(covid)
@@ -1766,14 +1766,14 @@ plot(fitted(covid), main = "Box Jenkins Decomposition of Daily Crashes (With Pan
 fcast <- forecast::forecast(covid, h=214, level=c(65,80))
 ```
 
-```{r, echo=FALSE, include=FALSE}
+```{r rename-HW-fcast-column, echo=FALSE, include=FALSE}
 daily_forecast_values_covid_HW <- summary(fcast)
 
 rownames(daily_forecast_values_covid_HW) <- seq(as.Date("2021/06/01"), 
                                                 as.Date("2021/12/31"), "day")
 ```
 
-```{r, echo=FALSE, message=FALSE}
+```{r HW_fcast-filter-forecast-ts, echo=FALSE, message=FALSE}
 daily_forecast_values_covid_HW
 
 autoplot(fcast) +
@@ -1781,7 +1781,7 @@ autoplot(fcast) +
   xlab("Year") + ylab("Crashes") 
 ```
 
-```{r, echo=FALSE, message=FALSE}
+```{r STLF-decomp-forecast-ts, echo=FALSE, message=FALSE}
 crashests2 %>% mstl() %>%
   autoplot()
 
@@ -1794,18 +1794,18 @@ m %>%
   xlab("Year") + ylab("Crashes") 
 ```
 
-```{r, echo=FALSE, include=FALSE}
+```{r rename-STLF-fcast, echo=FALSE, include=FALSE}
 daily_forecast_values_covid_STLF <- summary(m)
 
 rownames(daily_forecast_values_covid_STLF) <- seq(as.Date("2021/06/01"), 
                                                 as.Date("2021/12/31"), "day")
 ```
 
-```{r, echo=FALSE}
+```{r STLF-fcast-filter, echo=FALSE}
 daily_forecast_values_covid_STLF
 ```
 
-```{r, echo=FALSE}
+```{r HW-noncovid-fcast-decomp, echo=FALSE}
 noncovid <- HoltWinters(crashests.noncovid)
 
 summary(noncovid)
@@ -1815,14 +1815,14 @@ plot(fitted(noncovid), main = "Box Jenkins Decomposition of Daily Crashes (Witho
 fcast.noncovid <- forecast(noncovid, h=671, level=c(65,80))
 ```
 
-```{r, echo=FALSE, include=FALSE}
+```{r rename-noncovid-HW-fcast, echo=FALSE, include=FALSE}
 daily_forecast_values_noncovid_HW <- summary(fcast.noncovid)
 
 rownames(daily_forecast_values_noncovid_HW) <- seq(as.Date("2020/03/01"), 
                                                   as.Date("2021/12/31"), "day")
 ```
 
-```{r, echo=FALSE}
+```{r noncovid-HW-fcast-filter-forecast-ts, echo=FALSE}
 daily_forecast_values_noncovid_HW
 
 autoplot(fcast.noncovid) +
@@ -1830,7 +1830,7 @@ autoplot(fcast.noncovid) +
   xlab("Year") + ylab("Crashes")
 ```
 
-```{r, echo=FALSE}
+```{r noncovid-STLF-decomp-forecast-ts, echo=FALSE}
 crashests.noncovid %>% mstl() %>%
   autoplot()
 
@@ -1843,18 +1843,18 @@ p %>%
   xlab("Year") + ylab("Daily Crashes")
 ```
 
-```{r, echo=FALSE, include=FALSE}
+```{r rename-noncovid-STLF-fcast, echo=FALSE, include=FALSE}
 daily_forecast_values_noncovid_STLF <- summary(p)
 
 rownames(daily_forecast_values_noncovid_STLF) <- seq(as.Date("2020/03/01"), 
                                                    as.Date("2021/12/31"), "day")
 ```
 
-```{r, echo=FALSE}
+```{r noncovid-STLF-fcast-filter, echo=FALSE}
 daily_forecast_values_noncovid_STLF
 ```
 
-```{r, echo=FALSE, message=FALSE}
+```{r ms-HW-forecast-ts, echo=FALSE, message=FALSE}
 training_HW <- subset(crashests2, end=length(crashests2)-151)
 test_HW <- subset(crashests2, start=length(crashests2)-150)
 crashes.train_HW <- HoltWinters(training_HW)
@@ -1866,14 +1866,14 @@ crashes.train_HW %>%
   xlab("Date") + ylab("Crashes")
 ```
 
-```{r, echo=FALSE, include=FALSE}
+```{r rename-ms-HW-fcast, echo=FALSE, include=FALSE}
 fcast.ms.HW.daily.covid <- summary(forecast::forecast(crashes.train_HW, h=152, level=c(65,80)))
 
 rownames(fcast.ms.HW.daily.covid) <- seq(as.Date("2021/01/01"), 
                                                    as.Date("2021/06/01"), "day")
 ```
 
-```{r, echo=FALSE, message=FALSE}
+```{r ms-HW-fcast-filter-decomp-sum, echo=FALSE, message=FALSE}
 fcast.ms.HW.daily.covid
 
 autoplot(training_HW, series="Training data") +
@@ -1887,7 +1887,7 @@ crashes.test_HW <- Arima(test_HW)
 accuracy(crashes.test_HW)
 ```
 
-```{r, echo=FALSE}
+```{r ms-STLF-forecast-ts, echo=FALSE}
 training_STLF <- subset(crashests2, end=length(crashests2)-152)
 test_STLF <- subset(crashests2, start=length(crashests2)-151)
 crashes.train_STLF <- stlf(training_STLF, lambda = 0, h = 152, level=c(65,80))
@@ -1899,14 +1899,14 @@ crashes.train_STLF %>%
   xlab("Date") + ylab("Crashes")
 ```
 
-```{r, echo=FALSE, include=FALSE}
+```{r rename-ms-STLF-fcast, echo=FALSE, include=FALSE}
 fcast.ms.STLF.daily.covid <- summary(crashes.train_STLF)
 
 rownames(fcast.ms.STLF.daily.covid) <- seq(as.Date("2021/01/01"), 
                                          as.Date("2021/06/01"), "day")
 ```
 
-```{r, echo=FALSE, message=FALSE}
+```{r ms-STLF-fcast-filter-decomp-sum, echo=FALSE, message=FALSE}
 fcast.ms.STLF.daily.covid
 
 autoplot(training_STLF, series="Training data") +
@@ -1921,7 +1921,7 @@ crashes.test_STLF <- Arima(test_STLF)
 accuracy(crashes.test_STLF)
 ```
 
-```{r, echo=FALSE, message=FALSE}
+```{r noncovid-ms-HW-forecast-ts, echo=FALSE, message=FALSE}
 training_HW_noncovid <- subset(crashests.noncovid , end=length(crashests.noncovid)-426)
 test_HW_noncovid <- subset(crashests.noncovid, start=length(crashests.noncovid)-425)
 crashes.train_HW_noncovid <- HoltWinters(training_HW_noncovid)
@@ -1933,14 +1933,14 @@ crashes.train_HW_noncovid %>%
   xlab("Date") + ylab("Crashes")
 ```
 
-```{r, echo, include=FALSE}
+```{r rename-noncovid-ms-HW-fcast, echo, include=FALSE}
 fcast.ms.HW.daily.noncovid <- summary(forecast::forecast(crashes.train_HW_noncovid, h=426, level=c(65,80)))
 
 rownames(fcast.ms.HW.daily.noncovid) <- seq(as.Date("2019/01/01"), 
                                          as.Date("2020/03/01"), "day")
 ```
 
-```{r, echo=FALSE, message=FALSE}
+```{r noncovid-ms-HW-fcast-filter-decomp-sum, echo=FALSE, message=FALSE}
 fcast.ms.HW.daily.noncovid
 
 autoplot(training_HW_noncovid, series="Training data") +
@@ -1955,7 +1955,7 @@ crashes.test_HW_noncovid <- Arima(test_HW_noncovid)
 accuracy(crashes.test_HW_noncovid)
 ```
 
-```{r, echo=FALSE}
+```{r noncovid-ms-STLF-forecast-ts, echo=FALSE}
 training_STLF_noncovid <- subset(crashests.noncovid, end=length(crashests.noncovid)-426)
 test_STLF_noncovid <- subset(crashests.noncovid, start=length(crashests.noncovid)-425)
 crashes.train_STLF_noncovid <- stlf(training_STLF_noncovid, lambda = 0, h = 426, level=c(65,80))
@@ -1967,14 +1967,16 @@ crashes.train_STLF_noncovid %>%
   xlab("Date") + ylab("Crashes")
 ```
 
-```{r, echo=FALSE, include=FALSE}
+```{r rename-noncovid-ms-HW-fcast, echo=FALSE, include=FALSE}
 fcast.ms.STLF.daily.noncovid <- summary(crashes.train_STLF_noncovid)
 
 rownames(fcast.ms.STLF.daily.noncovid) <- seq(as.Date("2019/01/01"), 
                                          as.Date("2020/03/01"), "day")
 ```
 
-```{r, echo=FALSE, warning=FALSE}
+```{r noncovid-ms-HW-fcast-filter-decomp-sum, echo=FALSE, warning=FALSE}
+fcast.ms.STLF.daily.noncovid
+
 autoplot(training_STLF_noncovid, series="Training data") +
   autolayer(fitted(crashes.train_STLF_noncovid, h=12),
             series="12-step fitted values") + 
@@ -1986,12 +1988,12 @@ crashes.test_STLF_noncovid <- Arima(test_STLF_noncovid)
 accuracy(crashes.test_STLF_noncovid)
 ```
 
-```{r, message=FALSE, echo=FALSE}
+```{r load-library, message=FALSE, echo=FALSE}
 library(Mcomp)
 library(smooth)
 ```
 
-```{r, message=FALSE, echo=FALSE}
+```{r monthly-ts, message=FALSE, echo=FALSE}
 crashes_mts = crashes %>%
   filter(as.Date(crash_date) >= "2015/01/01" & as.Date(crash_date) <= "2021/05/31") %>%
   separate(crash_date, 
@@ -2021,7 +2023,7 @@ summary(fit.crashes)
 fcast <- forecast::forecast(fit.crashes, h=8, level=c(65,80))
 ```
 
-```{r, echo=FALSE, include=FALSE}
+```{r rename-monthly-lin-fcast, echo=FALSE, include=FALSE}
 monthly_forecast_values_covid_lin <- summary(fcast)
 
 rownames(monthly_forecast_values_covid_lin) <- seq(as.Date("2021/06/01"), 
@@ -2029,7 +2031,7 @@ rownames(monthly_forecast_values_covid_lin) <- seq(as.Date("2021/06/01"),
                                                    "month")
 ```
 
-```{r, echo=FALSE, message=FALSE}
+```{r monthly-lin-fcast-filter-forecast-ts, echo=FALSE, message=FALSE}
 monthly_forecast_values_covid_lin
 
 autoplot(fcast) +
@@ -2040,7 +2042,7 @@ autoplot(fcast) +
   theme(axis.text.x = element_text(angle = 90))
 ```
 
-```{r, message=FALSE, echo=FALSE}
+```{r monthly-noncovid-ts, message=FALSE, echo=FALSE}
 crashes_mts.noncovid = crashes %>%
   filter(as.Date(crash_date) >= "2015/01/01" & as.Date(crash_date) <= "2020/02/29") %>%
   separate(crash_date, 
@@ -2070,7 +2072,7 @@ summary(fit.crashes.noncovid)
 fcast.noncovid <- forecast::forecast(fit.crashes.noncovid, h=23, level=c(65,80))
 ```
 
-```{r, echo=FALSE, include=FALSE}
+```{r rename-noncovid-monthly-fcast, echo=FALSE, include=FALSE}
 monthly_forecast_values_noncovid_lin <- summary(fcast.noncovid)
 
 rownames(monthly_forecast_values_noncovid_lin) <- seq(as.Date("2020/03/01"), 
@@ -2078,7 +2080,7 @@ rownames(monthly_forecast_values_noncovid_lin) <- seq(as.Date("2020/03/01"),
                                                    "month")
 ```
 
-```{r, echo=FALSE, message=FALSE}
+```{r noncovid-monthly-lin-fcast-filter-forecast-ts, echo=FALSE, message=FALSE}
 monthly_forecast_values_noncovid_lin
 
 autoplot(fcast.noncovid) +
@@ -2092,7 +2094,7 @@ autoplot(fcast.noncovid) +
   theme(axis.text.x = element_text(angle = 90))
 ```
 
-```{r, echo=FALSE}
+```{r monthly-HW-fcast-decomp, echo=FALSE}
 covid.monthly <- HoltWinters(crashes_mts4)
 
 summary(covid.monthly)
@@ -2102,7 +2104,7 @@ plot(fitted(covid.monthly), main = "Box Jenkins Decomposition of Monthly Crashes
 fcast.covid.monthly <- forecast::forecast(covid.monthly, h=8, level=c(65,80))
 ```
 
-```{r, echo=FALSE, include=FALSE}
+```{r rename-monthly-HW-fcast, echo=FALSE, include=FALSE}
 monthly_forecast_values_covid_HW <- summary(fcast.covid.monthly)
 
 rownames(monthly_forecast_values_covid_HW) <- seq(as.Date("2021/06/01"), 
@@ -2110,7 +2112,7 @@ rownames(monthly_forecast_values_covid_HW) <- seq(as.Date("2021/06/01"),
                                                   "month")
 ```
 
-```{r, echo=FALSE, message=FALSE}
+```{r monthly-HW-fcast-filter-forecast-ts, echo=FALSE, message=FALSE}
 monthly_forecast_values_covid_HW
 
 autoplot(fcast.covid.monthly) +
@@ -2122,7 +2124,7 @@ autoplot(fcast.covid.monthly) +
   theme(axis.text.x = element_text(angle = 90))
 ```
 
-```{r, echo=FALSE}
+```{r noncovid-monthly-HW-fcast-decomp, echo=FALSE}
 noncovid.monthly <- HoltWinters(crashes_mts4.noncovid)
 
 summary(noncovid.monthly)
@@ -2132,7 +2134,7 @@ plot(fitted(noncovid.monthly), main = "Box Jenkins Decomposition of Monthly Cras
 fcast.noncovid.monthly <- forecast::forecast(noncovid.monthly, h=23, level=c(65,80))
 ```
 
-```{r, echo=FALSE, include=FALSE}
+```{r rename-noncovid-monthly-HW-fcast, echo=FALSE, include=FALSE}
 monthly_forecast_values_noncovid_HW <- summary(fcast.noncovid.monthly)
 
 rownames(monthly_forecast_values_noncovid_HW) <- seq(as.Date("2020/03/01"), 
@@ -2140,7 +2142,7 @@ rownames(monthly_forecast_values_noncovid_HW) <- seq(as.Date("2020/03/01"),
                                                      "month")
 ```
 
-```{r, echo=FALSE, message=FALSE}
+```{r noncovid-monthly-fcast-filter-forecast-ts, echo=FALSE, message=FALSE}
 monthly_forecast_values_noncovid_HW
 
 autoplot(fcast.noncovid.monthly) +
@@ -2152,7 +2154,7 @@ autoplot(fcast.noncovid.monthly) +
   theme(axis.text.x = element_text(angle = 90))
 ```
 
-```{r, echo=FALSE, message=FALSE}
+```{r monthly-STLF-forecast-ts-decomp, echo=FALSE, message=FALSE}
 crashes_mts4 %>% mstl() %>%
   autoplot() + 
   ggtitle("Box Jenkins Decomposition") + 
@@ -2175,18 +2177,18 @@ t %>%
   theme(axis.text.x = element_text(angle = 90))
 ```
 
-```{r, echo=FALSE, include=FALSE}
+```{r rename-monthly-STLF-fcast, echo=FALSE, include=FALSE}
 monthly_forecast_values_covid_STLF <- summary(t)
 
 rownames(monthly_forecast_values_covid_STLF) <- seq(as.Date("2021/06/01"), 
                                                      as.Date("2022/01/01"), "month")
 ```
 
-```{r, echo=FALSE}
+```{r monthly-STLF-fcast-filter, echo=FALSE}
 monthly_forecast_values_covid_STLF
 ```
 
-```{r, echo=FALSE, message=FALSE}
+```{r noncovid-monthly-STLF-forecast-ts-decomp, echo=FALSE, message=FALSE}
 crashes_mts4.noncovid %>% mstl() %>%
   autoplot() + 
   ggtitle("Box Jenkins Decomposition") + 
@@ -2209,18 +2211,18 @@ q %>%
   theme(axis.text.x = element_text(angle = 90))
 ```
 
-```{r, echo=FALSE, include=FALSE}
+```{r rename-noncovid-monthly-STLF-fcast, echo=FALSE, include=FALSE}
 monthly_forecast_values_noncovid_STLF <- summary(q)
 
 rownames(monthly_forecast_values_noncovid_STLF) <- seq(as.Date("2020/03/01"), 
                                                      as.Date("2022/01/01"), "month")
 ```
 
-```{r, echo=FALSE}
+```{r noncovid-monthly-STLF-fcast-filter, echo=FALSE}
 monthly_forecast_values_noncovid_STLF
 ```
 
-```{r, echo=FALSE,message=FALSE}
+```{r ms-HW-monthly-forecast-ts, echo=FALSE,message=FALSE}
 training_HW_monthly <- subset(crashes_mts4, end=length(crashes_mts4)-5)
 
 test_HW_monthly <- subset(crashes_mts4, start=length(crashes_mts4)-4)
@@ -2238,14 +2240,14 @@ crashes.train_HW_monthly %>%
   theme(axis.text.x = element_text(angle = 90), legend.position = "bottom")
 ```
 
-```{r, echo=FALSE, include=FALSE}
+```{r rename-ms-HW-monthly-fcast, echo=FALSE, include=FALSE}
 fcast.ms.HW.monthly.covid <- summary(forecast::forecast(crashes.train_HW_monthly, h=5, level=c(65,80)))
 
 rownames(fcast.ms.HW.monthly.covid) <- seq(as.Date("2021/01/01"),
                                            as.Date("2021/05/01"), "month")
 ```
 
-```{r, echo=FALSE, message=FALSE}
+```{r ms-HW-monthly-fcast-filter-decomp-sum, echo=FALSE, message=FALSE}
 fcast.ms.HW.monthly.covid
 
 autoplot(training_HW_monthly, series="Training data") +
@@ -2264,7 +2266,7 @@ crashes.test_HW_monthly <- Arima(test_HW_monthly)
 accuracy(crashes.test_HW_monthly)
 ```
 
-```{r, echo=FALSE, message=FALSE}
+```{r ms-STLF-monthly-forecast-ts, echo=FALSE, message=FALSE}
 training_STLF_monthly <- subset(crashes_mts4, end=length(crashes_mts4)-5)
 
 test_STLF_monthly <- subset(crashes_mts4, start=length(crashes_mts4)-4)
@@ -2282,14 +2284,14 @@ crashes.train_STLF_monthly %>%
   theme(axis.text.x = element_text(angle = 90), legend.position = "bottom")
 ```
 
-```{r, echo=FALSE, include=FALSE}
+```{r rename-ms-STLF-monthly-fcast, echo=FALSE, include=FALSE}
 fcast.ms.STLF.monthly.covid <- summary(crashes.train_STLF_monthly)
 
 rownames(fcast.ms.STLF.monthly.covid) <- seq(as.Date("2021/01/01"),
                                            as.Date("2021/05/01"), "month")
 ```
 
-```{r, echo=FALSE, message=FALSE}
+```{r ms-STLF-monthly-fcast-filter-decomp-sum, echo=FALSE, message=FALSE}
 fcast.ms.STLF.monthly.covid
 
 autoplot(training_STLF_monthly, series="Training data") +
@@ -2308,7 +2310,7 @@ crashes.test_STLF_monthly <- Arima(test_STLF_monthly)
 accuracy(crashes.test_STLF_monthly)
 ```
 
-```{r, echo=FALSE, message=FALSE}
+```{r noncovid-ms-HW-monthly-forecast-ts, echo=FALSE, message=FALSE}
 training_HW_noncovid_monthly <- subset(crashes_mts4.noncovid, 
                                        end=length(crashes_mts4.noncovid)-14)
 
@@ -2328,7 +2330,7 @@ crashes.train_HW_noncovid_monthly %>%
   theme(axis.text.x = element_text(angle = 90), legend.position = "bottom")
 ```
 
-```{r, echo=FALSE, include=FALSE}
+```{r rename-noncovid-ms-HW-monthly-fcast, echo=FALSE, include=FALSE}
 fcast.ms.HW.monthly.noncovid <- 
   summary(forecast::forecast(crashes.train_HW_noncovid_monthly, h=14, 
                              level=c(65,80)))
@@ -2337,7 +2339,7 @@ rownames(fcast.ms.HW.monthly.noncovid) <- seq(as.Date("2019/01/01"),
                                            as.Date("2020/02/29"), "month")
 ```
 
-```{r, echo=FALSE, message=FALSE}
+```{r noncovid-ms-HW-monthly-fcast-filter-decomp-sum, echo=FALSE, message=FALSE}
 fcast.ms.HW.monthly.noncovid
 
 autoplot(training_HW_noncovid_monthly, series="Training data") +
@@ -2356,7 +2358,7 @@ crashes.test_HW_noncovid_monthly <- Arima(test_HW_noncovid_monthly)
 accuracy(crashes.test_HW_noncovid_monthly)
 ```
 
-```{r, echo=FALSE, message=FALSE}
+```{r noncovid-ms-STLF-forecast-ts, echo=FALSE, message=FALSE}
 training_STLF_noncovid_monthly <- subset(crashes_mts4.noncovid, end=length(crashes_mts4.noncovid)-14)
 
 test_STLF_noncovid_monthly <- subset(crashes_mts4.noncovid, start=length(crashes_mts4.noncovid)-13)
@@ -2374,14 +2376,14 @@ crashes.train_STLF_noncovid_monthly %>%
   theme(axis.text.x = element_text(angle = 90), legend.position = "bottom")
 ```
 
-```{r, echo=FALSE, include=FALSE}
+```{r rename-noncovid-ms-STLF-fcast, echo=FALSE, include=FALSE}
 fcast.ms.STLF.monthly.noncovid <- summary(crashes.train_STLF_noncovid_monthly)
 
 rownames(fcast.ms.STLF.monthly.noncovid) <- seq(as.Date("2019/01/01"),
                                            as.Date("2020/02/29"), "month")
 ```
 
-```{r, echo=FALSE, message=FALSE}
+```{r noncovid-ms-STLF-fcast-filter-decomp-sum, echo=FALSE, message=FALSE}
 fcast.ms.STLF.monthly.noncovid
 
 autoplot(training_STLF_noncovid_monthly, series="Training data") +
@@ -2401,20 +2403,20 @@ accuracy(crashes.test_STLF_noncovid_monthly)
 
 ### Advanced Forecasting Methods 
 
-```{r, echo=FALSE}
+```{r nnetar-fit-sum, echo=FALSE}
 fit.nnetar <- nnetar(crashests2, lambda=0)
 
 summary(fit.nnetar)
 ```
 
-```{r, echo=FALSE, include=FALSE}
+```{r rename-nnetar-fcast, echo=FALSE, include=FALSE}
 fcast.nnetar.summary <- summary(forecast::forecast(fit.nnetar, h=214))
 
 rownames(fcast.nnetar.summary) <- seq(as.Date("2021/06/01"), 
                                                      as.Date("2021/12/31"), "day")
 ```
 
-```{r, echo=FALSE}
+```{r nnetar-fcast-filter-forecast-ts, echo=FALSE}
 fcast.nnetar.summary
 
 autoplot(forecast(fit.nnetar,h=212,lambda=0)) + 
@@ -2422,20 +2424,20 @@ autoplot(forecast(fit.nnetar,h=212,lambda=0)) +
   xlab("Date") + ylab("Crashes")
 ```
 
-```{r, echo=FALSE}
+```{r noncovid-nnetar-fit-sum, echo=FALSE}
 fit.nnetar.noncovid <- nnetar(crashests.noncovid, lambda=0)
 
 summary(fit.nnetar.noncovid)
 ```
 
-```{r, echo=FALSE, include=FALSE}
+```{r rename-noncovid-nnetar-fcast, echo=FALSE, include=FALSE}
 fcast.nnetar.noncovid.summary <- summary(forecast::forecast(fit.nnetar.noncovid, h=671))
 
 rownames(fcast.nnetar.noncovid.summary) <- seq(as.Date("2020/03/01"), 
                                                      as.Date("2021/12/31"), "day")
 ```
 
-```{r, echo=FALSE}
+```{r noncovid-nnetar-fcast-filter-forecast-ts, echo=FALSE}
 fcast.nnetar.noncovid.summary
 
 autoplot(forecast(fit.nnetar.noncovid,h=672,lambda=0)) + 
@@ -2443,7 +2445,7 @@ autoplot(forecast(fit.nnetar.noncovid,h=672,lambda=0)) +
   xlab("Date") + ylab("Crashes")
 ```
 
-```{r, echo=FALSE, message=FALSE}
+```{r nnetar-monthly-fit-sum-forecast-ts, echo=FALSE, message=FALSE}
 fit.nnetar.monthly <- nnetar(crashes_mts4, lambda=0)
 
 summary(fit.nnetar.monthly)
@@ -2460,7 +2462,7 @@ autoplot(forecast(fit.nnetar.monthly,h=20,lambda=0)) +
   xlab("Date") + ylab("Crashes")
 ```
 
-```{r, echo=FALSE, message=FALSE}
+```{r noncovid-nnetar-monthly-fit-sum-forecast-ts, echo=FALSE, message=FALSE}
 fit.nnetar.monthly.noncovid <- nnetar(crashes_mts4.noncovid, lambda=0)
 
 summary(fit.nnetar.monthly.noncovid)
@@ -2480,7 +2482,7 @@ autoplot(forecast(fit.nnetar.monthly.noncovid,h=25,lambda=0)) +
 
 Ending at end of 2019 while predicting and comparing Jan and Feb 2020 daily time series plots with real data. 
 
-```{r, echo=FALSE}
+```{r 2015-2019-ts, echo=FALSE}
 crashes_ts.2019 = crashes %>%
   filter(as.Date(crash_date) >= "2015/01/01" & as.Date(crash_date) <= "2019/12/31") %>%
   separate(crash_date, 
@@ -2498,7 +2500,7 @@ crashes_ts.2019 %>%
   xlab("Date") + ylab("Crashes")
 ```
 
-```{r, echo=FALSE, message=FALSE}
+```{r regression-2015-2019-ts, echo=FALSE, message=FALSE}
 #Converting crashes_ts.2019 to a time series object 
 crashests.2019 <- ts(crashes_ts.2019$count, start = c(2015,1), end = c(2019,365),
                          frequency = 365)
@@ -2525,7 +2527,7 @@ autoplot(crashests.2019.2[,'count'], series="Data") +
   theme(axis.text.x = element_text(angle = 90))
 ```
 
-```{r, echo=FALSE}
+```{r 2015-2019-HW-fcast-decomp, echo=FALSE}
 twentynineteen <- HoltWinters(crashests.2019)
 
 summary(twentynineteen)
@@ -2535,7 +2537,7 @@ plot(fitted(twentynineteen), main = "Box Jenkins Decomposition of Daily Crashes"
 fcast.2019 <- forecast::forecast(twentynineteen, h=61, level=c(65,80))
 ```
 
-```{r, echo=FALSE, include=FALSE}
+```{r rename-2015-2019-HW-fcast-true-val-crash, echo=FALSE, include=FALSE}
 twenty_nineteen_daily_forecast_values_HW <- summary(fcast.2019)
 
 rownames(twenty_nineteen_daily_forecast_values_HW) <- seq(as.Date("2020/01/01"),
@@ -2548,7 +2550,7 @@ twenty_nineteen_daily_forecast_values_HW <- twenty_nineteen_daily_forecast_value
   mutate(true_count = true_value$count)
 ```
 
-```{r, echo=FALSE}
+```{r 2015-2019-HW-fcast-filter-forecast-ts, echo=FALSE}
 twenty_nineteen_daily_forecast_values_HW
 
 autoplot(fcast.2019) +
@@ -2556,7 +2558,7 @@ autoplot(fcast.2019) +
   xlab("Year") + ylab("Crashes") 
 ```
 
-```{r, echo=FALSE}
+```{r 2015-2019-STLF-fit-forecast-ts, echo=FALSE}
 crashests.2019 %>% mstl() %>%
   autoplot() + 
   ggtitle("Box Jenkins Decomposition") + 
@@ -2571,7 +2573,7 @@ p %>%
   xlab("Date") + ylab("Daily Crashes")
 ```
 
-```{r, echo=FALSE, include=FALSE}
+```{r rename-2015-2019-STLF-fcast-true-val-crash, echo=FALSE, include=FALSE}
 twenty_nineteen_daily_forecast_values_STLF <- summary(p)
 
 rownames(twenty_nineteen_daily_forecast_values_STLF) <- seq(as.Date("2020/01/01"), as.Date("2020/03/01"), "day")
@@ -2583,11 +2585,11 @@ twenty_nineteen_daily_forecast_values_STLF <- twenty_nineteen_daily_forecast_val
   mutate(true_count = true_value$count)
 ```
 
-```{r, echo=FALSE}
+```{r 2015-2019-fcast-filter, echo=FALSE}
 twenty_nineteen_daily_forecast_values_STLF
 ```
 
-```{r, echo=FALSE, message=FALSE}
+```{r 2015-2019-monthly-ts, echo=FALSE, message=FALSE}
 crashes_mts.2019 = crashes %>%
   filter(as.Date(crash_date) >= "2015/01/01" & as.Date(crash_date) <= "2019/12/31") %>%
   separate(crash_date, 
@@ -2612,7 +2614,7 @@ crashes_mts4.2019 <- window(crashes_mts2.2019, start=c(1,01), end=c(5,12),
                             frequency=12)
 ```
 
-```{r, echo=FALSE, message=FALSE}
+```{r 2015-2019-lin-monthly-forecast-ts, echo=FALSE, message=FALSE}
 fit.crashes.2019 <- tslm(crashes_mts4.2019 ~ trend + season)
 
 summary(fit.crashes.2019)
@@ -2635,7 +2637,7 @@ autoplot(fcast.2019) +
   
 ```
 
-```{r, echo=FALSE, message=FALSE}
+```{r 2015-2019-HW-fit-fcast-true-forecast-ts, echo=FALSE, message=FALSE}
 covid.monthly.2019 <- HoltWinters(crashes_mts4.2019)
 
 summary(covid.monthly.2019)
@@ -2661,7 +2663,7 @@ autoplot(fcast.covid.monthly.2019) +
   theme(axis.text.x = element_text(angle = 90))
 ```
 
-```{r, echo=FALSE, message=FALSE}
+```{r 2015-2019-STLF-monthly-fit-fcast-forecast-ts, echo=FALSE, message=FALSE}
 crashes_mts4.2019 %>% mstl() %>%
   autoplot() + 
   ggtitle("Box Jenkins Decomposition") + 
@@ -2695,7 +2697,7 @@ twenty_nineteen_monthly_forecast_values_STLF
 
 ### ANOVA 
 
-```{r, echo=FALSE, message=FALSE}
+```{r crashes-dow, echo=FALSE, message=FALSE}
 crashes_dow = crashes %>%
   separate(crash_date, 
            into = c("Date", "Hour"), sep = 11) %>%
@@ -2708,7 +2710,7 @@ summary(anova_dow)
 TukeyHSD(anova_dow)
 ```
 
-```{r, echo=FALSE, message=FALSE}
+```{r crashes-race, echo=FALSE, message=FALSE}
 crashes_race = crashes %>%
   separate(crash_date, 
            into = c("Date", "Hour"), sep = 11) %>%
@@ -2722,7 +2724,7 @@ summary(anova_race)
 TukeyHSD(anova_race)
 ```
 
-```{r, echo=FALSE, message=FALSE}
+```{r crashes-gender, echo=FALSE, message=FALSE}
 crashes_gender= crashes %>%
   separate(crash_date, 
            into = c("Date", "Hour"), sep = 11) %>%
@@ -2736,7 +2738,7 @@ summary(anova_gender)
 TukeyHSD(anova_gender)
 ```
 
-```{r, echo=FALSE, message=FALSE}
+```{r crashes-vision, echo=FALSE, message=FALSE}
 crashes_vision= crashes %>%
   separate(crash_date, 
            into = c("Date", "Hour"), sep = 11) %>%
@@ -2750,7 +2752,7 @@ summary(anova_vision)
 TukeyHSD(anova_vision)
 ```
 
-```{r, echo=FALSE, message=FALSE}
+```{r crashes-vehicle, echo=FALSE, message=FALSE}
 crashes_vehicle= crashes %>%
   separate(crash_date, 
            into = c("Date", "Hour"), sep = 11) %>%
@@ -2764,7 +2766,7 @@ summary(anova_vehicle)
 TukeyHSD(anova_vehicle)
 ```
 
-```{r, echo=FALSE, message=FALSE}
+```{r crashes-weather, echo=FALSE, message=FALSE}
 crashes_weather= crashes %>%
   separate(crash_date, 
            into = c("Date", "Hour"), sep = 11) %>%
@@ -2778,7 +2780,7 @@ summary(anova_weather)
 TukeyHSD(anova_weather)
 ```
 
-```{r, echo=FALSE, message=FALSE}
+```{r crashes-traffic, echo=FALSE, message=FALSE}
 crashes_traffic= crashes %>%
   separate(crash_date, 
            into = c("Date", "Hour"), sep = 11) %>%
@@ -2792,7 +2794,7 @@ summary(anova_traffic)
 TukeyHSD(anova_traffic)
 ```
 
-```{r, echo=FALSE, message=FALSE}
+```{r crashes-roadfeat, echo=FALSE, message=FALSE}
 crashes_roadfeat = crashes %>%
   separate(crash_date, 
            into = c("Date", "Hour"), sep = 11) %>%
@@ -2806,7 +2808,7 @@ summary(anova_roadfeat)
 TukeyHSD(anova_roadfeat)
 ```
 
-```{r, echo=FALSE, message=FALSE}
+```{r crashes-alcohol, echo=FALSE, message=FALSE}
 crashes_alcohol= crashes %>%
   separate(crash_date, 
            into = c("Date", "Hour"), sep = 11) %>%
@@ -2820,7 +2822,7 @@ summary(anova_alcohol)
 TukeyHSD(anova_alcohol)
 ```
 
-```{r, echo=FALSE, message=FALSE}
+```{r crashes-month, echo=FALSE, message=FALSE}
 crashes_month = crashes %>%
   separate(crash_date, 
            into = c("Date", "Hour"), sep = 11) %>%
@@ -2834,7 +2836,7 @@ summary(anova_month)
 TukeyHSD(anova_month)
 ```
 
-```{r, echo=FALSE, message=FALSE}
+```{r crashes-airbag, echo=FALSE, message=FALSE}
 crashes_airbag = crashes %>%
   separate(crash_date, 
            into = c("Date", "Hour"), sep = 11) %>%
@@ -2848,7 +2850,7 @@ summary(anova_airbag)
 TukeyHSD(anova_airbag)
 ```
 
-```{r, echo=FALSE, message=FALSE}
+```{r crashes-protect, echo=FALSE, message=FALSE}
 crashes_protection = crashes %>%
   separate(crash_date, 
            into = c("Date", "Hour"), sep = 11) %>%
@@ -2863,7 +2865,7 @@ summary(anova_protection)
 TukeyHSD(anova_protection)
 ```
 
-```{r, echo=FALSE, message=FALSE}
+```{r crashes-contrib, echo=FALSE, message=FALSE}
 crashes_contributing = crashes %>%
   separate(crash_date, 
            into = c("Date", "Hour"), sep = 11) %>%
@@ -2879,7 +2881,7 @@ summary(anova_contributing)
 TukeyHSD(anova_contributing)
 ```
 
-```{r, echo=FALSE, message=FALSE}
+```{r crashes-firstharm, echo=FALSE, message=FALSE}
 crashes_first_harm = crashes %>%
   separate(crash_date, 
            into = c("Date", "Hour"), sep = 11) %>%
@@ -2893,7 +2895,7 @@ summary(anova_first_harm)
 TukeyHSD(anova_first_harm)
 ```
 
-```{r, echo=FALSE, message=FALSE}
+```{r crashes-mostharm, echo=FALSE, message=FALSE}
 crashes_most_harm = crashes %>%
   separate(crash_date, 
            into = c("Date", "Hour"), sep = 11) %>%
@@ -2909,7 +2911,7 @@ TukeyHSD(anova_most_harm)
 
 ### t Test
 
-```{r, echo=FALSE, message=FALSE}
+```{r crashes-rain, echo=FALSE, message=FALSE}
 crashes_rain = crashes %>%
   filter(WeatherCondition1 != "Unknown", WeatherCondition1 != "NA", 
          WeatherCondition1 != "") %>%
