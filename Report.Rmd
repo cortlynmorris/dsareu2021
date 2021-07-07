@@ -1994,12 +1994,12 @@ fcast <- forecast::forecast(fit.crashes, h=8)
 ```{r, echo=FALSE, eval=FALSE}
 monthly_forecast_values_covid_lin <- summary(fcast)
 
-rownames(monthly_forecast_values_covid_lin) <- seq(as.Date("2021/05/31"), 
-                                                     as.Date("2021/12/31"), 
+rownames(monthly_forecast_values_covid_lin) <- seq(as.Date("2021/06/01"), 
+                                                     as.Date("2022/01/01"), 
                                                    "month")
 ```
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, message=FALSE}
 monthly_forecast_values_covid_lin
 
 autoplot(fcast) +
@@ -2043,12 +2043,12 @@ fcast.noncovid <- forecast::forecast(fit.crashes.noncovid, h=23)
 ```{r, echo=FALSE, eval=FALSE}
 monthly_forecast_values_noncovid_lin <- summary(fcast.noncovid)
 
-rownames(monthly_forecast_values_noncovid_lin) <- seq(as.Date("2020/02/29"), 
-                                                   as.Date("2021/12/31"),
+rownames(monthly_forecast_values_noncovid_lin) <- seq(as.Date("2020/03/01"), 
+                                                   as.Date("2022/01/01"),
                                                    "month")
 ```
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, message=FALSE}
 monthly_forecast_values_noncovid_lin
 
 autoplot(fcast.noncovid) +
@@ -2075,12 +2075,12 @@ fcast.covid.monthly <- forecast::forecast(covid.monthly, 8)
 ```{r, echo=FALSE, eval=FALSE}
 monthly_forecast_values_covid_HW <- summary(fcast.covid.monthly)
 
-rownames(monthly_forecast_values_covid_HW) <- seq(as.Date("2021/05/31"), 
-                                                      as.Date("2021/12/31"), 
+rownames(monthly_forecast_values_covid_HW) <- seq(as.Date("2021/06/01"), 
+                                                      as.Date("2022/01/01"), 
                                                   "month")
 ```
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, message=FALSE}
 monthly_forecast_values_covid_HW
 
 autoplot(fcast.covid.monthly) +
@@ -2105,8 +2105,8 @@ fcast.noncovid.monthly <- forecast::forecast(noncovid.monthly, 23)
 ```{r, echo=FALSE, eval=FALSE}
 monthly_forecast_values_noncovid_HW <- summary(fcast.noncovid.monthly)
 
-rownames(monthly_forecast_values_noncovid_HW) <- seq(as.Date("2020/02/29"), 
-                                                      as.Date("2021/12/31"), 
+rownames(monthly_forecast_values_noncovid_HW) <- seq(as.Date("2020/03/01"), 
+                                                      as.Date("2022/01/01"), 
                                                      "month")
 ```
 
@@ -2142,8 +2142,8 @@ t %>%
 ```{r, echo=FALSE, eval=FALSE}
 monthly_forecast_values_covid_STLF <- summary(t)
 
-rownames(monthly_forecast_values_covid_STLF) <- seq(as.Date("2021/05/31"), 
-                                                     as.Date("2021/12/31"), "month")
+rownames(monthly_forecast_values_covid_STLF) <- seq(as.Date("2021/06/01"), 
+                                                     as.Date("2022/01/01"), "month")
 ```
 
 ```{r, echo=FALSE}
@@ -2311,54 +2311,68 @@ crashes.test_STLF_noncovid_monthly <- Arima(test_STLF_noncovid_monthly)
 accuracy(crashes.test_STLF_noncovid_monthly)
 ```
 
-## Advanced Forecasting Methods 
+### Advanced Forecasting Methods 
 
-### Neural Network Autoregression Forecasting Model of Daily Crashes (With Pandemic Data)
-
-```{r}
+```{r, echo=FALSE}
 fit.nnetar <- nnetar(crashests2, lambda=0)
 
 summary(fit.nnetar)
-
-forecast::forecast(fit.nnetar, h=212)
-
-autoplot(forecast(fit.nnetar,h=212,lambda=0)) + 
-  ggtitle("Neural Network Autoregression Forecasting Model of Daily Crashes (With Pandemic Data)")
 ```
 
-### Neural Network Autoregression Forecasting Model of Daily Crashes (Without Pandemic Data)
+```{r, echo=FALSE, eval=FALSE}
+fcast.nnetar.summary <- summary(forecast::forecast(fit.nnetar, h=214))
 
-```{r}
+rownames(fcast.nnetar.summary) <- seq(as.Date("2021/06/01"), 
+                                                     as.Date("2021/12/31"), "day")
+```
+
+```{r, echo=FALSE}
+fcast.nnetar.summary
+
+autoplot(forecast(fit.nnetar,h=212,lambda=0)) + 
+  ggtitle("NNAR Forecasting Model of Daily Crashes (With Pandemic Data)") + 
+  xlab("Date") + ylab("Crashes")
+```
+
+```{r, echo=FALSE}
 fit.nnetar.noncovid <- nnetar(crashests.noncovid, lambda=0)
 
 summary(fit.nnetar.noncovid)
-
-forecast::forecast(fit.nnetar.noncovid, h=30)
-
-autoplot(forecast(fit.nnetar.noncovid,h=210,lambda=0)) + 
-  ggtitle("Neural Network Autoregression Forecasting Model of Daily Crashes (Without Pandemic Data)")
 ```
 
-### Neural Network Autoregression Forecasting Model of Monthly Crashes (With Pandemic Data)
+```{r, echo=FALSE, eval=FALSE}
+fcast.nnetar.noncovid.summary <- summary(forecast::forecast(fit.nnetar.noncovid, h=671))
 
-```{r}
+rownames(fcast.nnetar.noncovid.summary) <- seq(as.Date("2020/03/01"), 
+                                                     as.Date("2021/12/31"), "day")
+```
+
+```{r, echo=FALSE}
+fcast.nnetar.noncovid.summary
+
+autoplot(forecast(fit.nnetar.noncovid,h=672,lambda=0)) + 
+  ggtitle("NNAR Forecasting Model of Daily Crashes (Without Pandemic Data)") + 
+  xlab("Date") + ylab("Crashes")
+```
+
+```{r, echo=FALSE, message=FALSE}
 fit.nnetar.monthly <- nnetar(crashes_mts4, lambda=0)
 
 summary(fit.nnetar.monthly)
 
-forecast::forecast(fit.nnetar.monthly, h=20)
+forecast::forecast(fit.nnetar.monthly, h=6)
 
 autoplot(forecast(fit.nnetar.monthly,h=20,lambda=0)) + 
   scale_x_continuous(breaks = c(1,2,3,4,5,6,7, 8, 9), 
                      labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
                                 "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022", 
                                 "Jan 2023")) + 
-  theme(axis.text.x = element_text(angle = 90))
+  theme(axis.text.x = element_text(angle = 90)) + 
+  ggtitle("NNAR Forecasting Model of Monthly Crashes (Pandemic Data)") + 
+  xlab("Date") + ylab("Crashes")
 ```
 
-### Neural Network Autoregression Forecasting Model of Monthly Crashes (Without Pandemic Data)
-
-```{r}
+```{r, echo=FALSE, message=FALSE}
 fit.nnetar.monthly.noncovid <- nnetar(crashes_mts4.noncovid, lambda=0)
 
 summary(fit.nnetar.monthly.noncovid)
@@ -2369,16 +2383,16 @@ autoplot(forecast(fit.nnetar.monthly.noncovid,h=25,lambda=0)) +
   scale_x_continuous(breaks = c(1,2,3,4,5,6,7, 8), 
                      labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
                                 "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022")) + 
-  theme(axis.text.x = element_text(angle = 90))
+  theme(axis.text.x = element_text(angle = 90)) + 
+  ggtitle("NNAR Forecasting Model of Monthly Crashes (Without Pandemic Data)") + 
+  xlab("Date") + ylab("Crashes")
 ```
 
-## Comparing Models 
+### Comparing Models Using 2015-2019
 
 Ending at end of 2019 while predicting and comparing Jan and Feb 2020 daily time series plots with real data. 
 
-### 2015-2019 Daily Time Series 
-
-```{r}
+```{r, echo=FALSE}
 crashes_ts.2019 = crashes %>%
   filter(as.Date(crash_date) >= "2015/01/01" & as.Date(crash_date) <= "2019/12/31") %>%
   separate(crash_date, 
@@ -2391,12 +2405,12 @@ crashes_ts.2019 %>%
   ggplot(aes(x = as.Date(Date), y = count)) + 
   geom_line() + 
   scale_x_date(date_labels = "%m-%Y", date_breaks = "6 month") + 
-  theme(axis.text.x = element_text(angle = 90))
+  theme(axis.text.x = element_text(angle = 90)) + 
+  ggtitle("2015-2019 Time Series") + 
+  xlab("Date") + ylab("Crashes")
 ```
 
-### 2015-2019 Time Series Forecast of Daily Crashes Using Linear Model 
-
-```{r}
+```{r, echo=FALSE, message=FALSE}
 #Converting crashes_ts.2019 to a time series object 
 crashests.2019 <- ts(crashes_ts.2019$count, start = c(2015,1), end = c(2019,365),
                          frequency = 365)
@@ -2421,9 +2435,7 @@ autoplot(crashests.2019.2[,'count'], series="Data") +
   theme(axis.text.x = element_text(angle = 90))
 ```
 
-### 2015-2019 Time Series Forecast of Daily Crashes Using HoltWinters 
-
-```{r}
+```{r, echo=FALSE}
 twentynineteen <- HoltWinters(crashests.2019)
 
 summary(twentynineteen)
@@ -2431,7 +2443,9 @@ summary(twentynineteen)
 plot(fitted(twentynineteen), main = "Box Jenkins Decomposition of Daily Crashes") 
 
 fcast.2019 <- forecast::forecast(twentynineteen, 61)
+```
 
+```{r, echo=FALSE, eval=FALSE}
 twenty_nineteen_daily_forecast_values_HW <- summary(fcast.2019)
 
 rownames(twenty_nineteen_daily_forecast_values_HW) <- seq(as.Date("2020/01/01"),
@@ -2442,7 +2456,9 @@ true_value = crashes_ts %>%
 
 twenty_nineteen_daily_forecast_values_HW <- twenty_nineteen_daily_forecast_values_HW %>%
   mutate(true_count = true_value$count)
+```
 
+```{r, echo=FALSE}
 twenty_nineteen_daily_forecast_values_HW
 
 autoplot(fcast.2019) +
@@ -2450,20 +2466,22 @@ autoplot(fcast.2019) +
   xlab("Year") + ylab("Crashes")
 ```
 
-### 2015-2019 Seasonal and Trend Decomposition Using Loess Forecasting Model of Daily Crashes 
-
-```{r}
+```{r, echo=FALSE}
 crashests.2019 %>% mstl() %>%
-  autoplot()
+  autoplot() + 
+  ggtitle("Box Jenkins Decomposition") + 
+  xlab("Date") + ylab("Count")
 
 p <- crashests.2019 %>%
   stlf(lambda = 0, h = 61) 
 
 p %>%
   autoplot() + 
-  ggtitle("2015-2019 Seasonal and Trend Decomposition Using Loess Forecasting Model for Daily Car Crashes") +
-  xlab("Year") + ylab("Daily Crashes")
+  ggtitle("2015-2019 STLF Model for Daily Car Crashes") +
+  xlab("Date") + ylab("Daily Crashes")
+```
 
+```{r, echo=FALSE, eval=FALSE}
 twenty_nineteen_daily_forecast_values_STLF <- summary(p)
 
 rownames(twenty_nineteen_daily_forecast_values_STLF) <- seq(as.Date("2020/01/01"), as.Date("2020/03/01"), "day")
@@ -2473,13 +2491,13 @@ true_value = crashes_ts %>%
 
 twenty_nineteen_daily_forecast_values_STLF <- twenty_nineteen_daily_forecast_values_STLF %>%
   mutate(true_count = true_value$count)
+```
 
+```{r, echo=FALSE}
 twenty_nineteen_daily_forecast_values_STLF
 ```
 
-### 2015-2019 Monthly Time Series 
-
-```{r, message=FALSE}
+```{r, echo=FALSE, message=FALSE}
 crashes_mts.2019 = crashes %>%
   filter(as.Date(crash_date) >= "2015/01/01" & as.Date(crash_date) <= "2019/12/31") %>%
   separate(crash_date, 
@@ -2504,9 +2522,7 @@ crashes_mts4.2019 <- window(crashes_mts2.2019, start=c(1,01), end=c(5,12),
                             frequency=12)
 ```
 
-### 2015-2019 Time Series Forecast of Monthly Crashes Using Linear Model 
-
-```{r}
+```{r, echo=FALSE, message=FALSE}
 fit.crashes.2019 <- tslm(crashes_mts4.2019 ~ trend + season)
 
 summary(fit.crashes.2019)
@@ -2529,9 +2545,7 @@ autoplot(fcast.2019) +
   
 ```
 
-### 2015-2019 Time Series Forecast of Monthly Crashes Using HoltWinters 
-
-```{r}
+```{r, echo=FALSE, message=FALSE}
 covid.monthly.2019 <- HoltWinters(crashes_mts4.2019)
 
 summary(covid.monthly.2019)
@@ -2556,11 +2570,11 @@ autoplot(fcast.covid.monthly.2019) +
   theme(axis.text.x = element_text(angle = 90))
 ```
 
-### 2015-2019 Seasonal and Trend Decomposition Using Loess Forecasting Model of Daily Crashes 
-
-```{r}
+```{r, echo=FALSE, message=FALSE}
 crashes_mts4.2019 %>% mstl() %>%
-  autoplot()
+  autoplot() + 
+  ggtitle("Box Jenkins Decomposition") + 
+  xlab("Date") + ylab("Count")
 
 t <- crashes_mts4.2019 %>%
   stlf(lambda = 0, h = 3) 
@@ -2578,15 +2592,15 @@ twenty_nineteen_monthly_forecast_values_STLF <- summary(t)
 
 rownames(twenty_nineteen_monthly_forecast_values_STLF) <- seq(as.Date("2020/01/01"), as.Date("2020/03/01"), "month")
 
-twenty_nineteen_daily_forecast_values_STLF
+twenty_nineteen_monthly_forecast_values_STLF
 
 ```
 
-## Statistical Analyses Using ANOVA
+## Statistical Analyses 
 
-### Is there a significant difference between the amount of crashes on each DOW?
+### ANOVA 
 
-```{r}
+```{r, echo=FALSE, message=FALSE}
 crashes_dow = crashes %>%
   separate(crash_date, 
            into = c("Date", "Hour"), sep = 11) %>%
@@ -2599,9 +2613,7 @@ summary(anova_dow)
 TukeyHSD(anova_dow)
 ```
 
-### Is there a significant difference between the amount of crashes per each race?
-
-```{r}
+```{r, echo=FALSE, message=FALSE}
 crashes_race = crashes %>%
   separate(crash_date, 
            into = c("Date", "Hour"), sep = 11) %>%
@@ -2615,9 +2627,7 @@ summary(anova_race)
 TukeyHSD(anova_race)
 ```
 
-### Is there a significant difference between the amount of crashes per each gender?
-
-```{r}
+```{r, echo=FALSE, message=FALSE}
 crashes_gender= crashes %>%
   separate(crash_date, 
            into = c("Date", "Hour"), sep = 11) %>%
@@ -2631,9 +2641,7 @@ summary(anova_gender)
 TukeyHSD(anova_gender)
 ```
 
-### Is there a significant difference between the amount of crashes per each Vision Obstruction?
-
-```{r}
+```{r, echo=FALSE, message=FALSE}
 crashes_vision= crashes %>%
   separate(crash_date, 
            into = c("Date", "Hour"), sep = 11) %>%
@@ -2647,9 +2655,7 @@ summary(anova_vision)
 TukeyHSD(anova_vision)
 ```
 
-### Is there a significant difference between the amount of crashes per each vehicle type?
-
-```{r}
+```{r, echo=FALSE, message=FALSE}
 crashes_vehicle= crashes %>%
   separate(crash_date, 
            into = c("Date", "Hour"), sep = 11) %>%
@@ -2663,9 +2669,7 @@ summary(anova_vehicle)
 TukeyHSD(anova_vehicle)
 ```
 
-### Is there a significant difference between the amount of crashes per each Weather Condition?
-
-```{r}
+```{r, echo=FALSE, message=FALSE}
 crashes_weather= crashes %>%
   separate(crash_date, 
            into = c("Date", "Hour"), sep = 11) %>%
@@ -2679,9 +2683,7 @@ summary(anova_weather)
 TukeyHSD(anova_weather)
 ```
 
-### Is there a significant difference between the amount of crashes per each traffic control type?
-
-```{r}
+```{r, echo=FALSE, message=FALSE}
 crashes_traffic= crashes %>%
   separate(crash_date, 
            into = c("Date", "Hour"), sep = 11) %>%
@@ -2695,9 +2697,7 @@ summary(anova_traffic)
 TukeyHSD(anova_traffic)
 ```
 
-### Is there a significant difference between the amount of crashes per each road feature?
-
-```{r}
+```{r, echo=FALSE, message=FALSE}
 crashes_roadfeat = crashes %>%
   separate(crash_date, 
            into = c("Date", "Hour"), sep = 11) %>%
@@ -2711,9 +2711,7 @@ summary(anova_roadfeat)
 TukeyHSD(anova_roadfeat)
 ```
 
-### Is there a significant difference between the amount of crashes per each alcohol result type?
-
-```{r}
+```{r, echo=FALSE, message=FALSE}
 crashes_alcohol= crashes %>%
   separate(crash_date, 
            into = c("Date", "Hour"), sep = 11) %>%
@@ -2727,9 +2725,7 @@ summary(anova_alcohol)
 TukeyHSD(anova_alcohol)
 ```
 
-### Is there a significant difference between the amount of crashes per each month?
-
-```{r}
+```{r, echo=FALSE, message=FALSE}
 crashes_month = crashes %>%
   separate(crash_date, 
            into = c("Date", "Hour"), sep = 11) %>%
@@ -2743,9 +2739,7 @@ summary(anova_month)
 TukeyHSD(anova_month)
 ```
 
-### Is there a significant difference between the amount of crashes per each airbag deploy?
-
-```{r}
+```{r, echo=FALSE, message=FALSE}
 crashes_airbag = crashes %>%
   separate(crash_date, 
            into = c("Date", "Hour"), sep = 11) %>%
@@ -2759,9 +2753,7 @@ summary(anova_airbag)
 TukeyHSD(anova_airbag)
 ```
 
-### Is there a significant difference between the amount of crashes per each protection?
-
-```{r}
+```{r, echo=FALSE, message=FALSE}
 crashes_protection = crashes %>%
   separate(crash_date, 
            into = c("Date", "Hour"), sep = 11) %>%
@@ -2776,9 +2768,7 @@ summary(anova_protection)
 TukeyHSD(anova_protection)
 ```
 
-### Is there a significant difference between the amount of crashes per each contributing circumstance?
-
-```{r}
+```{r, echo=FALSE, message=FALSE}
 crashes_contributing = crashes %>%
   separate(crash_date, 
            into = c("Date", "Hour"), sep = 11) %>%
@@ -2794,9 +2784,7 @@ summary(anova_contributing)
 TukeyHSD(anova_contributing)
 ```
 
-### Is there a significant difference between the amount of crashes per each first harmful event?
-
-```{r}
+```{r, echo=FALSE, message=FALSE}
 crashes_first_harm = crashes %>%
   separate(crash_date, 
            into = c("Date", "Hour"), sep = 11) %>%
@@ -2810,9 +2798,7 @@ summary(anova_first_harm)
 TukeyHSD(anova_first_harm)
 ```
 
-### Is there a significant difference between the amount of crashes per each most harmful event?
-
-```{r}
+```{r, echo=FALSE, message=FALSE}
 crashes_most_harm = crashes %>%
   separate(crash_date, 
            into = c("Date", "Hour"), sep = 11) %>%
@@ -2826,11 +2812,9 @@ summary(anova_most_harm)
 TukeyHSD(anova_most_harm)
 ```
 
-##Statistical Analyses Using t Test
+### t Test
 
-### Is there a significant difference between the amount of crashes in rain v. no rain?
-
-```{r}
+```{r, echo=FALSE, message=FALSE}
 crashes_rain = crashes %>%
   filter(WeatherCondition1 != "Unknown", WeatherCondition1 != "NA", 
          WeatherCondition1 != "") %>%
