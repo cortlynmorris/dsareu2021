@@ -661,7 +661,7 @@ crashes %>%
 
 Most direction of crashes were North, South, East, and West. This shows that there is no specific direction where crashes were most common. This data implies that there is the same amount of crashes in every direction of the road. 
 
-```{r location-direction, echo=FALSE}
+```{r location-direction-from, echo=FALSE}
 crashes %>% 
   filter(LocationDirectionFromRoad != "NA", LocationDirectionFromRoad != "Unknown",
          LocationDirectionFromRoad != "") %>%
@@ -696,7 +696,7 @@ crashes %>%
 
 When it comes to the location direction of the crash to the road the data is like location direction of crashes from road. Most crashes happen North, South, East, and West. 
 
-```{r location-direction, echo=FALSE}
+```{r location-direction-to, echo=FALSE}
 crashes %>% 
   filter(LocationDirectionToRoad != "NA", LocationDirectionToRoad != "Unknown") %>%
   count(LocationDirectionToRoad) %>% 
@@ -1459,7 +1459,7 @@ crashes %>%
   xlab("Longitude") + ylab("Latitude")
 ```
 
-```{r load-library, echo=FALSE, message=FALSE}
+```{r load-library-map, echo=FALSE, message=FALSE}
 library(maps)
 #install.packages("sf")
 library(sf)
@@ -1494,7 +1494,7 @@ wake_map <- wake_map +
 wake_map
 ```
 
-```{r load-library, message=FALSE, echo=FALSE}
+```{r load-library-interactive-map, message=FALSE, echo=FALSE}
 library(ggplot2)
 #install.packages("ggmap")
 library(ggmap)
@@ -1573,7 +1573,7 @@ ggplotly(coords.map.wake) %>%
 devtools::install_github("gaospecial/wordcloud2")
 ```
 
-```{r load-library, message=FALSE, echo=FALSE}
+```{r load-library-word-cloud, message=FALSE, echo=FALSE}
 #install.packages('wordcloud2')
 library(wordcloud2)
 ```
@@ -1640,7 +1640,7 @@ crashes_annual %>%
   facet_wrap(~Year, scales = "free_x")
 ```
 
-```{r load-library, echo=FALSE, message=FALSE}
+```{r load-library-ts, echo=FALSE, message=FALSE}
 library(zoo)
 ```
 
@@ -1694,7 +1694,7 @@ crashes_ts.noncovid %>%
   theme(axis.text.x = element_text(angle = 90))
 ```
 
-```{r load-library, message=FALSE, echo=FALSE}
+```{r load-library-forecast, message=FALSE, echo=FALSE}
 library(forecast)
 library(fpp2)
 library(TTR)
@@ -1955,7 +1955,7 @@ crashes.test_HW_noncovid <- Arima(test_HW_noncovid)
 accuracy(crashes.test_HW_noncovid)
 ```
 
-```{r noncovid-ms-STLF-forecast-ts, echo=FALSE}
+```{r noncovid-ms-STLF-forecast-ts2, echo=FALSE}
 training_STLF_noncovid <- subset(crashests.noncovid, end=length(crashests.noncovid)-426)
 test_STLF_noncovid <- subset(crashests.noncovid, start=length(crashests.noncovid)-425)
 crashes.train_STLF_noncovid <- stlf(training_STLF_noncovid, lambda = 0, h = 426, level=c(65,80))
@@ -1974,7 +1974,7 @@ rownames(fcast.ms.STLF.daily.noncovid) <- seq(as.Date("2019/01/01"),
                                          as.Date("2020/03/01"), "day")
 ```
 
-```{r noncovid-ms-HW-fcast-filter-decomp-sum, echo=FALSE, warning=FALSE}
+```{r noncovid-ms-HW-fcast-filter-decomp-sum2, echo=FALSE, warning=FALSE}
 fcast.ms.STLF.daily.noncovid
 
 autoplot(training_STLF_noncovid, series="Training data") +
@@ -1988,7 +1988,7 @@ crashes.test_STLF_noncovid <- Arima(test_STLF_noncovid)
 accuracy(crashes.test_STLF_noncovid)
 ```
 
-```{r load-library, message=FALSE, echo=FALSE}
+```{r load-library-smooth-ts, message=FALSE, echo=FALSE}
 library(Mcomp)
 library(smooth)
 ```
