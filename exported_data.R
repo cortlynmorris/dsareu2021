@@ -2397,11 +2397,15 @@ crashes_rain %>%
 ### Modeling Injury Outcome
 
 crashes_pm = crashes %>%
-  filter(Injury != "", Injury != "Unknown", VehicleType != "Unknown") %>%
+  filter(Injury != "", Injury != "Unknown", VehicleType != "Unknown", 
+         ContributingCircumstance1 != "Unknown", ContributingCircumstance1 != "", 
+         Protection != "Unknown", Protection != "") %>%
   mutate(Injury = as.factor(Injury)) %>%
   mutate(Injury2 = if_else(Injury == "No injury", "No injury", "Injury"), 
          Injury2 = as.factor(Injury2)) %>%
-  mutate(VehicleType = as.factor(VehicleType))
+  mutate(VehicleType = as.factor(VehicleType)) %>%
+  mutate(ContributingCircumstance1 = as.factor(ContributingCircumstance1)) %>%
+  mutate(Protection = as.factor(Protection))
   
 summary(crashes_pm$Injury)
 summary(crashes_pm$Injury2)
@@ -2445,9 +2449,26 @@ crashes_pm.pred <- ifelse(crashes_pm.pred.prob>0.5, "Injury", "No injury") #pred
 (tab <- table(pred=crashes_pm.pred, actual=crashes_pm.test$Injury2)) #confusion matrix: cross-tab of predictions vs actual class
 (accuracy=mean(crashes_pm.pred==crashes_pm.test$Injury2, na.rm=T)*100) #percent of correct predictions in test data
 
+#Balancing data
+df_crashes_pm_Injury_ind <- which(crashes_pm$Injury2 == "Injury")
+df_crashes_pm_NoInjury_ind <- which(crashes_pm$Injury2 == "No injury")
 
+oversample_df1 <- crashes_pm[c(df_crashes_pm_Injury_ind,
+                               df_crashes_pm_NoInjury_ind,
+                               df_crashes_pm_Injury_ind), ]
 
+oversample_df2 <- crashes_pm[c(df_crashes_pm_NoInjury_ind,
+                               df_crashes_pm_Injury_ind,
+                               df_crashes_pm_NoInjury_ind), ]
 
+#install.packages("ROSE")
+library(ROSE)
+over <- ovun.sample(Injury2~., data = crashes_pm.train, method = "both")$crashes_pm
 
+rose <- ROSE(Injury2~., data = crashes_pm.train, N = 500000, seed=2021)$crashes_pm
+
+#install.packages("Amelia")
+library(Amelia)
+missmap(crashes_pm)
 
   
