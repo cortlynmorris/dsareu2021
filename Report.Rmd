@@ -2478,11 +2478,7 @@ autoplot(forecast(fit.nnetar.monthly.noncovid,h=25,lambda=0)) +
   xlab("Date") + ylab("Crashes")
 ```
 
-### Comparing Models Using 2015-2019
-
-Ending at end of 2019 while predicting and comparing Jan and Feb 2020 daily time series plots with real data. 
-
-```{r 2015-2019-ts, echo=FALSE}
+```{r 2015-2019-ts, echo=FALSE, include=FALSE}
 crashes_ts.2019 = crashes %>%
   filter(as.Date(crash_date) >= "2015/01/01" & as.Date(crash_date) <= "2019/12/31") %>%
   separate(crash_date, 
@@ -2500,7 +2496,7 @@ crashes_ts.2019 %>%
   xlab("Date") + ylab("Crashes")
 ```
 
-```{r regression-2015-2019-ts, echo=FALSE, message=FALSE}
+```{r regression-2015-2019-ts, echo=FALSE, message=FALSE, include=FALSE}
 #Converting crashes_ts.2019 to a time series object 
 crashests.2019 <- ts(crashes_ts.2019$count, start = c(2015,1), end = c(2019,365),
                          frequency = 365)
@@ -2527,7 +2523,7 @@ autoplot(crashests.2019.2[,'count'], series="Data") +
   theme(axis.text.x = element_text(angle = 90))
 ```
 
-```{r 2015-2019-HW-fcast-decomp, echo=FALSE}
+```{r 2015-2019-HW-fcast-decomp, echo=FALSE, include=FALSE}
 twentynineteen <- HoltWinters(crashests.2019)
 
 summary(twentynineteen)
@@ -2550,7 +2546,7 @@ twenty_nineteen_daily_forecast_values_HW <- twenty_nineteen_daily_forecast_value
   mutate(true_count = true_value$count)
 ```
 
-```{r 2015-2019-HW-fcast-filter-forecast-ts, echo=FALSE}
+```{r 2015-2019-HW-fcast-filter-forecast-ts, echo=FALSE, include=FALSE}
 twenty_nineteen_daily_forecast_values_HW
 
 autoplot(fcast.2019) +
@@ -2558,7 +2554,7 @@ autoplot(fcast.2019) +
   xlab("Year") + ylab("Crashes") 
 ```
 
-```{r 2015-2019-STLF-fit-forecast-ts, echo=FALSE}
+```{r 2015-2019-STLF-fit-forecast-ts, echo=FALSE, include=FALSE}
 crashests.2019 %>% mstl() %>%
   autoplot() + 
   ggtitle("Box Jenkins Decomposition") + 
@@ -2585,11 +2581,11 @@ twenty_nineteen_daily_forecast_values_STLF <- twenty_nineteen_daily_forecast_val
   mutate(true_count = true_value$count)
 ```
 
-```{r 2015-2019-fcast-filter, echo=FALSE}
+```{r 2015-2019-fcast-filter, echo=FALSE, include=FALSE}
 twenty_nineteen_daily_forecast_values_STLF
 ```
 
-```{r 2015-2019-monthly-ts, echo=FALSE, message=FALSE}
+```{r 2015-2019-monthly-ts, echo=FALSE, message=FALSE, include=FALSE}
 crashes_mts.2019 = crashes %>%
   filter(as.Date(crash_date) >= "2015/01/01" & as.Date(crash_date) <= "2019/12/31") %>%
   separate(crash_date, 
@@ -2614,7 +2610,7 @@ crashes_mts4.2019 <- window(crashes_mts2.2019, start=c(1,01), end=c(5,12),
                             frequency=12)
 ```
 
-```{r 2015-2019-lin-monthly-forecast-ts, echo=FALSE, message=FALSE}
+```{r 2015-2019-lin-monthly-forecast-ts, echo=FALSE, message=FALSE, include=FALSE}
 fit.crashes.2019 <- tslm(crashes_mts4.2019 ~ trend + season)
 
 summary(fit.crashes.2019)
@@ -2637,7 +2633,7 @@ autoplot(fcast.2019) +
   
 ```
 
-```{r 2015-2019-HW-fit-fcast-true-forecast-ts, echo=FALSE, message=FALSE}
+```{r 2015-2019-HW-fit-fcast-true-forecast-ts, echo=FALSE, message=FALSE, include=FALSE}
 covid.monthly.2019 <- HoltWinters(crashes_mts4.2019)
 
 summary(covid.monthly.2019)
@@ -2663,7 +2659,7 @@ autoplot(fcast.covid.monthly.2019) +
   theme(axis.text.x = element_text(angle = 90))
 ```
 
-```{r 2015-2019-STLF-monthly-fit-fcast-forecast-ts, echo=FALSE, message=FALSE}
+```{r 2015-2019-STLF-monthly-fit-fcast-forecast-ts, echo=FALSE, message=FALSE, include=FALSE}
 crashes_mts4.2019 %>% mstl() %>%
   autoplot() + 
   ggtitle("Box Jenkins Decomposition") + 
