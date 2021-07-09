@@ -1640,8 +1640,10 @@ STL <- stlf(train, lambda=0, h=h, biasadj=TRUE)
 NNAR <- forecast(nnetar(train), h=h)
 TBATS <- forecast(tbats(train, biasadj=TRUE), h=h)
 Combination <- (ETS[["mean"]] + ARIMA[["mean"]] + TBATS[["mean"]])/3
+Combination <- (ARIMA[["mean"]] + TBATS[["mean"]] + STL[["mean"]] + NNAR[["mean"]])/4
 
-autoplot(crashests2) +
+
+autoplot(train) +
   autolayer(NNAR, series="NNAR", alpha=0.7) +
   autolayer(ARIMA, series="ARIMA", PI=F) +
   autolayer(TBATS, series="TBATS", PI=F) +
