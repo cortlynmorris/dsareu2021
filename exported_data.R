@@ -1639,10 +1639,16 @@ ARIMA <- forecast(auto.arima(train, lambda=0, biasadj=TRUE), h=h)
 STL <- stlf(train, lambda=0, h=h, biasadj=TRUE)
 NNAR <- forecast(nnetar(train), h=h)
 TBATS <- forecast(tbats(train, biasadj=TRUE), h=h)
+<<<<<<< HEAD
 Combination <- (ARIMA[["mean"]] + TBATS[["mean"]] + NNAR[["mean"]] + 
                   STL[["mean"]])/4
+=======
+Combination <- (ETS[["mean"]] + ARIMA[["mean"]] + TBATS[["mean"]])/3
+Combination <- (ARIMA[["mean"]] + TBATS[["mean"]] + STL[["mean"]] + NNAR[["mean"]])/4
+>>>>>>> c47359963f0ad1db91e99c05490af1ab529a6364
 
-autoplot(crashests2) +
+
+autoplot(train) +
   autolayer(NNAR, series="NNAR", alpha=0.7) +
   autolayer(ARIMA, series="ARIMA", PI=F) +
   autolayer(TBATS, series="TBATS", PI=F) +
