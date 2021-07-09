@@ -2473,4 +2473,14 @@ rose <- ROSE(Injury2~., data = crashes_pm.train, N = 500000, seed=2021)$crashes_
 library(Amelia)
 missmap(crashes_pm)
 
+#best method so far
+df_crashes_pm_Injury_ind <- which(crashes_pm$Injury2 == "Injury")
+df_crashes_pm_NoInjury_ind <- which(crashes_pm$Injury2 == "No injury")
+
+oversample_df1 <- crashes_pm[c(df_crashes_pm_Injury_ind, df_crashes_pm_NoInjury_ind, df_crashes_pm_Injury_ind), ]
+table(oversample_df1$Injury2)
+
+
+
+
   
