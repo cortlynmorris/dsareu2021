@@ -1639,7 +1639,8 @@ ARIMA <- forecast(auto.arima(train, lambda=0, biasadj=TRUE), h=h)
 STL <- stlf(train, lambda=0, h=h, biasadj=TRUE)
 NNAR <- forecast(nnetar(train), h=h)
 TBATS <- forecast(tbats(train, biasadj=TRUE), h=h)
-Combination <- (ETS[["mean"]] + ARIMA[["mean"]] + TBATS[["mean"]])/3
+Combination <- (ARIMA[["mean"]] + TBATS[["mean"]] + NNAR[["mean"]] + 
+                  STL[["mean"]])/4
 
 autoplot(crashests2) +
   autolayer(NNAR, series="NNAR", alpha=0.7) +
@@ -2475,8 +2476,52 @@ missmap(crashes_pm)
 df_crashes_pm_Injury_ind <- which(crashes_pm$Injury2 == "Injury")
 df_crashes_pm_NoInjury_ind <- which(crashes_pm$Injury2 == "No injury")
 
-oversample_df1 <- crashes_pm[c(df_crashes_pm_Injury_ind, df_crashes_pm_NoInjury_ind, df_crashes_pm_Injury_ind), ]
+oversample_df1 <- crashes_pm[c(df_crashes_pm_NoInjury_ind, 
+                               rep(df_crashes_pm_Injury_ind, 5)), ]
+ 
 table(oversample_df1$Injury2)
+
+
+### Modeling Injury Outcome
+
+Injury2.fit2 <- glm(Injury2~Age+VehicleType+ContributingCircumstance1+Protection, 
+                   data=oversample_df1, family = "binomial")
+summary(Injury2.fit2)
+
+#Model coefficients
+coef(Injury2.fit2) #extract coefficients
+round(coef(Injury2.fit2), digits = 4) #get rounded coefficients
+round(confint(Injury2.fit2), digits = 4) #get confidence intervals (CI) for coefs
+
+#Odds ratios
+round(exp(coef(Injury2.fit2)), digits = 4) #OR=exp(coef)
+(round(exp(coef(Injury2.fit2)), digits = 4)-1)*100 #percent change in odds
+round(exp(confint(Injury2.fit2)), digits = 4) #confidence intervals for ORs
+round(data.frame(OR=exp(coef(Injury2.fit2)), exp(confint(Injury2.fit2))), digits = 4) #ORs & their CIs
+
+#Model selection based on AIC
+#install.packages("MASS") #run once: installing package needed for the `stepAIC` function
+library(MASS) 
+Injury2.select2 <- stepAIC(Injury2.fit2)
+summary(Injury2.select2)
+
+#Get a pseudo R^2 
+#install.packages("pscl") #package for computing the McFadden R^2
+library(pscl)
+pR2(Injury2.select2)
+
+#Prediction accuracy on test data
+set.seed(101) #for reproducibility of results
+sample2 <- sample(c(TRUE, FALSE), nrow(oversample_df1), replace = T, prob = c(0.7,0.3)) #70/30% training/test sets
+oversample_df1.train <- oversample_df1[sample, ]
+oversample_df1.test <- oversample_df1[!sample, ]
+oversample_df1.fit.train <- glm(Injury2~Age+VehicleType+ContributingCircumstance1+Protection, 
+                            data=oversample_df1.train, family="binomial") #fitting model on training set
+oversample_df1.pred.prob <- predict(oversample_df1.fit.train, newdata=oversample_df1.test, 
+                                type="response") #predicting prob. of default=1 for test set
+oversample_df1.pred <- ifelse(oversample_df1.pred.prob>0.5, "Injury", "No injury") #predicting `default` based on prob estimates
+(tab <- table(pred=oversample_df1.pred, actual=oversample_df1.test$Injury2)) #confusion matrix: cross-tab of predictions vs actual class
+(accuracy=mean(oversample_df1.pred==oversample_df1.test$Injury2, na.rm=T)*100) #percent of correct predictions in test data
 
 
 
