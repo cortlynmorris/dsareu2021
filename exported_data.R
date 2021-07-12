@@ -1674,6 +1674,15 @@ cbind('Residuals' = residuals(fit.ets.daily.covid),
 fit.ets.daily.covid %>% forecast(h=214) %>%
   autoplot()
 
+#Time Series with Covariates 
+d <- crashes_ts$Injury
+fit <- auto.arima(crashes_ts, xreg=d) # It finds a ARMA(1,0,2) is best.
+checkresiduals(fit)
+
+fourier.crashes <- tslm(crashests2 ~ trend + fourier(crashests2, K=2))
+summary(fourier.crashes)
+
+
 ##Different attempt at forecasting for monthly (THIS WORKS)
 #install.packages("Mcomp")
 #install.packages("smooth")
