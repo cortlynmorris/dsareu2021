@@ -1640,18 +1640,16 @@ STL <- stlf(train, lambda=0, h=h, biasadj=TRUE)
 NNAR <- forecast(nnetar(train), h=h)
 TBATS <- forecast(tbats(train, biasadj=TRUE), h=h)
 
-Combination <- (ARIMA[["mean"]] + TBATS[["mean"]] + NNAR[["mean"]] + 
-                  STL[["mean"]])/4
-Combination <- (ETS[["mean"]] + ARIMA[["mean"]] + TBATS[["mean"]])/3
-Combination <- (ARIMA[["mean"]] + TBATS[["mean"]] + STL[["mean"]] + NNAR[["mean"]])/4
-
+Combination <- (ARIMA[["mean"]] + TBATS[["mean"]] + STL[["mean"]] + 
+                  NNAR[["mean"]])/4
 
 autoplot(train) +
-  autolayer(NNAR, series="NNAR", alpha=0.7) +
+  autolayer(NNAR, series="NNAR") +
+  autolayer(STL, series="STL", PI=F) +
+  autolayer(Combination, series="Combination") +
   autolayer(ARIMA, series="ARIMA", PI=F) +
   autolayer(TBATS, series="TBATS", PI=F) +
-  autolayer(STL, series="STL", PI=F) +
-  autolayer(Combination, series="Combination", PI=F) +
+  scale_color_brewer(palette="RdYlBu") + 
   xlab("Year") + ylab("Crashes") +
   ggtitle("Crashes")
 
