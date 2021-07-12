@@ -2702,6 +2702,84 @@ twenty_nineteen_monthly_forecast_values_STLF
 
 ```
 
+### ETS
+
+```{r, echo=FALSE, message=FALSE}
+##Working with ets() monthly covid MAM model 
+fit.ets.monthly.covid <- ets(y=crashes_mts4, model="MAM")
+
+summary(fit.ets.monthly.covid)
+
+autoplot(fit.ets.monthly.covid)
+
+cbind('Residuals' = residuals(fit.ets.monthly.covid),
+      'Forecast errors' = residuals(fit.ets.monthly.covid,type='response')) %>%
+  autoplot(facet=TRUE) + xlab("Year") + ylab("")
+
+fit.ets.monthly.covid %>% forecast(h=8) %>%
+  autoplot()
+
+##Working with ets() monthly noncovid MAM model 
+fit.ets.monthly.noncovid <- ets(y=crashes_mts4.noncovid, model="MAM")
+
+summary(fit.ets.monthly.noncovid)
+
+autoplot(fit.ets.monthly.noncovid)
+
+cbind('Residuals' = residuals(fit.ets.monthly.noncovid),
+      'Forecast errors' = residuals(fit.ets.monthly.noncovid,type='response')) %>%
+  autoplot(facet=TRUE) + xlab("Year") + ylab("")
+
+fit.ets.monthly.noncovid %>% forecast(h=8) %>%
+  autoplot()
+
+##Working with ets() monthly MNM covid model 
+
+fit.ets.monthly.covid.MNM <-ets(y=crashes_mts4, model="ZZM")
+#automatically selects MNM
+
+summary(fit.ets.monthly.covid.MNM)
+#alpha = 0.3386, gamma = 2e-04
+
+autoplot(fit.ets.monthly.covid.MNM)
+
+cbind('Residuals' = residuals(fit.ets.monthly.covid.MNM),
+      'Forecast errors' = residuals(fit.ets.monthly.covid.MNM,type='response')) %>%
+  autoplot(facet=TRUE) + xlab("Year") + ylab("")
+
+fit.ets.monthly.covid.MNM %>% forecast(h=8) %>%
+  autoplot()
+
+##Working with ets() monthly MMM covid model 
+
+fit.ets.monthly.covid.MMM <-ets(y=crashes_mts4, model="MMM")
+
+summary(fit.ets.monthly.covid.MMM)
+
+autoplot(fit.ets.monthly.covid.MMM)
+
+cbind('Residuals' = residuals(fit.ets.monthly.covid.MMM),
+      'Forecast errors' = residuals(fit.ets.monthly.covid.MMM,type='response')) %>%
+  autoplot(facet=TRUE) + xlab("Year") + ylab("")
+
+fit.ets.monthly.covid.MMM %>% forecast(h=8) %>%
+  autoplot()
+
+##Working with ets() monthly MNA covid model 
+
+fit.ets.monthly.covid.MNA <-ets(y=crashes_mts4, model="MNA")
+summary(fit.ets.monthly.covid.MNA)
+
+autoplot(fit.ets.monthly.covid.MNA)
+
+cbind('Residuals' = residuals(fit.ets.monthly.covid.MNA),
+      'Forecast errors' = residuals(fit.ets.monthly.covid.MNA,type='response')) %>%
+  autoplot(facet=TRUE) + xlab("Year") + ylab("")
+
+fit.ets.monthly.covid.MNA %>% forecast(h=8) %>%
+  autoplot()
+```
+
 ## Statistical Analyses 
 
 ### ANOVA 
