@@ -3,11 +3,9 @@ title: "Visualizing, Modeling and Forecasting Crashes in Wake County, North Caro
 author: "Cortlyn Morris, Kelly Wentzlof, Ayan Gulzar"
 date: "6/11/2021"
 output:
-  word_document:
-    toc: yes
   html_document:
-    toc: yes
-    toc_float: yes
+    toc: true
+    toc_float: true
 ---
 
 ```{r setup, include=FALSE}
@@ -33,22 +31,22 @@ library(zoo)
 
 ```{r read-data, message=FALSE, echo=FALSE, include=FALSE}
 #Code for Cortlyns computer (Mac)
- setwd("/Users/cmorris/Desktop/dsreu2021/rstudiodirectory/ResearchProject")
- persons <- read.csv(file="Persons_Involved_in_Crashes.csv")
- glimpse(persons)
-    
- locations <- read.csv(file="Reported_Crash_Locations.csv")
- glimpse(locations)
-    
- crashes <- persons %>% left_join(locations, by="key_crash")
+ # setwd("/Users/cmorris/Desktop/dsreu2021/rstudiodirectory/ResearchProject")
+ # persons <- read.csv(file="Persons_Involved_in_Crashes.csv")
+ # glimpse(persons)
+ #    
+ # locations <- read.csv(file="Reported_Crash_Locations.csv")
+ # glimpse(locations)
+ #    
+ # crashes <- persons %>% left_join(locations, by="key_crash")
 
 #Code for Kelly's computer (Windows)
 #library(readr)
-#persons <- read_csv("~/NCAT REU/Mostafa/Data/Persons_Involved_in_Crashes.csv")
+persons <- read_csv("~/NCAT REU/Mostafa/Data/Persons_Involved_in_Crashes.csv")
 
-#locations <- read_csv("~/NCAT REU/Mostafa/Data/Reported_Crash_Locations.csv")
+locations <- read_csv("~/NCAT REU/Mostafa/Data/Reported_Crash_Locations.csv")
 
-#crashes <- persons %>% left_join(locations, by="key_crash")
+crashes <- persons %>% left_join(locations, by="key_crash")
 
 # Code for Ayan's computer (Window)
 #library(readr)
@@ -1665,7 +1663,7 @@ crashes_ts %>%
   geom_line() +
   geom_line(aes(y=rollmean(count, 7, na.pad = TRUE)), color = "red") +
   scale_x_date(date_labels = "%m-%Y", date_breaks = "6 month") + 
-  theme(axis.text.x = element_text(angle = 90)) + 
+  theme(axis.text.x = element_text(angle = 90), title = element_text(size=9)) + 
   ggtitle("Time Series Plot for Frequency of Daily Crashes With 7 Day Moving Average (With Pandemic Data)")
 ```
 
@@ -1702,10 +1700,10 @@ crashes_ts.noncovid = crashes %>%
 crashes_ts.noncovid %>%
   filter(as.Date(Date) >= "2015/01/01") %>%
   ggplot(aes(x = as.Date(Date), y = count)) + 
-  ggtitle("Time Series Plot for Frequency of Daily Crashes (Without Pandemic Data") + xlab("Date") + ylab("Count") + 
+  ggtitle("Time Series Plot for Frequency of Daily Crashes (Without Pandemic Data)") + xlab("Date") + ylab("Count") + 
   geom_line() + 
   scale_x_date(date_labels = "%m-%Y", date_breaks = "6 month") + 
-  theme(axis.text.x = element_text(angle = 90))
+  theme(axis.text.x = element_text(angle = 90), title = element_text(size = 11))
 ```
 
 ```{r load-library-forecast, message=FALSE, echo=FALSE}
@@ -1788,7 +1786,7 @@ rownames(daily_forecast_values_covid_HW) <- seq(as.Date("2021/06/01"),
 ```
 
 ```{r HW_fcast-filter-forecast-ts, echo=FALSE, message=FALSE}
-daily_forecast_values_covid_HW
+head(daily_forecast_values_covid_HW)
 
 autoplot(fcast) +
   ggtitle("Forecasts of Daily Car Crashes Using HoltWinters (With Pandemic Data)") +
@@ -1797,7 +1795,8 @@ autoplot(fcast) +
 
 ```{r STLF-decomp-forecast-ts, echo=FALSE, message=FALSE}
 crashests2 %>% mstl() %>%
-  autoplot()
+  autoplot() + 
+  ggtitle("Time Series Decomposition (With Pandemic Data)")
 
 m <- crashests2 %>%
   stlf(lambda = 0, h = 214, level=c(80,95)) 
@@ -1816,7 +1815,7 @@ rownames(daily_forecast_values_covid_STLF) <- seq(as.Date("2021/06/01"),
 ```
 
 ```{r STLF-fcast-filter, echo=FALSE}
-daily_forecast_values_covid_STLF
+head(daily_forecast_values_covid_STLF)
 ```
 
 ```{r HW-noncovid-fcast-decomp, echo=FALSE}
@@ -1824,7 +1823,7 @@ noncovid <- HoltWinters(crashests.noncovid)
 
 summary(noncovid)
 
-plot(fitted(noncovid), main = "Box Jenkins Decomposition of Daily Crashes (Without Pandemic Data)") 
+plot(fitted(noncovid), main="Box Jenkins Decomposition of Daily Crashes (Without Pandemic Data)", cex.main=1)
 
 fcast.noncovid <- forecast(noncovid, h=671, level=c(80,95))
 ```
@@ -1837,7 +1836,7 @@ rownames(daily_forecast_values_noncovid_HW) <- seq(as.Date("2020/03/01"),
 ```
 
 ```{r noncovid-HW-fcast-filter-forecast-ts, echo=FALSE}
-daily_forecast_values_noncovid_HW
+head(daily_forecast_values_noncovid_HW)
 
 autoplot(fcast.noncovid) +
   ggtitle("Forecasts of Daily Car Crashes Using HoltWinters (Without Pandemic Data)") +
@@ -1846,7 +1845,8 @@ autoplot(fcast.noncovid) +
 
 ```{r noncovid-STLF-decomp-forecast-ts, echo=FALSE}
 crashests.noncovid %>% mstl() %>%
-  autoplot()
+  autoplot() + 
+  ggtitle("Time Series Decomposition (Without Pandemic Data)")
 
 p <- crashests.noncovid %>%
   stlf(lambda = 0, h = 671, level = c(80, 95)) 
@@ -1865,7 +1865,7 @@ rownames(daily_forecast_values_noncovid_STLF) <- seq(as.Date("2020/03/01"),
 ```
 
 ```{r noncovid-STLF-fcast-filter, echo=FALSE}
-daily_forecast_values_noncovid_STLF
+head(daily_forecast_values_noncovid_STLF)
 ```
 
 ```{r ms-HW-forecast-ts, echo=FALSE, message=FALSE}
@@ -1874,7 +1874,8 @@ test_HW <- subset(crashests2, start=length(crashests2)-150)
 crashes.train_HW <- HoltWinters(training_HW)
 crashes.train_HW %>%
   forecast::forecast(h=151, level=c(80,95)) %>%
-  autoplot() + autolayer(test_HW, alpha=0.7) + 
+  autoplot(alpha=0.7) + 
+  autolayer(test_HW, alpha=0.8) + 
   theme(legend.position = "bottom") + 
   ggtitle("Multi-Step HoltWinters Forecasts of Crashes (With Pandemic Data)") + 
   xlab("Date") + ylab("Crashes")
@@ -1888,7 +1889,7 @@ rownames(fcast.ms.HW.daily.covid) <- seq(as.Date("2021/01/01"),
 ```
 
 ```{r ms-HW-fcast-filter-decomp-sum, echo=FALSE, message=FALSE}
-fcast.ms.HW.daily.covid
+head(fcast.ms.HW.daily.covid)
 
 autoplot(training_HW, series="Training data") +
   autolayer(fitted(crashes.train_HW, h=12),
@@ -1907,7 +1908,8 @@ test_STLF <- subset(crashests2, start=length(crashests2)-151)
 crashes.train_STLF <- stlf(training_STLF, lambda = 0, h = 152, level=c(80,95))
 crashes.train_STLF %>%
   forecast::forecast(h=152) %>%
-  autoplot() + autolayer(test_STLF, alpha = 0.6) + 
+  autoplot(alpha=0.7) + 
+  autolayer(test_STLF, alpha = 0.8) + 
   theme(legend.position = "bottom") + 
   ggtitle("Multi-Step STLF Forecasts of Crashes (With Pandemic Data)") + 
   xlab("Date") + ylab("Crashes")
@@ -1921,7 +1923,7 @@ rownames(fcast.ms.STLF.daily.covid) <- seq(as.Date("2021/01/01"),
 ```
 
 ```{r ms-STLF-fcast-filter-decomp-sum, echo=FALSE, message=FALSE}
-fcast.ms.STLF.daily.covid
+head(fcast.ms.STLF.daily.covid)
 
 autoplot(training_STLF, series="Training data") +
   autolayer(fitted(crashes.train_STLF, h=12),
@@ -1941,7 +1943,8 @@ test_HW_noncovid <- subset(crashests.noncovid, start=length(crashests.noncovid)-
 crashes.train_HW_noncovid <- HoltWinters(training_HW_noncovid)
 crashes.train_HW_noncovid %>%
   forecast::forecast(h=426, level=c(80,95)) %>%
-  autoplot() + autolayer(test_HW_noncovid, alpha=0.7) + 
+  autoplot(alpha=0.7) + 
+  autolayer(test_HW_noncovid, alpha=0.8) + 
   theme(legend.position = "bottom") + 
   ggtitle("Multi-Step HoltWinters Forecasts of Crashes (Without Pandemic Data)") + 
   xlab("Date") + ylab("Crashes")
@@ -1955,7 +1958,7 @@ rownames(fcast.ms.HW.daily.noncovid) <- seq(as.Date("2019/01/01"),
 ```
 
 ```{r noncovid-ms-HW-fcast-filter-decomp-sum, echo=FALSE, message=FALSE}
-fcast.ms.HW.daily.noncovid
+head(fcast.ms.HW.daily.noncovid)
 
 autoplot(training_HW_noncovid, series="Training data") +
   autolayer(fitted(crashes.train_HW_noncovid, h=12),
@@ -1975,7 +1978,8 @@ test_STLF_noncovid <- subset(crashests.noncovid, start=length(crashests.noncovid
 crashes.train_STLF_noncovid <- stlf(training_STLF_noncovid, lambda = 0, h = 426, level=c(80,95))
 crashes.train_STLF_noncovid %>%
   forecast(h=426) %>%
-  autoplot() + autolayer(test_STLF_noncovid, alpha = 0.6) + 
+  autoplot(alpha=0.7) + 
+  autolayer(test_STLF_noncovid, alpha = 0.8) + 
   theme(legend.position = "bottom") + 
   ggtitle("Multi-Step STLF Forecasts of Crashes (Without Pandemic Data)") + 
   xlab("Date") + ylab("Crashes")
@@ -1989,7 +1993,7 @@ rownames(fcast.ms.STLF.daily.noncovid) <- seq(as.Date("2019/01/01"),
 ```
 
 ```{r noncovid-ms-HW-fcast-filter-decomp-sum2, echo=FALSE, warning=FALSE}
-fcast.ms.STLF.daily.noncovid
+head(fcast.ms.STLF.daily.noncovid)
 
 autoplot(training_STLF_noncovid, series="Training data") +
   autolayer(fitted(crashes.train_STLF_noncovid, h=12),
@@ -2000,11 +2004,6 @@ autoplot(training_STLF_noncovid, series="Training data") +
 
 crashes.test_STLF_noncovid <- Arima(test_STLF_noncovid)
 accuracy(crashes.test_STLF_noncovid)
-```
-
-```{r load-library-smooth-ts, message=FALSE, echo=FALSE}
-library(Mcomp)
-library(smooth)
 ```
 
 ```{r monthly-ts, message=FALSE, echo=FALSE}
@@ -2095,7 +2094,7 @@ rownames(monthly_forecast_values_noncovid_lin) <- seq(as.Date("2020/03/01"),
 ```
 
 ```{r noncovid-monthly-lin-fcast-filter-forecast-ts, echo=FALSE, message=FALSE}
-monthly_forecast_values_noncovid_lin
+head(monthly_forecast_values_noncovid_lin)
 
 autoplot(fcast.noncovid) +
   ggtitle("Forecasts of Monthly Car Crashes Using Linear Model (Without Pandemic Data)") +
@@ -2105,7 +2104,7 @@ autoplot(fcast.noncovid) +
                                 "Jan 2018", 
                                 "Jan 2019", "Jan 2020", "Jan 2021", 
                                 "Jan 2022")) + 
-  theme(axis.text.x = element_text(angle = 90))
+  theme(axis.text.x = element_text(angle = 90), title = element_text(size = 10))
 ```
 
 ```{r monthly-HW-fcast-decomp, echo=FALSE}
@@ -2113,7 +2112,7 @@ covid.monthly <- HoltWinters(crashes_mts4)
 
 summary(covid.monthly)
 
-plot(fitted(covid.monthly), main = "Box Jenkins Decomposition of Monthly Crashes (With Pandemic Data)") 
+plot(fitted(covid.monthly), main = "Box Jenkins Decomposition of Monthly Crashes (With Pandemic Data)", cex.main=1)
 
 fcast.covid.monthly <- forecast::forecast(covid.monthly, h=8, level=c(80,95))
 ```
@@ -2143,7 +2142,7 @@ noncovid.monthly <- HoltWinters(crashes_mts4.noncovid)
 
 summary(noncovid.monthly)
 
-plot(fitted(noncovid.monthly), main = "Box Jenkins Decomposition of Monthly Crashes (Without Pandemic Data)") 
+plot(fitted(noncovid.monthly), main = "Box Jenkins Decomposition of Monthly Crashes (Without Pandemic Data)", cex.main=1)
 
 fcast.noncovid.monthly <- forecast::forecast(noncovid.monthly, h=23, level=c(80,95))
 ```
@@ -2157,7 +2156,7 @@ rownames(monthly_forecast_values_noncovid_HW) <- seq(as.Date("2020/03/01"),
 ```
 
 ```{r noncovid-monthly-fcast-filter-forecast-ts, echo=FALSE, message=FALSE}
-monthly_forecast_values_noncovid_HW
+head(monthly_forecast_values_noncovid_HW)
 
 autoplot(fcast.noncovid.monthly) +
   ggtitle("Forecasts of Monthly Car Crashes Using HoltWinters (Without Pandemic Data)") +
@@ -2165,7 +2164,7 @@ autoplot(fcast.noncovid.monthly) +
   scale_x_continuous(breaks = c(1,2,3,4,5,6,7, 8), 
                      labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
                                 "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022")) + 
-  theme(axis.text.x = element_text(angle = 90))
+  theme(axis.text.x = element_text(angle = 90), title = element_text(size = 10))
 ```
 
 ```{r monthly-STLF-forecast-ts-decomp, echo=FALSE, message=FALSE}
@@ -2233,7 +2232,7 @@ rownames(monthly_forecast_values_noncovid_STLF) <- seq(as.Date("2020/03/01"),
 ```
 
 ```{r noncovid-monthly-STLF-fcast-filter, echo=FALSE}
-monthly_forecast_values_noncovid_STLF
+head(monthly_forecast_values_noncovid_STLF)
 ```
 
 ```{r ms-HW-monthly-forecast-ts, echo=FALSE,message=FALSE}
@@ -2290,7 +2289,7 @@ crashes.train_STLF_monthly <- stlf(training_STLF_monthly, lambda = 0, h = 5, lev
 crashes.train_STLF_monthly %>%
   forecast::forecast(h=5) %>%
   autoplot() + autolayer(test_STLF_monthly) + 
-  ggtitle("Multi-Step STLF Monthly Forecasts of Crashes (Pandemic)") + 
+  ggtitle("Multi-Step STLF Monthly Forecasts of Crashes (With Pandemic Data)") + 
   xlab("Date") + ylab("Crashes") + 
   scale_x_continuous(breaks = c(1,2,3,4,5,6,7), 
                      labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
@@ -2336,7 +2335,7 @@ crashes.train_HW_noncovid_monthly <- HoltWinters(training_HW_noncovid_monthly)
 crashes.train_HW_noncovid_monthly %>%
   forecast::forecast(h=14, level=c(80,95)) %>%
   autoplot() + autolayer(test_HW_noncovid_monthly) + 
-  ggtitle("Multi-Step HW Monthly Forecasts of Crashes (NonPandemic)") + 
+  ggtitle("Multi-Step HW Monthly Forecasts of Crashes (Without Pandemic Data)") + 
   xlab("Date") + ylab("Crashes") + 
   scale_x_continuous(breaks = c(1,2,3,4,5,6,7), 
                      labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
@@ -2354,7 +2353,7 @@ rownames(fcast.ms.HW.monthly.noncovid) <- seq(as.Date("2019/01/01"),
 ```
 
 ```{r noncovid-ms-HW-monthly-fcast-filter-decomp-sum, echo=FALSE, message=FALSE}
-fcast.ms.HW.monthly.noncovid
+head(fcast.ms.HW.monthly.noncovid)
 
 autoplot(training_HW_noncovid_monthly, series="Training data") +
   autolayer(fitted(crashes.train_HW_noncovid_monthly, h=12),
@@ -2382,7 +2381,7 @@ crashes.train_STLF_noncovid_monthly <- stlf(training_STLF_noncovid_monthly, lamb
 crashes.train_STLF_noncovid_monthly %>%
   forecast::forecast(h=14) %>%
   autoplot() + autolayer(test_STLF_noncovid_monthly) + 
-  ggtitle("Multi-Step STLF Monthly Forecasts of Crashes (NonPandemic)") + 
+  ggtitle("Multi-Step STLF Monthly Forecasts of Crashes (Without Pandemic Data)") + 
   xlab("Date") + ylab("Crashes") + 
   scale_x_continuous(breaks = c(1,2,3,4,5,6,7), 
                      labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
@@ -2398,7 +2397,7 @@ rownames(fcast.ms.STLF.monthly.noncovid) <- seq(as.Date("2019/01/01"),
 ```
 
 ```{r noncovid-ms-STLF-fcast-filter-decomp-sum, echo=FALSE, message=FALSE}
-fcast.ms.STLF.monthly.noncovid
+head(fcast.ms.STLF.monthly.noncovid)
 
 autoplot(training_STLF_noncovid_monthly, series="Training data") +
   autolayer(fitted(crashes.train_STLF_noncovid_monthly, h=12),
@@ -2431,7 +2430,7 @@ rownames(fcast.nnetar.summary) <- seq(as.Date("2021/06/01"),
 ```
 
 ```{r nnetar-fcast-filter-forecast-ts, echo=FALSE}
-fcast.nnetar.summary
+head(fcast.nnetar.summary)
 
 autoplot(forecast(fit.nnetar,h=212,lambda=0)) + 
   ggtitle("NNAR Forecasting Model of Daily Crashes (With Pandemic Data)") + 
@@ -2452,7 +2451,7 @@ rownames(fcast.nnetar.noncovid.summary) <- seq(as.Date("2020/03/01"),
 ```
 
 ```{r noncovid-nnetar-fcast-filter-forecast-ts, echo=FALSE}
-fcast.nnetar.noncovid.summary
+head(fcast.nnetar.noncovid.summary)
 
 autoplot(forecast(fit.nnetar.noncovid,h=672,lambda=0)) + 
   ggtitle("NNAR Forecasting Model of Daily Crashes (Without Pandemic Data)") + 
