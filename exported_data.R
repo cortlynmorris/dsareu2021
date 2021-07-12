@@ -1640,10 +1640,13 @@ STL <- stlf(train, lambda=0, h=h, biasadj=TRUE)
 NNAR <- forecast(nnetar(train), h=h)
 TBATS <- forecast(tbats(train, biasadj=TRUE), h=h)
 <<<<<<< HEAD
+<<<<<<< HEAD
 Combination <- (ARIMA[["mean"]] + TBATS[["mean"]] + NNAR[["mean"]] + 
                   STL[["mean"]])/4
 =======
 Combination <- (ETS[["mean"]] + ARIMA[["mean"]] + TBATS[["mean"]])/3
+=======
+>>>>>>> e39eecd3e3c93cb947ad6d58fb5fc91bdaa06dfe
 Combination <- (ARIMA[["mean"]] + TBATS[["mean"]] + STL[["mean"]] + NNAR[["mean"]])/4
 >>>>>>> c47359963f0ad1db91e99c05490af1ab529a6364
 
@@ -1665,7 +1668,7 @@ c(ARIMA = accuracy(ARIMA, crashests2)["Test set", "RMSE"],
     accuracy(Combination, crashests2)["Test set", "RMSE"])
 
 ##Working with ets() daily (THIS GETS RID OF SEASONALITY DUE TO TOO HIGH OF FREQUENCY)
-fit.ets.daily.covid <- ets(y=crashests2)
+fit.ets.daily.covid <- ets(y=crashests2, model="MAM")
 
 summary(fit.ets.daily.covid)
 
@@ -1676,6 +1679,21 @@ cbind('Residuals' = residuals(fit.ets.daily.covid),
   autoplot(facet=TRUE) + xlab("Year") + ylab("")
 
 fit.ets.daily.covid %>% forecast(h=214) %>%
+  autoplot()
+
+##Working with ets() monthly 
+
+fit.ets.monthly.covid <-ets(y=crashes_mts4, model="MAM")
+
+summary(fit.ets.monthly.covid)
+
+autoplot(fit.ets.monthly.covid)
+
+cbind('Residuals' = residuals(fit.ets.monthly.covid),
+      'Forecast errors' = residuals(fit.ets.monthly.covid,type='response')) %>%
+  autoplot(facet=TRUE) + xlab("Year") + ylab("")
+
+fit.ets.monthly.covid %>% forecast(h=8) %>%
   autoplot()
 
 ##Different attempt at forecasting for monthly (THIS WORKS)
