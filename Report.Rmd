@@ -276,7 +276,7 @@ About half as many vehicles were seized compared to vehicles not seized.
 
 ```{r vehicle-seize, echo=FALSE} 
 crashes %>% 
-  filter(VehicleSeizure != "NA") %>%
+  filter(VehicleSeizure != "NA", VehicleSeizure != "") %>%
   count(VehicleSeizure) %>% 
   mutate(logtrans = round(log10(n), digits = 2)) %>% 
   ggplot(aes(x=VehicleSeizure, y=logtrans, fill=VehicleSeizure)) +
@@ -292,7 +292,8 @@ Airbags did not deploy during most crashes, therefore many accidents logged were
 
 ```{r airbag-deploy, echo=FALSE}
 crashes %>% 
-  filter(AirbagDeployed != "NA", AirbagDeployed != "Unknown") %>%
+  filter(AirbagDeployed != "NA", AirbagDeployed != "Unknown", 
+         AirbagDeployed != "") %>%
   count(AirbagDeployed) %>% 
   mutate(logtrans = round(log10(n), digits = 2), 
          AirbagDeployed = reorder(AirbagDeployed,logtrans)) %>% 
@@ -309,7 +310,7 @@ Most car crashes resulted in drivers and passengers not being ejected. More peop
 
 ```{r ejection, echo=FALSE}
 crashes %>% 
-  filter(Ejection != "NA", Ejection != "Unknown") %>%
+  filter(Ejection != "NA", Ejection != "Unknown", Ejection != "") %>%
   count(Ejection) %>% 
   mutate(logtrans = round(log10(n), digits = 2), 
          Ejection = reorder(Ejection,logtrans)) %>% 
@@ -368,7 +369,7 @@ The highest frequency of crashes did not result in any injury. Following the hig
 
 ```{r injury, echo=FALSE}
 crashes %>% 
-  filter(Injury != "NA", Injury != "Unknown") %>%
+  filter(Injury != "NA", Injury != "Unknown", Injury != "") %>%
   count(Injury) %>% 
   mutate(Percent = round(n/sum(n)*100, digits = 2), 
          Injury = reorder(Injury,Percent)) %>% 
@@ -385,7 +386,8 @@ The highest frequency of crashes occured when drivers and passengers wore a shou
 
 ```{r protection, echo=FALSE}
 crashes %>% 
-  filter(Protection != "NA", Protection != "Unable to determine") %>%
+  filter(Protection != "NA", Protection != "Unable to determine", 
+         Protection != "") %>%
   count(Protection) %>% 
   mutate(logtrans = round(log10(n), digits = 2), 
          Protection = reorder(Protection,logtrans)) %>% 
@@ -402,7 +404,7 @@ More crashes resulted in people in the vehicle not being trapped than people in 
 
 ```{r trapped, echo=FALSE}
 crashes %>% 
-  filter(Trapped != "NA", Trapped != "Unknown") %>%
+  filter(Trapped != "NA", Trapped != "Unknown", Trapped != "") %>%
   count(Trapped) %>% 
   mutate(logtrans = round(log10(n), digits = 2), 
          Trapped = reorder(Trapped,logtrans)) %>% 
@@ -419,7 +421,8 @@ The highest frequency of crashes occured when there was was no vision obstructio
 
 ```{r vision-obstruction, echo=FALSE}
 crashes %>% 
-  filter(VisionObstruction != "NA", VisionObstruction != "Unknown") %>%
+  filter(VisionObstruction != "NA", VisionObstruction != "Unknown", 
+         VisionObstruction != "") %>%
   count(VisionObstruction) %>% 
   mutate(logtrans = round(log10(n), digits = 2), 
          VisionObstruction = reorder(VisionObstruction,logtrans)) %>% 
@@ -437,7 +440,8 @@ The highest frequency of crashes had no contributing circumstances indicated.
 ```{r contrib-circum-1, echo=FALSE}
 crashes %>% 
   filter(ContributingCircumstance1 != "NA", ContributingCircumstance1 != "Unknown", 
-         ContributingCircumstance1 != "Unable to determine") %>%
+         ContributingCircumstance1 != "Unable to determine",
+         ContributingCircumstance1 != "") %>%
   count(ContributingCircumstance1) %>% 
   mutate(logtrans = round(log10(n), digits = 2), 
          ContributingCircumstance1 = reorder(ContributingCircumstance1,logtrans)) %>% 
@@ -493,7 +497,8 @@ The highest frequency of crashes had inattention as a contributing circumstance 
 crashes %>% 
   filter(ContributingCircumstance2 != "NA", 
          ContributingCircumstance2 != "Unknown", 
-         ContributingCircumstance2 != "Unable to determine") %>%
+         ContributingCircumstance2 != "Unable to determine", 
+         ContributingCircumstance2 != "") %>%
   count(ContributingCircumstance2) %>% 
   mutate(logtrans = round(log10(n), digits = 2), 
          ContributingCircumstance2 = reorder(ContributingCircumstance2,
@@ -550,7 +555,8 @@ The higest frequency of crashes had inattention as a contributing circumstance 3
 crashes %>% 
   filter(ContributingCircumstance3 != "NA", 
          ContributingCircumstance3 != "Unknown", 
-         ContributingCircumstance3 != "Unable to determine") %>%
+         ContributingCircumstance3 != "Unable to determine", 
+         ContributingCircumstance3 != "") %>%
   count(ContributingCircumstance3) %>% 
   mutate(logtrans = round(log10(n), digits = 2), 
          ContributingCircumstance3 = 
@@ -605,7 +611,8 @@ Most of the crashes on the roadway. This means it includes accidents on highways
 
 ```{r location-relation, echo=FALSE}
 crashes %>% 
-  filter(LocationRelationToRoad != "NA", LocationRelationToRoad != "Unknown") %>%
+  filter(LocationRelationToRoad != "NA", LocationRelationToRoad != "Unknown",
+         LocationRelationToRoad != "") %>%
   count(LocationRelationToRoad) %>% 
   mutate(logtrans = round(log10(n), digits = 2), 
          LocationRelationToRoad = reorder(LocationRelationToRoad,logtrans)) %>% 
@@ -620,7 +627,8 @@ crashes %>%
 
 ```{r location-in-near, echo=FALSE}
 crashes %>% 
-  filter(LocationInNearIndicator != "NA", LocationInNearIndicator != "Unknown") %>%
+  filter(LocationInNearIndicator != "NA", LocationInNearIndicator != "Unknown",
+         LocationInNearIndicator != "") %>%
   count(LocationInNearIndicator) %>% 
   mutate(logtrans = round(log10(n), digits = 2), 
          LocationInNearIndicator = reorder(LocationInNearIndicator,logtrans)) %>% 
@@ -635,7 +643,8 @@ crashes %>%
 
 ```{r location-ramp, echo=FALSE}
 crashes %>% 
-  filter(LocationRampIndicator != "NA", LocationRampIndicator != "Unknown") %>%
+  filter(LocationRampIndicator != "NA", LocationRampIndicator != "Unknown", 
+         LocationRampIndicator != "") %>%
   count(LocationRampIndicator) %>% 
   mutate(logtrans = round(log10(n), digits = 2), 
          LocationRampIndicator = reorder(LocationRampIndicator,logtrans)) %>% 
@@ -1073,7 +1082,8 @@ crashes %>%
   filter(Injury != "NA", Injury != "Unknown", ContributingCircumstance1 != "NA", 
          ContributingCircumstance1 != "NaN", 
          ContributingCircumstance1 != "Unable to determine", 
-         ContributingCircumstance1 != "Unknown") %>%
+         ContributingCircumstance1 != "Unknown", 
+         ContributingCircumstance1 !="") %>%
   group_by(Injury) %>%
   ggplot(aes(fill=Injury, x=ContributingCircumstance1)) + 
   geom_bar(position="fill", stat="count") + 
@@ -1125,7 +1135,7 @@ Pedestrians are most likely to die, followed by pedalcyclists most likely due to
 ```{r person-injury, echo=FALSE}
 crashes %>%
   filter(Injury != "NA", Injury != "Unknown", PersonType != "NA", 
-        PersonType != "NaN", PersonType != "Unknown") %>%
+        PersonType != "NaN", PersonType != "Unknown", PersonType != "") %>%
   group_by(Injury) %>%
   ggplot(aes(fill=Injury, x=PersonType)) + 
   geom_bar(position="fill", stat="count") + 
@@ -1140,7 +1150,7 @@ Total ejection leads to the most deaths and injuries, followed by partial ejecti
 ```{r ejection-injury, echo=FALSE}
 crashes %>%
   filter(Injury != "NA", Injury != "Unknown", Ejection != "NA", 
-         Ejection != "NaN", Ejection != "Unknown") %>%
+         Ejection != "NaN", Ejection != "Unknown", Ejection!= "") %>%
   group_by(Injury) %>%
   ggplot(aes(fill=Injury, x=Ejection)) + 
   geom_bar(position="fill", stat="count") + 
@@ -1185,7 +1195,7 @@ Rain and sleet, hail, freezing rain/drizzle leads to the most disabling type inj
 ```{r weather-injury, echo=FALSE}
 crashes %>%
   filter(Injury != "NA", Injury != "Unknown", WeatherCondition1 != "NA", 
-         WeatherCondition1 != "NaN") %>%
+         WeatherCondition1 != "NaN", WeatherCondition1 != "") %>%
   group_by(Injury) %>%
   ggplot(aes(fill=Injury, x=WeatherCondition1)) + 
   geom_bar(position="fill", stat="count") + 
@@ -1215,7 +1225,7 @@ crashes %>%
   filter(Injury != "NA", Injury != "Unknown", AlcoholResultType != "NA", 
          AlcoholResultType != "NaN", AlcoholResultType != "Unknown",
          AlcoholResultType != "Contaminated sample/unusable", 
-         AlcoholResultType != "Pending") %>%
+         AlcoholResultType != "Pending", AlcoholResultType != "") %>%
   group_by(Injury) %>%
   ggplot(aes(fill=Injury, x=AlcoholResultType)) + 
   geom_bar(position="fill", stat="count") + 
@@ -1230,7 +1240,7 @@ Places where warning signs are post led to the post injuries including people ki
 ```{r traffic-injury, echo=FALSE}
 crashes %>%
   filter(Injury != "NA", Injury != "Unknown", TrafficControlType != "NA", 
-         TrafficControlType != "NaN") %>%
+         TrafficControlType != "NaN", TrafficControlType != "") %>%
   group_by(Injury) %>%
   ggplot(aes(fill=Injury, x=TrafficControlType)) + 
   geom_bar(position="fill", stat="count") + 
@@ -1260,7 +1270,8 @@ The most injuries occurred when people were using reflective clothing, lighting,
 ```{r protection-injury, echo=FALSE}
 crashes %>%
   filter(Injury != "NA", Injury != "Unknown", Protection != "NA", 
-         Protection != "NaN", Protection != "Unable to determine") %>%
+         Protection != "NaN", Protection != "Unable to determine", 
+         Protection != "") %>%
   group_by(Injury) %>%
   ggplot(aes(fill=Injury, x=Protection)) + 
   geom_bar(position="fill", stat="count") + 
@@ -1275,7 +1286,7 @@ Signs and embankment led to the most people being killed. This may be because th
 ```{r vision-obstruct-injury, echo=FALSE}
 crashes %>%
   filter(Injury != "NA", Injury != "Unknown", VisionObstruction != "NA", 
-         VisionObstruction != "NaN") %>%
+         VisionObstruction != "NaN", VisionObstruction != "") %>%
   group_by(Injury) %>%
   ggplot(aes(fill=Injury, x=VisionObstruction)) + 
   geom_bar(position="fill", stat="count") + 
@@ -1290,7 +1301,8 @@ When airbags were not deployed, there was a smaller amount of injuries. This may
 ```{r airbag-injury, echo=FALSE}
 crashes %>%
   filter(Injury != "NA", Injury != "Unknown", AirbagDeployed != "NA", 
-         AirbagDeployed != "NaN", AirbagDeployed != "Unknown") %>%
+         AirbagDeployed != "NaN", AirbagDeployed != "Unknown", 
+         AirbagDeployed != "") %>%
   group_by(Injury) %>%
   ggplot(aes(fill=Injury, x=AirbagDeployed)) + 
   geom_bar(position="fill", stat="count") + 
