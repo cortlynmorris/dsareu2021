@@ -1674,39 +1674,6 @@ cbind('Residuals' = residuals(fit.ets.daily.covid),
 fit.ets.daily.covid %>% forecast(h=214) %>%
   autoplot()
 
-##Working with ets() monthly MAM (multiplicative HW method) covid model 
-
-fit.ets.monthly.covid.MAM <-ets(y=crashes_mts4, model="MAM")
-
-summary(fit.ets.monthly.covid.MAM)
-#alpha = 0.8161, beta = 1e-04, gamma = 1e-04, phi = 0.9799
-
-autoplot(fit.ets.monthly.covid.MAM)
-
-cbind('Residuals' = residuals(fit.ets.monthly.covid.MAM),
-      'Forecast errors' = residuals(fit.ets.monthly.covid.MAM,type='response')) %>%
-  autoplot(facet=TRUE) + xlab("Year") + ylab("")
-
-fit.ets.monthly.covid.MAM %>% forecast(h=8) %>%
-  autoplot()
-
-##Working with ets() monthly ANN (simple exponential smoothing) covid model 
-
-fit.ets.monthly.covid.MNM <-ets(y=crashes_mts4, model="ZZM")
-#automatically selects MNM
-
-summary(fit.ets.monthly.covid.MNM)
-#alpha = 0.3386, gamma = 2e-04
-
-autoplot(fit.ets.monthly.covid.MNM)
-
-cbind('Residuals' = residuals(fit.ets.monthly.covid.MNM),
-      'Forecast errors' = residuals(fit.ets.monthly.covid.MNM,type='response')) %>%
-  autoplot(facet=TRUE) + xlab("Year") + ylab("")
-
-fit.ets.monthly.covid.MNM %>% forecast(h=8) %>%
-  autoplot()
-
 ##Different attempt at forecasting for monthly (THIS WORKS)
 #install.packages("Mcomp")
 #install.packages("smooth")
@@ -1844,6 +1811,29 @@ autoplot(fcast.covid.monthly) +
                                 "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022")) + 
   theme(axis.text.x = element_text(angle = 90))
 
+#Holtwinters with COVID time series monthly with parameters 
+covid.monthly.p <- HoltWinters(crashes_mts4, alpha = 0.8161, beta = 1e-04, 
+                             gamma = 1e-04)
+
+summary(covid.monthly.p)
+
+plot(fitted(covid.monthly.p), main = "Box Jenkins Decomposition of Monthly Crashes (With Pandemic Data)") 
+
+fcast.covid.monthly.p <- forecast::forecast(covid.monthly.p, 8)
+
+monthly_forecast_values_covid_HW.p <- summary(fcast.covid.monthly.p)
+
+rownames(monthly_forecast_values_covid_HW.p) <- seq(as.Date("2021/05/31"), 
+                                                  as.Date("2021/12/31"), "month")
+
+autoplot(fcast.covid.monthly.p) +
+  ggtitle("Forecasts of Monthly Car Crashes Using HoltWinters (With Pandemic Data)") +
+  xlab("Year") + ylab("Crashes") +
+  scale_x_continuous(breaks = c(1,2,3,4,5,6,7, 8), 
+                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
+                                "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022")) + 
+  theme(axis.text.x = element_text(angle = 90))
+
 #Holtwinters with nonCOVID time series monthly (THIS Works)
 noncovid.monthly <- HoltWinters(crashes_mts4.noncovid)
 
@@ -1859,6 +1849,29 @@ rownames(monthly_forecast_values_noncovid_HW) <- seq(as.Date("2020/02/29"),
                                                       as.Date("2021/12/31"), "month")
 
 autoplot(fcast.noncovid.monthly) +
+  ggtitle("Forecasts of Monthly Car Crashes Using HoltWinters (Without Pandemic Data)") +
+  xlab("Year") + ylab("Crashes") + 
+  scale_x_continuous(breaks = c(1,2,3,4,5,6,7, 8), 
+                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
+                                "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022")) + 
+  theme(axis.text.x = element_text(angle = 90))
+
+#Holtwinters with nonCOVID time series monthly with parameters
+noncovid.monthly.p <- HoltWinters(crashes_mts4.noncovid, alpha = 0.2493, 
+                                beta = 0.0056, gamma = 0.0038)
+
+summary(noncovid.monthly.p)
+
+plot(fitted(noncovid.monthly.p), main = "Box Jenkins Decomposition of Monthly Crashes (Without Pandemic Data)") 
+
+fcast.noncovid.monthly.p <- forecast::forecast(noncovid.monthly.p, 23)
+
+monthly_forecast_values_noncovid_HW.p <- summary(fcast.noncovid.monthly.p)
+
+rownames(monthly_forecast_values_noncovid_HW.p) <- seq(as.Date("2020/02/29"), 
+                                                     as.Date("2021/12/31"), "month")
+
+autoplot(fcast.noncovid.monthly.p) +
   ggtitle("Forecasts of Monthly Car Crashes Using HoltWinters (Without Pandemic Data)") +
   xlab("Year") + ylab("Crashes") + 
   scale_x_continuous(breaks = c(1,2,3,4,5,6,7, 8), 
@@ -1969,8 +1982,37 @@ autoplot(training_STLF_noncovid_monthly, series="Training data") +
 crashes.test_STLF_noncovid_monthly <- Arima(test_STLF_noncovid_monthly)
 accuracy(crashes.test_STLF_noncovid_monthly)
 
-##Working with ets() monthly covid (THIS GETS RID OF SEASONALITY DUE TO TOO HIGH OF FREQUENCY)
-fit.ets.monthly.covid <- ets(y=crashes_mts4)
+## Forecast combination (monthly covid)
+train_monthly <- window(crashes_mts4, end=c(2018,12))
+h_monthly <- length(crashes_mts4) - length(train_monthly)
+#ETS <- forecast(ets(train), h=h)
+ARIMA_monthly <- forecast(auto.arima(train_monthly, lambda=0, biasadj=TRUE), h=h_monthly)
+STL_monthly <- stlf(train_monthly, lambda=0, h=h_monthly, biasadj=TRUE)
+NNAR_monthly <- forecast(nnetar(train_monthly), h=h_monthly)
+TBATS_monthly <- forecast(tbats(train_monthly, biasadj=TRUE), h=h_monthly)
+
+Combination_monthly <- (ARIMA_monthly[["mean"]] + TBATS_monthly[["mean"]] + 
+                          STL_monthly[["mean"]] + NNAR_monthly[["mean"]])/4
+
+autoplot(train_monthly) +
+  autolayer(NNAR_monthly, series="NNAR") +
+  autolayer(STL_monthly, series="STL", PI=F) +
+  autolayer(Combination_monthly, series="Combination") +
+  autolayer(ARIMA_monthly, series="ARIMA", PI=F) +
+  autolayer(TBATS_monthly, series="TBATS", PI=F) +
+  scale_color_brewer(palette="RdYlBu") + 
+  xlab("Year") + ylab("Crashes") +
+  ggtitle("Crashes")
+
+c(ARIMA_monthly = accuracy(ARIMA_monthly, crashes_mts4)["Test set", "RMSE"],
+  TBATS_monthly = accuracy(TBATS_monthly, crashes_mts4)["Test set", "RMSE"],
+  NNAR_monthly = accuracy(NNAR_monthly, crashes_mts4)["Test set", "RMSE"],
+  STL_monthly = accuracy(STL_monthly, crashes_mts4)["Test set", "RMSE"],
+  Combination_monthly =
+    accuracy(Combination_monthly, crashes_mts4)["Test set", "RMSE"])
+
+##Working with ets() monthly covid MAM model 
+fit.ets.monthly.covid <- ets(y=crashes_mts4, model="MAM")
 
 summary(fit.ets.monthly.covid)
 
@@ -1981,6 +2023,66 @@ cbind('Residuals' = residuals(fit.ets.monthly.covid),
   autoplot(facet=TRUE) + xlab("Year") + ylab("")
 
 fit.ets.monthly.covid %>% forecast(h=8) %>%
+  autoplot()
+
+##Working with ets() monthly noncovid MAM model 
+fit.ets.monthly.noncovid <- ets(y=crashes_mts4.noncovid, model="MAM")
+
+summary(fit.ets.monthly.noncovid)
+
+autoplot(fit.ets.monthly.noncovid)
+
+cbind('Residuals' = residuals(fit.ets.monthly.noncovid),
+      'Forecast errors' = residuals(fit.ets.monthly.noncovid,type='response')) %>%
+  autoplot(facet=TRUE) + xlab("Year") + ylab("")
+
+fit.ets.monthly.noncovid %>% forecast(h=8) %>%
+  autoplot()
+
+##Working with ets() monthly MNM covid model 
+
+fit.ets.monthly.covid.MNM <-ets(y=crashes_mts4, model="ZZM")
+#automatically selects MNM
+
+summary(fit.ets.monthly.covid.MNM)
+#alpha = 0.3386, gamma = 2e-04
+
+autoplot(fit.ets.monthly.covid.MNM)
+
+cbind('Residuals' = residuals(fit.ets.monthly.covid.MNM),
+      'Forecast errors' = residuals(fit.ets.monthly.covid.MNM,type='response')) %>%
+  autoplot(facet=TRUE) + xlab("Year") + ylab("")
+
+fit.ets.monthly.covid.MNM %>% forecast(h=8) %>%
+  autoplot()
+
+##Working with ets() monthly MMM covid model 
+
+fit.ets.monthly.covid.MMM <-ets(y=crashes_mts4, model="MMM")
+
+summary(fit.ets.monthly.covid.MMM)
+
+autoplot(fit.ets.monthly.covid.MMM)
+
+cbind('Residuals' = residuals(fit.ets.monthly.covid.MMM),
+      'Forecast errors' = residuals(fit.ets.monthly.covid.MMM,type='response')) %>%
+  autoplot(facet=TRUE) + xlab("Year") + ylab("")
+
+fit.ets.monthly.covid.MMM %>% forecast(h=8) %>%
+  autoplot()
+
+##Working with ets() monthly MNA covid model 
+
+fit.ets.monthly.covid.MNA <-ets(y=crashes_mts4, model="MNA")
+summary(fit.ets.monthly.covid.MNA)
+
+autoplot(fit.ets.monthly.covid.MNA)
+
+cbind('Residuals' = residuals(fit.ets.monthly.covid.MNA),
+      'Forecast errors' = residuals(fit.ets.monthly.covid.MNA,type='response')) %>%
+  autoplot(facet=TRUE) + xlab("Year") + ylab("")
+
+fit.ets.monthly.covid.MNA %>% forecast(h=8) %>%
   autoplot()
 
 ##Advanced Forecasting Methods
