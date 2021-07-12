@@ -1674,19 +1674,37 @@ cbind('Residuals' = residuals(fit.ets.daily.covid),
 fit.ets.daily.covid %>% forecast(h=214) %>%
   autoplot()
 
-##Working with ets() monthly 
+##Working with ets() monthly MAM (multiplicative HW method) covid model 
 
-fit.ets.monthly.covid <-ets(y=crashes_mts4, model="MAM")
+fit.ets.monthly.covid.MAM <-ets(y=crashes_mts4, model="MAM")
 
-summary(fit.ets.monthly.covid)
+summary(fit.ets.monthly.covid.MAM)
+#alpha = 0.8161, beta = 1e-04, gamma = 1e-04, phi = 0.9799
 
-autoplot(fit.ets.monthly.covid)
+autoplot(fit.ets.monthly.covid.MAM)
 
-cbind('Residuals' = residuals(fit.ets.monthly.covid),
-      'Forecast errors' = residuals(fit.ets.monthly.covid,type='response')) %>%
+cbind('Residuals' = residuals(fit.ets.monthly.covid.MAM),
+      'Forecast errors' = residuals(fit.ets.monthly.covid.MAM,type='response')) %>%
   autoplot(facet=TRUE) + xlab("Year") + ylab("")
 
-fit.ets.monthly.covid %>% forecast(h=8) %>%
+fit.ets.monthly.covid.MAM %>% forecast(h=8) %>%
+  autoplot()
+
+##Working with ets() monthly ANN (simple exponential smoothing) covid model 
+
+fit.ets.monthly.covid.MNM <-ets(y=crashes_mts4, model="ZZM")
+#automatically selects MNM
+
+summary(fit.ets.monthly.covid.MNM)
+#alpha = 0.3386, gamma = 2e-04
+
+autoplot(fit.ets.monthly.covid.MNM)
+
+cbind('Residuals' = residuals(fit.ets.monthly.covid.MNM),
+      'Forecast errors' = residuals(fit.ets.monthly.covid.MNM,type='response')) %>%
+  autoplot(facet=TRUE) + xlab("Year") + ylab("")
+
+fit.ets.monthly.covid.MNM %>% forecast(h=8) %>%
   autoplot()
 
 ##Different attempt at forecasting for monthly (THIS WORKS)
