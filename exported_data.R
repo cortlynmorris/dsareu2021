@@ -1639,16 +1639,11 @@ ARIMA <- forecast(auto.arima(train, lambda=0, biasadj=TRUE), h=h)
 STL <- stlf(train, lambda=0, h=h, biasadj=TRUE)
 NNAR <- forecast(nnetar(train), h=h)
 TBATS <- forecast(tbats(train, biasadj=TRUE), h=h)
-<<<<<<< HEAD
-<<<<<<< HEAD
+
 Combination <- (ARIMA[["mean"]] + TBATS[["mean"]] + NNAR[["mean"]] + 
                   STL[["mean"]])/4
-=======
 Combination <- (ETS[["mean"]] + ARIMA[["mean"]] + TBATS[["mean"]])/3
-=======
->>>>>>> e39eecd3e3c93cb947ad6d58fb5fc91bdaa06dfe
 Combination <- (ARIMA[["mean"]] + TBATS[["mean"]] + STL[["mean"]] + NNAR[["mean"]])/4
->>>>>>> c47359963f0ad1db91e99c05490af1ab529a6364
 
 
 autoplot(train) +
@@ -2506,9 +2501,12 @@ oversample_df1 <- crashes_pm[c(df_crashes_pm_NoInjury_ind,
 table(oversample_df1$Injury2)
 
 
-### Modeling Injury Outcome
+### Modeling Injury Outcome Using Oversampled Data
 
-Injury2.fit2 <- glm(Injury2~Age+VehicleType+ContributingCircumstance1+Protection, 
+Injury2.fit2 <- glm(Injury2~Age+VehicleType+ContributingCircumstance1+Protection+
+                      WeatherCondition1+MostHarmfulEvent+RoadFeature+
+                      TrafficControlType+RoadClassification+PersonType+Ejection+
+                      AlcoholResultType+VisionObstruction,
                    data=oversample_df1, family = "binomial")
 summary(Injury2.fit2)
 
@@ -2539,7 +2537,10 @@ set.seed(101) #for reproducibility of results
 sample2 <- sample(c(TRUE, FALSE), nrow(oversample_df1), replace = T, prob = c(0.7,0.3)) #70/30% training/test sets
 oversample_df1.train2 <- oversample_df1[sample, ]
 oversample_df1.test2 <- oversample_df1[!sample, ]
-oversample_df1.fit.train2 <- glm(Injury2~Age+VehicleType+ContributingCircumstance1+Protection, 
+oversample_df1.fit.train2 <- glm(Injury2~Age+VehicleType+ContributingCircumstance1+Protection+
+                                   WeatherCondition1+MostHarmfulEvent+RoadFeature+
+                                   TrafficControlType+RoadClassification+PersonType+Ejection+
+                                   AlcoholResultType+VisionObstruction, 
                             data=oversample_df1.train2, family="binomial") #fitting model on training set
 oversample_df1.pred.prob2 <- predict(oversample_df1.fit.train2, newdata=oversample_df1.test2, 
                                 type="response") #predicting prob. of default=1 for test set
