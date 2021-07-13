@@ -1706,7 +1706,7 @@ y <- ts(crashes_ts, frequency=7)
 z <- fourier(ts(crashes_ts, frequency=365.25), K=5)
 zf <- fourier(ts(crashes_ts, frequency=365.25), K=5, h=100)
 fit <- auto.arima(y, xreg=cbind(z,crashes_rain), seasonal=FALSE)
-fc <- forecast(fit, xreg=cbind(zf,holidayf), h=100)
+fc <- forecast(fit, xreg=cbind(zf,holidayf), h=100) #we need future covariate values
 
 
 #Time Series with Covariates 
