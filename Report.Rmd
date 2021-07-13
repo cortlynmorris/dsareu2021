@@ -1838,9 +1838,18 @@ rownames(daily_forecast_values_noncovid_HW) <- seq(as.Date("2020/03/01"),
 ```{r noncovid-HW-fcast-filter-forecast-ts, echo=FALSE}
 head(daily_forecast_values_noncovid_HW)
 
+true_HW_noncovid_crashes <- crashes_ts %>%
+  filter(Date >= as.Date("2020/03/01") & Date <= as.Date("2021/05/31"))
+
+true_HW_noncovid_crashes <- ts(true_HW_noncovid_crashes$count, 
+                               start = c(2020,3), end = c(2021,153), 
+                               frequency = 365)
+
 autoplot(fcast.noncovid) +
+  autolayer(true_HW_noncovid_crashes, alpha=0.8) + 
   ggtitle("Forecasts of Daily Car Crashes Using HoltWinters (Without Pandemic Data)") +
-  xlab("Year") + ylab("Crashes")
+  xlab("Year") + ylab("Crashes") + 
+  theme(legend.position = "bottom")
 ```
 
 ```{r noncovid-STLF-decomp-forecast-ts, echo=FALSE}
@@ -1851,10 +1860,19 @@ crashests.noncovid %>% mstl() %>%
 p <- crashests.noncovid %>%
   stlf(lambda = 0, h = 671, level = c(80, 95)) 
 
+true_noncovid_crashes <- crashes_ts %>%
+  filter(Date >= as.Date("2020/03/01") & Date <= as.Date("2021/05/31"))
+
+true_noncovid_crashes <- ts(true_noncovid_crashes$count, 
+                               start = c(2020,3), end = c(2021,153), 
+                               frequency = 365)
+
 p %>%
   autoplot() + 
-  ggtitle("STLF Model for Daily Car Crashes (Without Pandemic Data)") +
-  xlab("Year") + ylab("Daily Crashes")
+  autolayer(true_noncovid_crashes, alpha=0.8) + 
+  ggtitle("Seasonal and Trend Decomposition Using Loess Forecasting Model for Daily Car Crashes (Without Pandemic Data)") +
+  xlab("Year") + ylab("Daily Crashes") + 
+  theme(legend.position = "bottom")
 ```
 
 ```{r rename-noncovid-STLF-fcast, echo=FALSE, include=FALSE}
