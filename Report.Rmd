@@ -110,7 +110,8 @@ crashes %>%
   labs(title = 
   "Frequency of Crashes by Weather Condition and if Weather Contributed to Crash",
        x = "Weather Condition",
-       y = "Count (log10 Scale)")
+       y = "Count (log10 Scale)") + 
+  theme(title = element_text(size = 8))
 ```
 
 The highest frequency of crashes occur when there is no traffic control present. Without a control present, drivers may be less confident in their actions. 
@@ -801,7 +802,7 @@ other kinds of crashes that are most common. The rest of the crashes had a
 decreasing number of drivers involved in crashes as the number of drivers 
 ranged from 3 to 18.
 
-```{r driver, echo=FALSE}
+```{r driver, echo=FALSE, message=FALSE}
 crashes %>% 
   filter(PersonType == "Driver") %>%
   group_by(key_crash) %>%
@@ -824,7 +825,7 @@ crash. However, despite this fact, we can still follow a pretty regular
 decreasing trend with the majority of crashes involved 1 passenger which 
 trickles all the way to a crash involving a maximum of 88 passengers. 
 
-```{r passenger, echo=FALSE}
+```{r passenger, echo=FALSE, message=FALSE}
 crashes %>% 
   filter(PersonType == "Passenger") %>%
   group_by(key_crash) %>%
@@ -846,7 +847,7 @@ There is little variety in the number of pedestrians involved in crashes. When
 pedestrians were involved, there was a majority of it only being 1 with a 
 distant second and third being 2 and 3 pedestrians.
 
-```{r pedestrian, echo=FALSE}
+```{r pedestrian, echo=FALSE, message=FALSE}
 crashes %>% 
   filter(PersonType == "Pedestrian") %>%
   group_by(key_crash) %>%
@@ -870,7 +871,7 @@ to the total amount of data we are working with, very few crashes involve
 pedalcyclists anf if they do, it is only 1 with a singular exception for a 
 crash involving 2.
 
-```{r pedalcyclist, echo=FALSE}
+```{r pedalcyclist, echo=FALSE, message=FALSE}
 crashes %>% 
   filter(PersonType == "Pedalcyclist") %>%
   group_by(key_crash) %>%
@@ -894,7 +895,7 @@ are involved in crashes. This category encompasses those who do not fit into the
 majority of 1 other person being involved with a decreasing amount as it goes 
 up to a maximum of 5 other people involved. 
 
-```{r other-person, echo=FALSE}
+```{r other-person, echo=FALSE, message=FALSE}
 crashes %>% 
   filter(PersonType == "Other*") %>%
   group_by(key_crash) %>%
@@ -918,7 +919,7 @@ higher than it realistically was due to poor data entry. This plot included
 many more observations than pedestrians, pedalcyclists, and others combined
 with a majority of crashes involving only 1 unknown person and a few involving 2.
 
-```{r unknown-person, echo=FALSE}
+```{r unknown-person, echo=FALSE, message=FALSE}
 crashes %>% 
   filter(PersonType == "Unknown") %>%
   group_by(key_crash) %>%
@@ -941,7 +942,7 @@ have a small distribution of number of people killed per crash ranging from 1
 to three with one being the majority and taking a large jump to 2 and 3 killed 
 per crash.
 
-```{r killed, echo=FALSE}
+```{r killed, echo=FALSE, message=FALSE}
 crashes %>% 
   filter(Injury == "Killed") %>%
   group_by(key_crash) %>%
@@ -965,7 +966,7 @@ type A injuries per crash as the number of those injuries increases with the
 majority if type A injuries per crash is one and the fewest was 5 type A 
 injuries per crash with a frequency of only 1.
 
-```{r a-injury, echo=FALSE}
+```{r a-injury, echo=FALSE, message=FALSE}
 crashes %>% 
   filter(Injury == "A type injury (disabling)") %>%
   group_by(key_crash) %>%
@@ -989,7 +990,7 @@ as well as more of them total. A majority of the type B injuries per crash is
 one and the frequency decreases as the number of type B injuries per crash 
 increases up to 11.
 
-```{r b-injury, echo=FALSE}
+```{r b-injury, echo=FALSE, message=FALSE}
 crashes %>% 
   filter(Injury == "B type injury (evident)") %>%
   group_by(key_crash) %>%
@@ -1013,7 +1014,7 @@ the other type of injuries, the majority of crashes that involved type C
 injuries only had 1 and there was a decreasing frequency as the number of type 
 C injuries per crash increased up to a maximum of 26.
 
-```{r c-injury, echo=FALSE}
+```{r c-injury, echo=FALSE, message=FALSE}
 crashes %>% 
   filter(Injury == "C type injury (possible)") %>%
   group_by(key_crash) %>%
@@ -1037,7 +1038,7 @@ people per crash spanning from 1 to 90. Despite this wide range of values, we
 can still see that the data follows the trend of decreasing frequency as the 
 number of uninjured people per crash increases. 
 
-```{r no-injury, echo=FALSE}
+```{r no-injury, echo=FALSE, message=FALSE}
 crashes %>% 
   filter(Injury == "No injury") %>%
   group_by(key_crash) %>%
@@ -1057,7 +1058,7 @@ crashes %>%
 
 Once again, I do not think that this data will be useful for our analysis since it is likely that these unknown injuries are likely due to poor data entry but we can follow the same trend of a decreasing frequency as the number of unknown injuries per crash in creases from 1 all the way up to 16, with 1 having a very clear majority.
 
-```{r unknown-injury, echo=FALSE}
+```{r unknown-injury, echo=FALSE, message=FALSE}
 crashes %>% 
   filter(Injury == "Unknown") %>%
   group_by(key_crash) %>%
@@ -1663,7 +1664,7 @@ crashes_ts %>%
   geom_line() +
   geom_line(aes(y=rollmean(count, 7, na.pad = TRUE)), color = "red") +
   scale_x_date(date_labels = "%m-%Y", date_breaks = "6 month") + 
-  theme(axis.text.x = element_text(angle = 90), title = element_text(size=9)) + 
+  theme(axis.text.x = element_text(angle = 90), title = element_text(size=8)) + 
   ggtitle("Time Series Plot for Frequency of Daily Crashes With 7 Day Moving Average (With Pandemic Data)")
 ```
 
@@ -1838,15 +1839,15 @@ rownames(daily_forecast_values_noncovid_HW) <- seq(as.Date("2020/03/01"),
 ```{r noncovid-HW-fcast-filter-forecast-ts, echo=FALSE}
 head(daily_forecast_values_noncovid_HW)
 
-true_HW_noncovid_crashes <- crashes_ts %>%
+true_crashes <- crashes_ts %>%
   filter(Date >= as.Date("2020/03/01") & Date <= as.Date("2021/05/31"))
 
-true_HW_noncovid_crashes <- ts(true_HW_noncovid_crashes$count, 
+true_crashes <- ts(true_crashes$count, 
                                start = c(2020,3), end = c(2021,153), 
                                frequency = 365)
 
 autoplot(fcast.noncovid) +
-  autolayer(true_HW_noncovid_crashes, alpha=0.8) + 
+  autolayer(true_crashes, alpha=0.8) + 
   ggtitle("Forecasts of Daily Car Crashes Using HoltWinters (Without Pandemic Data)") +
   xlab("Year") + ylab("Crashes") + 
   theme(legend.position = "bottom")
@@ -1860,16 +1861,16 @@ crashests.noncovid %>% mstl() %>%
 p <- crashests.noncovid %>%
   stlf(lambda = 0, h = 671, level = c(80, 95)) 
 
-true_noncovid_crashes <- crashes_ts %>%
+true_crashes <- crashes_ts %>%
   filter(Date >= as.Date("2020/03/01") & Date <= as.Date("2021/05/31"))
 
-true_noncovid_crashes <- ts(true_noncovid_crashes$count, 
+true_crashes <- ts(true_crashes$count, 
                                start = c(2020,3), end = c(2021,153), 
                                frequency = 365)
 
 p %>%
   autoplot() + 
-  autolayer(true_noncovid_crashes, alpha=0.8) + 
+  autolayer(true_crashes, alpha=0.8) + 
   ggtitle("Seasonal and Trend Decomposition Using Loess Forecasting Model for Daily Car Crashes (Without Pandemic Data)") +
   xlab("Year") + ylab("Daily Crashes") + 
   theme(legend.position = "bottom")
