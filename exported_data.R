@@ -1549,9 +1549,18 @@ rownames(daily_forecast_values_noncovid_HW) <- seq(as.Date("2020/03/01"),
 
 daily_forecast_values_noncovid_HW
 
+true_noncovid_crashes <- crashes_ts %>%
+  filter(Date >= as.Date("2020/03/01") & Date <= as.Date("2021/05/31"))
+
+true_noncovid_crashes <- ts(true_noncovid_crashes$count, 
+                               start = c(2020,3), end = c(2021,153), 
+                               frequency = 365)
+
 autoplot(fcast.noncovid) +
+  autolayer(true_noncovid_crashes, alpha=0.8) + 
   ggtitle("Forecasts of Daily Car Crashes Using HoltWinters (Without Pandemic Data)") +
-  xlab("Year") + ylab("Crashes")
+  xlab("Year") + ylab("Crashes") + 
+  theme(legend.position = "bottom")
 
 #STLF forecasting 
 crashests.noncovid %>% mstl() %>%
@@ -1560,10 +1569,19 @@ crashests.noncovid %>% mstl() %>%
 p <- crashests.noncovid %>%
   stlf(lambda = 0, h = 671) 
 
+true_noncovid_crashes <- crashes_ts %>%
+  filter(Date >= as.Date("2020/03/01") & Date <= as.Date("2021/05/31"))
+
+true_noncovid_crashes <- ts(true_noncovid_crashes$count, 
+                               start = c(2020,3), end = c(2021,153), 
+                               frequency = 365)
+
 p %>%
   autoplot() + 
+  autolayer(true_noncovid_crashes, alpha=0.8) + 
   ggtitle("Seasonal and Trend Decomposition Using Loess Forecasting Model for Daily Car Crashes (Without Pandemic Data)") +
-  xlab("Year") + ylab("Daily Crashes")
+  xlab("Year") + ylab("Daily Crashes") + 
+  theme(legend.position = "bottom")
 
 daily_forecast_values_noncovid_STLF <- summary(p)
 
@@ -1607,7 +1625,8 @@ test_HW_noncovid <- subset(crashests.noncovid, start=length(crashests.noncovid)-
 crashes.train_HW_noncovid <- HoltWinters(training_HW_noncovid)
 crashes.train_HW_noncovid %>%
   forecast(h=671) %>%
-  autoplot() + autolayer(test_HW_noncovid, alpha=0.7)
+  autoplot() + 
+  autolayer(test_HW_noncovid)
 
 autoplot(training_HW_noncovid, series="Training data") +
   autolayer(fitted(crashes.train_HW_noncovid, h=12),
@@ -1675,6 +1694,7 @@ fit.ets.daily.covid %>% forecast(h=214) %>%
   autoplot()
 
 #Time Series with Covariates 
+#below does not work 
 d <- crashes_ts$Injury
 fit <- auto.arima(crashes_ts, xreg=d) # It finds a ARMA(1,0,2) is best.
 checkresiduals(fit)
@@ -1682,6 +1702,35 @@ checkresiduals(fit)
 fourier.crashes <- tslm(crashests2 ~ trend + fourier(crashests2, K=2))
 summary(fourier.crashes)
 
+p <- crashes$Injury
+
+fit.crashes <- tslm(crashests2 ~ p)
+
+#testing ARIMA - doesnt work 
+fit <- auto.arima(crashes[,"Injury"], seasonal=FALSE)
+fit %>% forecast(h=10) %>% autoplot(include=80)
+
+#tslm 
+fit.crashes <- tslm(crashes_ts~crashes_rain)
+
+#possible covariates?
+crashes_rain = crashes %>%
+  filter(WeatherCondition1 != "Unknown", WeatherCondition1 != "NA", 
+         WeatherCondition1 != "") %>%
+  mutate(WeatherCondition1 = case_when(
+    WeatherCondition1 == "Rain" ~ "Rain", 
+    TRUE ~ "Not Rain")) %>%
+  group_by(key_crash,Crash_Date_DOW) %>%
+  summarize(count = length(key_crash))
+
+crashes_Friday = crashes %>%
+  filter(Crash_Date_DOW != "Unknown", Crash_Date_DOW != "NA", 
+         Crash_Date_DOW != "") %>%
+  mutate(Crash_Date_DOW = case_when(
+    Crash_Date_DOW == "Friday" ~ "Friday", 
+    TRUE ~ "Not Friday")) %>%
+  group_by(key_crash,Crash_Date_DOW) %>%
+  summarize(count = length(key_crash))
 
 ##Different attempt at forecasting for monthly (THIS WORKS)
 #install.packages("Mcomp")
