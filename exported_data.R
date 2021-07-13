@@ -1654,13 +1654,15 @@ accuracy(crashes.test_STLF_noncovid)
 train <- window(crashests2, end=c(2019,12))
 h <- length(crashests2) - length(train)
 #ETS <- forecast(ets(train), h=h)
-ARIMA <- forecast(auto.arima(train, lambda=0, biasadj=TRUE), h=h)
+ARIMA <- forecast::forecast(auto.arima(train, lambda=0, biasadj=TRUE), h=h)
 STL <- stlf(train, lambda=0, h=h, biasadj=TRUE)
-NNAR <- forecast(nnetar(train), h=h)
-TBATS <- forecast(tbats(train, biasadj=TRUE), h=h)
+NNAR <- forecast::forecast(nnetar(train), h=h)
+TBATS <- forecast::forecast(tbats(train, biasadj=TRUE), h=h)
 
 Combination <- (ARIMA[["mean"]] + TBATS[["mean"]] + STL[["mean"]] + 
                   NNAR[["mean"]])/4
+
+library(RColorBrewer)
 
 autoplot(train) +
   autolayer(NNAR, series="NNAR") +
@@ -1699,7 +1701,7 @@ y <- msts(crashests2, seasonal.periods=c(7,365.25))
 fit <- tbats(y)
 fc <- forecast(fit, h=214)
 summary(fc) # i believe this is still daily seasonality 
-autoplot(fc)
+plot(fc)
 
 #Working with ARIMA (doesn't work)
 y <- ts(crashes_ts, frequency=7)
@@ -1712,7 +1714,7 @@ fc <- forecast(fit, xreg=cbind(zf,holidayf), h=100) #we need future covariate va
 #Time Series with Covariates 
 #below does not work 
 d <- crashes_ts$Injury
-fit <- auto.arima(crashes_ts, xreg=d) # It finds a ARMA(1,0,2) is best.
+fit <- auto.arima(crashests2, xreg=d) # It finds a ARMA(1,0,2) is best.
 checkresiduals(fit)
 
 fourier.crashes <- tslm(crashests2 ~ trend + fourier(crashests2, K=2))
