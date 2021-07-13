@@ -1693,6 +1693,22 @@ cbind('Residuals' = residuals(fit.ets.daily.covid),
 fit.ets.daily.covid %>% forecast(h=214) %>%
   autoplot()
 
+##Looking at seasonality of data 
+#Working with TBATS daily (does not work)
+y <- msts(crashests2, seasonal.periods=c(7,365.25))
+fit <- tbats(y)
+fc <- forecast(fit, h=214)
+summary(fc) # i believe this is still daily seasonality 
+autoplot(fc)
+
+#Working with ARIMA (doesn't work)
+y <- ts(crashes_ts, frequency=7)
+z <- fourier(ts(crashes_ts, frequency=365.25), K=5)
+zf <- fourier(ts(crashes_ts, frequency=365.25), K=5, h=100)
+fit <- auto.arima(y, xreg=cbind(z,crashes_rain), seasonal=FALSE)
+fc <- forecast(fit, xreg=cbind(zf,holidayf), h=100)
+
+
 #Time Series with Covariates 
 #below does not work 
 d <- crashes_ts$Injury
