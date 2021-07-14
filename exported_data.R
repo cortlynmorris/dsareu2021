@@ -1650,7 +1650,7 @@ true_noncovid_crashes <- ts(true_noncovid_crashes$count,
 
 autoplot(fc_tbats_noncovid) + 
   #autolayer(true_noncovid_crashes, alpha=0.8) + 
-  ggtitle("TBATS Forecasting Model for Daily Car Crashes (Without Pandemic Data)") +
+  ggtitle("TBATS Forecasting Model for Daily Car Crashes (With Pandemic Data)") +
   xlab("Year") + ylab("Crashes") + 
   scale_x_continuous(breaks = c(1,2,3,4,5,6,7,8), 
                      labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
@@ -1658,7 +1658,7 @@ autoplot(fc_tbats_noncovid) +
   theme(axis.text.x = element_text(angle=90), legend.position = "bottom")
 autoplot(fc_tbats_noncovid2) + 
   autolayer(true_noncovid_crashes, alpha=0.8) + 
-  ggtitle("TBATS Forecasting Model for Daily Car Crashes (Without Pandemic Data)") +
+  ggtitle("TBATS Forecasting Model for Daily Car Crashes (With Pandemic Data)") +
   xlab("Year") + ylab("Crashes") + 
   theme(legend.position = "bottom")
 
@@ -1675,8 +1675,8 @@ autoplot(training_HW, series="Training data") +
   autolayer(fitted(crashes.train_HW, h=12),
             series="12-step fitted values")
 
-crashes.test_HW <- Arima(test_HW)
-accuracy(crashes.test_HW)
+#crashes.test_HW <- HoltWinters(test_HW)
+#accuracy(crashes.test_HW)
 
 #STLF (with covid)
 training_STLF <- subset(crashests2, end=length(crashests2)-214)
@@ -1690,8 +1690,52 @@ autoplot(training_STLF, series="Training data") +
   autolayer(fitted(crashes.train_STLF, h=12),
             series="12-step fitted values")
 
-crashes.test_STLF <- Arima(test_STLF)
-accuracy(crashes.test_STLF)
+#crashes.test_STLF <- stlf(test_STLF)
+#accuracy(crashes.test_STLF)
+
+#TBATS (with covid)
+y <- msts(crashes_ts$count, seasonal.periods=c(7,365.25))
+y2 <- msts(crashests2, seasonal.periods=c(7,365.25))
+
+training_TBATS <- subset(y, end=length(y)-151)
+training_TBATS2 <- subset(y2, end=length(y2)-151)
+
+test_TBATS <- subset(y, start=length(y)-150)
+test_TBATS2 <- subset(y2, start=length(y2)-150)
+
+crashes.train_TBATS <- tbats(training_TBATS)
+crashes.train_TBATS2 <- tbats(training_TBATS2)
+
+crashes.train_TBATS %>%
+  forecast(h=151) %>%
+  autoplot(alpha=0.2) + 
+  autolayer(test_TBATS, alpha=0.75) + 
+  scale_x_continuous(breaks = c(1,2,3,4,5,6,7,8), 
+                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
+                                "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022")) + 
+  theme(axis.text.x = element_text(angle=90), legend.position = "bottom") + 
+  ggtitle("Multi-Step TBATS Daily Forecasts of Crashes (Without Pandemic Data)") + 
+  xlab("Date") + ylab("Crashes") 
+crashes.train_TBATS2 %>%
+  forecast(h=151) %>%
+  autoplot(alpha=0.2) + 
+  ggtitle("Multi-Step TBATS Daily Forecasts of Crashes (Without Pandemic Data)") + 
+  xlab("Date") + ylab("Crashes") + 
+  autolayer(test_TBATS2, alpha=0.75) + 
+  theme(legend.position = "bottom")
+
+autoplot(training_TBATS, series="Training data") +
+  autolayer(fitted(crashes.train_TBATS, h=12),
+            series="12-step fitted values")
+autoplot(training_TBATS2, series="Training data") +
+  autolayer(fitted(crashes.train_TBATS2, h=12),
+            series="12-step fitted values")
+
+crashes.test_TBATS <- tbats(test_TBATS)
+crashes.test_TBATS2 <- tbats(test_TBATS2)
+
+accuracy(crashes.test_TBATS)
+accuracy(crashes.test_TBATS2)
 
 #HW (noncovid)
 training_HW_noncovid <- subset(crashests.noncovid , end=length(crashests.noncovid)-671)
@@ -1706,8 +1750,8 @@ autoplot(training_HW_noncovid, series="Training data") +
   autolayer(fitted(crashes.train_HW_noncovid, h=12),
             series="12-step fitted values")
 
-crashes.test_HW_noncovid <- Arima(test_HW_noncovid)
-accuracy(crashes.test_HW_noncovid)
+#crashes.test_HW_noncovid <- HoltWinters(test_HW_noncovid)
+#accuracy(crashes.test_HW_noncovid)
 
 #STLF (non covid)
 training_STLF_noncovid <- subset(crashests.noncovid, end=length(crashests.noncovid)-671)
@@ -1721,8 +1765,49 @@ autoplot(training_STLF_noncovid, series="Training data") +
   autolayer(fitted(crashes.train_STLF_noncovid, h=12),
             series="12-step fitted values")
 
-crashes.test_STLF_noncovid <- Arima(test_STLF_noncovid)
-accuracy(crashes.test_STLF_noncovid)
+#crashes.test_STLF_noncovid <- stlf(test_STLF_noncovid)
+#accuracy(crashes.test_STLF_noncovid)
+
+#TBATS (noncovid)
+y.noncovid <- msts(crashes_ts.noncovid$count, seasonal.periods=c(7,365.25))
+y2.noncovid <- msts(crashests.noncovid, seasonal.periods=c(7,365.25))
+
+training_TBATS.noncovid <- subset(y.noncovid, end=length(y.noncovid)-671)
+training_TBATS2.noncovid <- subset(y2.noncovid, end=length(y2.noncovid)-671)
+
+test_TBATS.noncovid <- subset(y.noncovid, start=length(y.noncovid)-670)
+test_TBATS2.noncovid <- subset(y2.noncovid, start=length(y2.noncovid)-670)
+
+crashes.train_TBATS.noncovid <- tbats(training_TBATS.noncovid)
+crashes.train_TBATS2.noncovid <- tbats(training_TBATS2.noncovid)
+
+crashes.train_TBATS.noncovid %>%
+  forecast(h=671) %>%
+  autoplot(alpha=0.2) + 
+  autolayer(test_TBATS.noncovid, alpha=0.75) +
+  theme(legend.position = "bottom") + 
+  ggtitle("Multi-Step TBATS Daily Forecasts of Crashes (Without Pandemic Data)") + 
+  xlab("Date") + ylab("Crashes") 
+crashes.train_TBATS2.noncovid %>%
+  forecast(h=671) %>%
+  autoplot(alpha=0.2) + 
+  ggtitle("Multi-Step TBATS Daily Forecasts of Crashes (Without Pandemic Data)") + 
+  xlab("Date") + ylab("Crashes") + 
+  autolayer(test_TBATS2.noncovid, alpha=0.75) + 
+  theme(legend.position = "bottom")
+
+autoplot(training_TBATS.noncovid, series="Training data") +
+  autolayer(fitted(crashes.train_TBATS.noncovid, h=12),
+            series="12-step fitted values")
+autoplot(training_TBATS2.noncovid, series="Training data") +
+  autolayer(fitted(crashes.train_TBATS2.noncovid, h=12),
+            series="12-step fitted values")
+
+crashes.test_TBATS.noncovid <- tbats(test_TBATS.noncovid)
+crashes.test_TBATS2.noncovid <- tbats(test_TBATS2.noncovid)
+
+accuracy(crashes.test_TBATS.noncovid)
+accuracy(crashes.test_TBATS2.noncovid)
 
 ##Forecast Combinations (daily covid)
 train <- window(crashests2, end=c(2019,12))
@@ -2086,8 +2171,8 @@ autoplot(training_HW_monthly, series="Training data") +
   autolayer(fitted(crashes.train_HW_monthly, h=12),
             series="12-step fitted values")
 
-crashes.test_HW_monthly <- Arima(test_HW_monthly)
-accuracy(crashes.test_HW_monthly)
+#crashes.test_HW_monthly <- HoltWinters(test_HW_monthly)
+#accuracy(crashes.test_HW_monthly)
 
 #STLF (with covid)
 training_STLF_monthly <- subset(crashes_mts4, end=length(crashes_mts4)-8)
@@ -2101,8 +2186,8 @@ autoplot(training_STLF_monthly, series="Training data") +
   autolayer(fitted(crashes.train_STLF_monthly, h=12),
             series="12-step fitted values")
 
-crashes.test_STLF_monthly <- Arima(test_STLF_monthly)
-accuracy(crashes.test_STLF_monthly)
+#crashes.test_STLF_monthly <- stlf(test_STLF_monthly)
+#accuracy(crashes.test_STLF_monthly)
 
 #HW (noncovid)
 training_HW_noncovid_monthly <- subset(crashes_mts4.noncovid, end=length(crashes_mts4.noncovid)-23)
@@ -2116,8 +2201,8 @@ autoplot(training_HW_noncovid_monthly, series="Training data") +
   autolayer(fitted(crashes.train_HW_noncovid_monthly, h=12),
             series="12-step fitted values")
 
-crashes.test_HW_noncovid_monthly <- Arima(test_HW_noncovid_monthly)
-accuracy(crashes.test_HW_noncovid_monthly)
+#crashes.test_HW_noncovid_monthly <- HoltWinters(test_HW_noncovid_monthly)
+#accuracy(crashes.test_HW_noncovid_monthly)
 
 #STLF (non covid)
 training_STLF_noncovid_monthly <- subset(crashes_mts4.noncovid, end=length(crashes_mts4.noncovid)-23)
@@ -2131,8 +2216,8 @@ autoplot(training_STLF_noncovid_monthly, series="Training data") +
   autolayer(fitted(crashes.train_STLF_noncovid_monthly, h=12),
             series="12-step fitted values")
 
-crashes.test_STLF_noncovid_monthly <- Arima(test_STLF_noncovid_monthly)
-accuracy(crashes.test_STLF_noncovid_monthly)
+#crashes.test_STLF_noncovid_monthly <- stlf(test_STLF_noncovid_monthly)
+#accuracy(crashes.test_STLF_noncovid_monthly)
 
 ## Forecast combination (monthly covid)
 train_monthly <- window(crashes_mts4, end=c(2018,12))
