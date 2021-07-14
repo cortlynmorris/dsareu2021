@@ -1893,8 +1893,8 @@ test_HW <- subset(crashests2, start=length(crashests2)-150)
 crashes.train_HW <- HoltWinters(training_HW)
 crashes.train_HW %>%
   forecast::forecast(h=151, level=c(80,95)) %>%
-  autoplot(alpha=0.7) + 
-  autolayer(test_HW, alpha=0.8) + 
+  autoplot(alpha=0.2) + 
+  autolayer(test_HW, alpha=0.75) + 
   theme(legend.position = "bottom") + 
   ggtitle("Multi-Step HoltWinters Forecasts of Crashes (With Pandemic Data)") + 
   xlab("Date") + ylab("Crashes")
@@ -1927,8 +1927,8 @@ test_STLF <- subset(crashests2, start=length(crashests2)-151)
 crashes.train_STLF <- stlf(training_STLF, lambda = 0, h = 152, level=c(80,95))
 crashes.train_STLF %>%
   forecast::forecast(h=152) %>%
-  autoplot(alpha=0.7) + 
-  autolayer(test_STLF, alpha = 0.8) + 
+  autoplot(alpha=0.2) + 
+  autolayer(test_STLF, alpha = 0.75) + 
   theme(legend.position = "bottom") + 
   ggtitle("Multi-Step STLF Forecasts of Crashes (With Pandemic Data)") + 
   xlab("Date") + ylab("Crashes")
@@ -1962,8 +1962,8 @@ test_HW_noncovid <- subset(crashests.noncovid, start=length(crashests.noncovid)-
 crashes.train_HW_noncovid <- HoltWinters(training_HW_noncovid)
 crashes.train_HW_noncovid %>%
   forecast::forecast(h=426, level=c(80,95)) %>%
-  autoplot(alpha=0.7) + 
-  autolayer(test_HW_noncovid, alpha=0.8) + 
+  autoplot(alpha=0.2) + 
+  autolayer(test_HW_noncovid, alpha=0.75) + 
   theme(legend.position = "bottom") + 
   ggtitle("Multi-Step HoltWinters Forecasts of Crashes (Without Pandemic Data)") + 
   xlab("Date") + ylab("Crashes")
@@ -1997,8 +1997,8 @@ test_STLF_noncovid <- subset(crashests.noncovid, start=length(crashests.noncovid
 crashes.train_STLF_noncovid <- stlf(training_STLF_noncovid, lambda = 0, h = 426, level=c(80,95))
 crashes.train_STLF_noncovid %>%
   forecast(h=426) %>%
-  autoplot(alpha=0.7) + 
-  autolayer(test_STLF_noncovid, alpha = 0.8) + 
+  autoplot(alpha=0.2) + 
+  autolayer(test_STLF_noncovid, alpha = 0.75) + 
   theme(legend.position = "bottom") + 
   ggtitle("Multi-Step STLF Forecasts of Crashes (Without Pandemic Data)") + 
   xlab("Date") + ylab("Crashes")
