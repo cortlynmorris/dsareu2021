@@ -2071,16 +2071,20 @@ fcast.ms.TBATS.covid2 <- summary(forecast::forecast(crashes.train_TBATS2, h=152,
 rownames(fcast.ms.TBATS.covid2) <- seq(as.Date("2021/01/01"), as.Date("2021/06/01"), "day")
 ```
 
-```{r, tbats-ms-plot, echo=FALSE, message=FALSE}
+```{r, tbats-ms-plot, echo=FALSE, message=FALSE, warning=FALSE}
 head(fcast.ms.TBATS.covid)
 head(fcast.ms.TBATS.covid2)
 
 autoplot(training_TBATS, series="Training data") +
   autolayer(fitted(crashes.train_TBATS, h=12),
-            series="12-step fitted values")
+            series="12-step fitted values") + 
+  ggtitle("12-Step Fitted Values of TBATS Model (With Pandemic Data") + 
+  xlab("Date") + ylab("Crashes")
 autoplot(training_TBATS2, series="Training data") +
   autolayer(fitted(crashes.train_TBATS2, h=12),
-            series="12-step fitted values")
+            series="12-step fitted values") + 
+  ggtitle("12-Step Fitted Values of TBATS Model (With Pandemic Data") + 
+  xlab("Date") + ylab("Crashes")
 
 crashes.test_TBATS <- tbats(test_TBATS)
 crashes.test_TBATS2 <- tbats(test_TBATS2)
@@ -2151,7 +2155,7 @@ autoplot(training_STLF_noncovid, series="Training data") +
   xlab("Date") + ylab("Crashes")
 ```
 
-```{r tbats-noncovid, echo=FALSE, message=FALSE, include=FALSE}
+```{r tbats-ms-noncovid, echo=FALSE, message=FALSE, include=FALSE}
 y.noncovid <- msts(crashes_ts.noncovid$count, seasonal.periods=c(7,365.25))
 y2.noncovid <- msts(crashests.noncovid, seasonal.periods=c(7,365.25))
 
@@ -2175,7 +2179,7 @@ rownames(fcast.ms.TBATS.noncovid2) <- seq(as.Date("2019/01/01"),
                                          as.Date("2020/03/01"), "day")
 ```
 
-```{r tbats-noncovid-plots, echo=FALSE, message=FALSE}
+```{r tbats-noncovid-plots, echo=FALSE, message=FALSE, warning=FALSE}
 head(fcast.ms.TBATS.noncovid)
 head(fcast.ms.TBATS.noncovid2)
 
@@ -2200,10 +2204,14 @@ crashes.train_TBATS2.noncovid %>%
 
 autoplot(training_TBATS.noncovid, series="Training data") +
   autolayer(fitted(crashes.train_TBATS.noncovid, h=12),
-            series="12-step fitted values")
+            series="12-step fitted values") + 
+  ggtitle("12-Step Fitted Values of TBATS Model (Without Pandemic Data") + 
+  xlab("Date") + ylab("Crashes")
 autoplot(training_TBATS2.noncovid, series="Training data") +
   autolayer(fitted(crashes.train_TBATS2.noncovid, h=12),
-            series="12-step fitted values")
+            series="12-step fitted values") + 
+  ggtitle("12-Step Fitted Values of TBATS Model (Without Pandemic Data") + 
+  xlab("Date") + ylab("Crashes")
 
 crashes.test_TBATS.noncovid <- tbats(test_TBATS.noncovid)
 crashes.test_TBATS2.noncovid <- tbats(test_TBATS2.noncovid)
