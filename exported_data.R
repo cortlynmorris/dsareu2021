@@ -2611,13 +2611,30 @@ crashes_rain %>%
 crashes_pm = crashes %>%
   filter(Injury != "", Injury != "Unknown", VehicleType != "Unknown", 
          ContributingCircumstance1 != "Unknown", ContributingCircumstance1 != "", 
-         Protection != "Unknown", Protection != "") %>%
+         Protection != "Unknown", Protection != "", WeatherCondition1 != "Unknown",
+         WeatherCondition1 != "", MostHarmfulEvent != "Unknown",
+         MostHarmfulEvent != "", RoadFeature != "Unknown", RoadFeature != "",
+         TrafficControlType != "Unknown", TrafficControlType != "",
+         RoadClassification != "Unkown", RoadClassification != "",
+         PersonType != "", PersonType != "Unknown", AlcoholResultType != "",
+         AlcoholResultType != "Unknown", VisionObstruction != "", 
+         VisionObstruction != "Unknown") %>%
   mutate(Injury = as.factor(Injury)) %>%
   mutate(Injury2 = if_else(Injury == "No injury", "No injury", "Injury"), 
          Injury2 = as.factor(Injury2)) %>%
   mutate(VehicleType = as.factor(VehicleType)) %>%
   mutate(ContributingCircumstance1 = as.factor(ContributingCircumstance1)) %>%
-  mutate(Protection = as.factor(Protection))
+  mutate(Protection = as.factor(Protection)) %>%
+  mutate(WeatherCondition1 = as.factor(WeatherCondition1)) %>%
+  mutate(MostHarmfulEvent = as.factor(MostHarmfulEvent)) %>%
+  mutate(RoadFeature = as.factor(RoadFeature)) %>%
+  mutate(TrafficControlType = as.factor(TrafficControlType)) %>%
+  mutate(RoadClassification = as.factor(RoadClassification)) %>%
+  mutate(PersonType = as.factor(PersonType)) %>%
+  mutate(AlcoholResultType = as.factor(AlcoholResultType)) %>%
+  mutate(VisionObstruction = as.factor(VisionObstruction))
+  
+
   
 summary(crashes_pm$Injury)
 summary(crashes_pm$Injury2)
@@ -2683,7 +2700,7 @@ rose <- ROSE(Injury2~., data = crashes_pm.train, N = 500000, seed=2021)$crashes_
 library(Amelia)
 missmap(crashes_pm)
 
-#best method so far
+#best method so far for oversampling
 df_crashes_pm_Injury_ind <- which(crashes_pm$Injury2 == "Injury")
 df_crashes_pm_NoInjury_ind <- which(crashes_pm$Injury2 == "No injury")
 
@@ -2692,15 +2709,31 @@ oversample_df1 <- crashes_pm[c(df_crashes_pm_NoInjury_ind,
  
 table(oversample_df1$Injury2)
 
+#Undersampling model
+crashes_pm_no_injury = crashes_pm %>%
+  filter(Injury2 == "No injury")
+
+crashes_pm_injury = crashes_pm %>%
+  filter(Injury2 == "Injury")
+
+s = sample(1:nrow(crashes_pm_no_injury), 35000, replace = F)
+
+undersample_df1 = crashes_pm_injury %>%
+  bind_rows(crashes_pm_no_injury[s,])
 
 ### Modeling Injury Outcome Using Oversampled Data
 
 Injury2.fit2 <- glm(Injury2~Age+VehicleType+ContributingCircumstance1+Protection+
                       WeatherCondition1+MostHarmfulEvent+RoadFeature+
-                      TrafficControlType+RoadClassification+PersonType+Ejection+
+                      TrafficControlType+RoadClassification+PersonType+
                       AlcoholResultType+VisionObstruction,
                    data=oversample_df1, family = "binomial")
 summary(Injury2.fit2)
+
+ci = cbind(coef(Injury2.fit2)-1.96*(summary(Injury2.fit2)$coefficients[,"Std. Error"]),
+       coef(Injury2.fit2)+1.96*(summary(Injury2.fit2)$coefficients[,"Std. Error"]))
+
+round(ci, 3)
 
 #Model coefficients
 coef(Injury2.fit2) #extract coefficients
