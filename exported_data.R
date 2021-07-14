@@ -1841,7 +1841,8 @@ c(ARIMA = accuracy(ARIMA, crashests2)["Test set", "RMSE"],
   Combination =
     accuracy(Combination, crashests2)["Test set", "RMSE"])
 
-##Working with ets() daily (THIS GETS RID OF SEASONALITY DUE TO TOO HIGH OF FREQUENCY)
+##Working with ets() daily (doesn't work)
+#(THIS GETS RID OF SEASONALITY DUE TO TOO HIGH OF FREQUENCY)
 fit.ets.daily.covid <- ets(y=crashests2, model="MAM")
 
 summary(fit.ets.daily.covid)
@@ -1911,6 +1912,206 @@ crashes_Friday = crashes %>%
     TRUE ~ "Not Friday")) %>%
   group_by(key_crash,Crash_Date_DOW) %>%
   summarize(count = length(key_crash))
+
+##Adding dummy variables to dataset 
+#snow
+crashes_snow = crashes %>%
+  mutate(Snow = case_when(
+    WeatherCondition1 == "Snow" ~ 1, 
+    TRUE ~ 0)) 
+
+crashes_snow = crashes_snow %>%
+  filter(as.Date(crash_date) >= "2015/01/01" & as.Date(crash_date) <= "2021/05/31") %>%
+  separate(crash_date, 
+           into = c("Date", "Hour"), sep = 11) %>%
+  group_by(Date,Snow) %>% #am I grouping by the right things? 
+  summarize(count = length(unique(key_crash)))
+
+#Converting crashes_snow to a time series object 
+crashes_snow_ts2 <- ts(crashes_snow$count, start = c(2015,1), end = c(2021,153),
+                 frequency = 365)
+
+#Converting crashes_snow to a time series object (not the method to use)
+crashes_snow_ts <- as.ts(crashes_snow)
+
+##attempting blogpost code (works)
+y <- ts(crashes_snow$count, frequency=7)
+z <- fourier(ts(crashes_snow$count, frequency=365.25), K=5)
+zf <- fourier(ts(crashes_snow$count, frequency=365.25), K=5, h=100)
+fit <- auto.arima(y, xreg=cbind(z), seasonal=FALSE)
+fc <- forecast(fit, xreg=cbind(zf), h=100)
+
+autoplot(fc)
+
+##attempting textbook (Works)
+#crashes_snow_ts3 <- window(crashes_snow)
+crashes_snow_ts2 <- ts(crashes_snow$count, start = c(2015,1), end = c(2021,153),
+                       frequency = 365)
+plots <- list()
+for (i in seq(6)) {
+  fit <- auto.arima(crashes_snow_ts2, xreg = fourier(crashes_snow_ts2, K = i),
+                    seasonal = FALSE, lambda = 0)
+  plots[[i]] <- autoplot(forecast(fit,
+                                  xreg=fourier(crashes_snow_ts2, K=i, h=214))) +
+    xlab(paste("K=",i,"   AICC=",round(fit[["aicc"]],2))) +
+    ylab("")
+}
+
+#loading necessary packages
+#install.packages("gridExtra")
+library(gridExtra)
+
+gridExtra::grid.arrange(
+  plots[[1]],plots[[2]],plots[[3]],
+  plots[[4]],plots[[5]],plots[[6]], nrow=3)
+
+#diff attempt (TAKES A LONG TIME (because K=1-25) BUT IT DOES WORK)
+bestfit <- list(aicc=Inf)
+for(K in seq(25)) {
+  fit <- auto.arima(crashes_snow_ts2, xreg=fourier(crashes_snow_ts2, K=K),
+                    seasonal=FALSE)
+  if(fit[["aicc"]] < bestfit[["aicc"]]) {
+    bestfit <- fit
+    bestK <- K
+  }
+}
+
+fc <- forecast(bestfit,
+               xreg=fourier(crashes_snow_ts2, K=bestK, h=214))
+autoplot(fc)
+
+##friday dummy variable
+crashes_friday = crashes %>%
+  mutate(Friday = case_when(
+    Crash_Date_DOW == "Friday" ~ 1, 
+    TRUE ~ 0)) 
+
+crashes_friday = crashes_friday %>%
+  filter(as.Date(crash_date) >= "2015/01/01" & as.Date(crash_date) <= "2021/05/31") %>%
+  separate(crash_date, 
+           into = c("Date", "Hour"), sep = 11) %>%
+  group_by(Date,Friday) %>% #am I grouping by the right things? 
+  summarize(count = length(unique(key_crash)))
+
+#Converting crashes_ts to a time series object 
+crashes_friday_ts2 <- ts(crashes_friday$count, start = c(2015,1), end = c(2021,153),
+                         frequency = 365)
+
+#Converting crashes_ts to a time series object 
+crashes_friday_ts <- as.ts(crashes_friday)
+
+##attempting blogpost 
+y <- ts(crashes_friday$count, frequency=7)
+z <- fourier(ts(crashes_friday$count, frequency=365.25), K=5)
+zf <- fourier(ts(crashes_friday$count, frequency=365.25), K=5, h=100)
+fit <- auto.arima(y, xreg=cbind(z), seasonal=FALSE)
+fc <- forecast(fit, xreg=cbind(zf), h=100)
+autoplot(fc)
+
+##attempting textbook 
+#crashes_friday_ts3 <- window(crashes_friday)
+crashes_friday_ts2 <- ts(crashes_friday$count, start = c(2015,1), end = c(2021,153),
+                       frequency = 365)
+plots <- list()
+for (i in seq(6)) {
+  fit <- auto.arima(crashes_friday_ts2, xreg = fourier(crashes_friday_ts2, K = i),
+                    seasonal = FALSE, lambda = 0)
+  plots[[i]] <- autoplot(forecast(fit,
+                                  xreg=fourier(crashes_friday_ts2, K=i, h=214))) +
+    xlab(paste("K=",i,"   AICC=",round(fit[["aicc"]],2))) +
+    ylab("")
+}
+
+#loading necessary packages
+#install.packages("gridExtra")
+library(gridExtra)
+
+gridExtra::grid.arrange(
+  plots[[1]],plots[[2]],plots[[3]],
+  plots[[4]],plots[[5]],plots[[6]], nrow=3)
+
+#diff attempt (TAKES A LONG TIME BUT WORKS)
+bestfit <- list(aicc=Inf)
+for(K in seq(25)) {
+  fit <- auto.arima(crashes_friday_ts2, xreg=fourier(crashes_friday_ts2, K=K),
+                    seasonal=FALSE)
+  if(fit[["aicc"]] < bestfit[["aicc"]]) {
+    bestfit <- fit
+    bestK <- K
+  }
+}
+
+fc <- forecast(bestfit,
+               xreg=fourier(crashes_friday_ts2, K=bestK, h=214))
+autoplot(fc)
+
+##friday and snow together 
+crashes_snow_friday = crashes %>%
+  mutate(Friday = case_when(
+    Crash_Date_DOW == "Friday" ~ 1, 
+    TRUE ~ 0)) %>%
+  mutate(Snow = case_when(
+    WeatherCondition1 == "Snow" ~ 1, 
+    TRUE ~ 0))
+
+crashes_snow_friday = crashes_snow_friday %>%
+  filter(as.Date(crash_date) >= "2015/01/01" & as.Date(crash_date) <= "2021/05/31") %>%
+  separate(crash_date, 
+           into = c("Date", "Hour"), sep = 11) %>%
+  group_by(Date,Friday,Snow) %>% #am I grouping by the right things? 
+  summarize(count = length(unique(key_crash)))
+
+#Converting crashes_ts to a time series object 
+crashes_snow_friday_ts2 <- ts(crashes_snow_friday$count, start = c(2015,1), end = c(2021,153),
+                         frequency = 365)
+
+#Converting crashes_ts to a time series object 
+crashes_snow_friday_ts <- as.ts(crashes_snow_friday)
+
+##attempting blogpost 
+y <- ts(crashes_snow_friday$count, frequency=7)
+z <- fourier(ts(crashes_snow_friday$count, frequency=365.25), K=5)
+zf <- fourier(ts(crashes_snow_friday$count, frequency=365.25), K=5, h=100)
+fit <- auto.arima(y, xreg=cbind(z), seasonal=FALSE)
+fc <- forecast(fit, xreg=cbind(zf), h=100)
+autoplot(fc)
+
+##attempting textbook 
+#crashes_friday_ts3 <- window(crashes_friday)
+crashes_snow_friday_ts2 <- ts(crashes_snow_friday$count, start = c(2015,1), end = c(2021,153),
+                         frequency = 365)
+plots <- list()
+for (i in seq(6)) {
+  fit <- auto.arima(crashes_snow_friday_ts2, xreg = fourier(crashes_snow_friday_ts2, K = i),
+                    seasonal = FALSE, lambda = 0)
+  plots[[i]] <- autoplot(forecast(fit,
+                                  xreg=fourier(crashes_snow_friday_ts2, K=i, h=214))) +
+    xlab(paste("K=",i,"   AICC=",round(fit[["aicc"]],2))) +
+    ylab("")
+}
+
+#loading necessary packages
+#install.packages("gridExtra")
+library(gridExtra)
+
+gridExtra::grid.arrange(
+  plots[[1]],plots[[2]],plots[[3]],
+  plots[[4]],plots[[5]],plots[[6]], nrow=3)
+
+#diff attempt (TAKES A LONG TIME BUT WORKS)
+bestfit <- list(aicc=Inf)
+for(K in seq(25)) {
+  fit <- auto.arima(crashes_snow_friday_ts2, xreg=fourier(crashes_snow_friday_ts2, K=K),
+                    seasonal=FALSE)
+  if(fit[["aicc"]] < bestfit[["aicc"]]) {
+    bestfit <- fit
+    bestK <- K
+  }
+}
+
+fc <- forecast(bestfit,
+               xreg=fourier(crashes_snow_friday_ts2, K=bestK, h=214))
+autoplot(fc)
 
 ##Different attempt at forecasting for monthly (THIS WORKS)
 #install.packages("Mcomp")
