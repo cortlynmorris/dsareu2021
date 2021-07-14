@@ -1492,6 +1492,38 @@ daily_forecast_values_covid_STLF <- summary(m)
 rownames(daily_forecast_values_covid_STLF) <- seq(as.Date("2021/06/01"), 
                                                 as.Date("2021/12/31"), "day")
 
+#TBATS forecasting 
+y <- msts(crashes_ts$count, seasonal.periods=c(7,365.25))
+y2 <- msts(crashests2, seasonal.periods=c(7,365.25))
+
+fit_tbats_covid <- tbats(y)
+fit_tbats_covid2 <- tbats(y2)
+
+fc_tbats_covid <- forecast::forecast(fit_tbats_covid, h=214)
+fc_tbats_covid2 <- forecast::forecast(fit_tbats_covid2, h=214)
+
+daily_forecast_values_covid_TBATS <- summary(fc_tbats_covid)
+daily_forecast_values_covid_TBATS2 <- summary(fc_tbats_covid2)
+
+rownames(daily_forecast_values_covid_TBATS) <- seq(as.Date("2021/06/01"), 
+                                                  as.Date("2021/12/31"), "day")
+rownames(daily_forecast_values_covid_TBATS2) <- seq(as.Date("2021/06/01"), 
+                                                  as.Date("2021/12/31"), "day")
+
+head(daily_forecast_values_covid_TBATS)
+head(daily_forecast_values_covid_TBATS2)
+
+autoplot(fc_tbats_covid) + 
+  ggtitle("TBATS Forecasting Model for Daily Car Crashes (With Pandemic Data)") +
+  xlab("Year") + ylab("Crashes") + 
+  scale_x_continuous(breaks = c(1,2,3,4,5,6,7,8), 
+                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
+                                "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022")) + 
+  theme(axis.text.x = element_text(angle=90))
+autoplot(fc_tbats_covid2) + 
+  ggtitle("TBATS Forecasting Model for Daily Car Crashes (With Pandemic Data)") +
+  xlab("Year") + ylab("Crashes")
+
 ####Working with non COVID time series daily (THIS WORKS)
 #Regular non COVID time series daily 
 crashes_ts.noncovid = crashes %>%
@@ -1587,6 +1619,48 @@ daily_forecast_values_noncovid_STLF <- summary(p)
 
 rownames(daily_forecast_values_noncovid_STLF) <- seq(as.Date("2020/03/01"), 
                                                    as.Date("2021/12/31"), "day")
+
+#TBATS forecasting noncovid 
+y.noncovid <- msts(crashes_ts.noncovid$count, seasonal.periods=c(7,365.25))
+y2.noncovid <- msts(crashests.noncovid, seasonal.periods=c(7,365.25))
+
+fit_tbats_noncovid <- tbats(y.noncovid)
+fit_tbats_noncovid2 <- tbats(y2.noncovid)
+
+fc_tbats_noncovid <- forecast::forecast(fit_tbats_noncovid, h=671)
+fc_tbats_noncovid2 <- forecast::forecast(fit_tbats_noncovid2, h=671)
+
+daily_forecast_values_noncovid_TBATS <- summary(fc_tbats_noncovid)
+daily_forecast_values_noncovid_TBATS2 <- summary(fc_tbats_noncovid2)
+
+rownames(daily_forecast_values_noncovid_TBATS) <- seq(as.Date("2020/03/01"), 
+                                                      as.Date("2021/12/31"), "day")
+rownames(daily_forecast_values_noncovid_TBATS2) <- seq(as.Date("2020/03/01"), 
+                                                       as.Date("2021/12/31"), "day")
+
+head(daily_forecast_values_noncovid_TBATS)
+head(daily_forecast_values_noncovid_TBATS2)
+
+true_noncovid_crashes <- crashes_ts %>%
+  filter(Date >= as.Date("2020/03/01") & Date <= as.Date("2021/05/31"))
+
+true_noncovid_crashes <- ts(true_noncovid_crashes$count, 
+                            start = c(2020,3), end = c(2021,153), 
+                            frequency = 365)
+
+autoplot(fc_tbats_noncovid) + 
+  #autolayer(true_noncovid_crashes, alpha=0.8) + 
+  ggtitle("TBATS Forecasting Model for Daily Car Crashes (Without Pandemic Data)") +
+  xlab("Year") + ylab("Crashes") + 
+  scale_x_continuous(breaks = c(1,2,3,4,5,6,7,8), 
+                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
+                                "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022")) + 
+  theme(axis.text.x = element_text(angle=90), legend.position = "bottom")
+autoplot(fc_tbats_noncovid2) + 
+  autolayer(true_noncovid_crashes, alpha=0.8) + 
+  ggtitle("TBATS Forecasting Model for Daily Car Crashes (Without Pandemic Data)") +
+  xlab("Year") + ylab("Crashes") + 
+  theme(legend.position = "bottom")
 
 ##Multi-step forecasts on training data (daily)
 #HW (with covid)
@@ -1696,11 +1770,13 @@ fit.ets.daily.covid %>% forecast(h=214) %>%
   autoplot()
 
 ##Looking at seasonality of data 
-#Working with TBATS daily (does not work)
-y <- msts(crashests2, seasonal.periods=c(7,365.25))
+#Working with TBATS daily 
+#Do I use crashes_ts (like I did with the ts() func or should I use crashests2?)
+y <- msts(crashes_ts$count, seasonal.periods=c(7,365.25))
+y2 <- msts(crashests2, seasonal.periods=c(7,365.25))
 fit <- tbats(y)
 fc <- forecast(fit, h=214)
-summary(fc) # i believe this is still daily seasonality 
+summary(fc) 
 plot(fc)
 
 #Working with ARIMA (doesn't work)
