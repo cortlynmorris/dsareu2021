@@ -2093,6 +2093,36 @@ accuracy(crashes.test_TBATS)
 accuracy(crashes.test_TBATS2)
 ```
 
+```{r combination, echo=FALSE, message=FALSE}
+train <- window(crashests2, end=c(2019,12))
+h <- length(crashests2) - length(train)
+#ETS <- forecast(ets(train), h=h)
+ARIMA <- forecast::forecast(auto.arima(train, lambda=0, biasadj=TRUE), h=h)
+STL <- stlf(train, lambda=0, h=h, biasadj=TRUE)
+NNAR <- forecast::forecast(nnetar(train), h=h)
+TBATS <- forecast::forecast(tbats(train, biasadj=TRUE), h=h)
+
+Combination <- (ARIMA[["mean"]] + TBATS[["mean"]] + STL[["mean"]] + 
+                  NNAR[["mean"]])/4
+
+autoplot(train) +
+  autolayer(NNAR, series="NNAR") +
+  autolayer(STL, series="STL", PI=F) +
+  autolayer(Combination, series="Combination") +
+  autolayer(ARIMA, series="ARIMA", PI=F) +
+  autolayer(TBATS, series="TBATS", PI=F) +
+  scale_color_brewer(palette="RdYlBu") + 
+  xlab("Year") + ylab("Crashes") +
+  ggtitle("Crashes")
+
+c(ARIMA = accuracy(ARIMA, crashests2)["Test set", "RMSE"],
+  TBATS = accuracy(TBATS, crashests2)["Test set", "RMSE"],
+  NNAR = accuracy(NNAR, crashests2)["Test set", "RMSE"],
+  STL = accuracy(STL, crashests2)["Test set", "RMSE"],
+  Combination =
+    accuracy(Combination, crashests2)["Test set", "RMSE"])
+```
+
 ```{r noncovid-ms-HW-forecast-ts, echo=FALSE, message=FALSE, include=FALSE}
 training_HW_noncovid <- subset(crashests.noncovid , end=length(crashests.noncovid)-426)
 test_HW_noncovid <- subset(crashests.noncovid, start=length(crashests.noncovid)-425)
