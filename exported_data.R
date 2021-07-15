@@ -3065,7 +3065,7 @@ crashes_pm2 = crashes %>%
   mutate(PersonType = as.factor(PersonType)) %>%
   mutate(AlcoholResultType = as.factor(AlcoholResultType)) %>%
   mutate(VisionObstruction = as.factor(VisionObstruction))
-  
+
 #Does NOT Include AlcoholResultType
 crashes_pm = crashes %>%
   filter(Injury != "", Injury != "Unknown", VehicleType != "Unknown", 
@@ -3108,11 +3108,13 @@ crashes_pm = crashes %>%
   mutate(RoadClassification = as.factor(RoadClassification)) %>%
   mutate(PersonType = as.factor(PersonType)) %>%
   mutate(VisionObstruction = as.factor(VisionObstruction))
-  
+
 summary(crashes_pm$Injury)
 summary(crashes_pm$Injury2)
 
-Injury2.fit <- glm(Injury2~Age+VehicleType+ContributingCircumstance1+Protection, 
+Injury2.fit <- glm(Injury2~Age+VehicleType+ContributingCircumstance1+Protection+
+                     WeatherCondition1+MostHarmfulEvent+RoadFeature+
+                     TrafficControlType+RoadClassification+PersonType+VisionObstruction, 
                    data=crashes_pm, family = "binomial")
 summary(Injury2.fit)
 
@@ -3165,15 +3167,15 @@ oversample_df2 <- crashes_pm[c(df_crashes_pm_NoInjury_ind,
 
 #install.packages("ROSE")
 library(ROSE)
-over <- ovun.sample(Injury2~Age+VehicleType+ContributingCircumstance1+Protection+
-                      WeatherCondition1+MostHarmfulEvent+RoadFeature+
-                      TrafficControlType+RoadClassification+PersonType+VisionObstruction, 
-                    data = crashes_pm.train, method = "both")$crashes_pm
+over <- ROSE::ovun.sample(Injury2~Age+VehicleType+ContributingCircumstance1+Protection+
+                            WeatherCondition1+MostHarmfulEvent+RoadFeature+
+                            TrafficControlType+RoadClassification+PersonType+VisionObstruction, 
+                          data = crashes_pm.train, method = "both", N = 245633)$data
 
-rose <- ROSE(Injury2~Age+VehicleType+ContributingCircumstance1+Protection+
-               WeatherCondition1+MostHarmfulEvent+RoadFeature+
-               TrafficControlType+RoadClassification+PersonType+VisionObstruction, 
-             data = crashes_pm.train, N = 500000, seed=2021)$crashes_pm
+rose <- ROSE::ROSE(Injury2~Age+VehicleType+ContributingCircumstance1+Protection+
+                     WeatherCondition1+MostHarmfulEvent+RoadFeature+
+                     TrafficControlType+RoadClassification+PersonType+VisionObstruction, 
+                   data = crashes_pm.train, N = 500000, seed=2021)$crashes_pm
 
 #install.packages("Amelia")
 library(Amelia)
@@ -3185,7 +3187,7 @@ df_crashes_pm_NoInjury_ind <- which(crashes_pm$Injury2 == "No injury")
 
 oversample_df1 <- crashes_pm[c(df_crashes_pm_NoInjury_ind, 
                                rep(df_crashes_pm_Injury_ind, 5)), ]
- 
+
 table(oversample_df1$Injury2)
 
 
@@ -3194,11 +3196,11 @@ table(oversample_df1$Injury2)
 Injury2.fit2 <- glm(Injury2~Age+VehicleType+ContributingCircumstance1+Protection+
                       WeatherCondition1+MostHarmfulEvent+RoadFeature+
                       TrafficControlType+RoadClassification+PersonType+VisionObstruction,
-                   data=oversample_df1, family = "binomial")
+                    data=oversample_df1, family = "binomial")
 summary(Injury2.fit2)
 
 ci = cbind(coef(Injury2.fit2)-1.96*(summary(Injury2.fit2)$coefficients[,"Std. Error"]),
-       coef(Injury2.fit2)+1.96*(summary(Injury2.fit2)$coefficients[,"Std. Error"]))
+           coef(Injury2.fit2)+1.96*(summary(Injury2.fit2)$coefficients[,"Std. Error"]))
 
 round(ci, 3)
 
@@ -3233,9 +3235,9 @@ oversample_df1.fit.train2 <- glm(Injury2~Age+VehicleType+ContributingCircumstanc
                                    WeatherCondition1+MostHarmfulEvent+RoadFeature+
                                    TrafficControlType+RoadClassification+PersonType+
                                    AlcoholResultType+VisionObstruction, 
-                            data=oversample_df1.train2, family="binomial") #fitting model on training set
+                                 data=oversample_df1.train2, family="binomial") #fitting model on training set
 oversample_df1.pred.prob2 <- predict(oversample_df1.fit.train2, newdata=oversample_df1.test2, 
-                                type="response") #predicting prob. of default=1 for test set
+                                     type="response") #predicting prob. of default=1 for test set
 oversample_df1.pred2 <- ifelse(oversample_df1.pred.prob2>0.5, "Injury", "No injury") #predicting `default` based on prob estimates
 (tab2 <- table(pred=oversample_df1.pred2, actual=oversample_df1.test2$Injury2)) #confusion matrix: cross-tab of predictions vs actual class
 (accuracy2=mean(oversample_df1.pred2==oversample_df1.test2$Injury2, na.rm=T)*100) #percent of correct predictions in test data
@@ -3263,7 +3265,7 @@ Injury2.fit3 <- glm(Injury2~Age+VehicleType+ContributingCircumstance1+Protection
 summary(Injury2.fit3)
 
 ci2 = cbind(coef(Injury2.fit3)-1.96*(summary(Injury2.fit3)$coefficients[,"Std. Error"]),
-           coef(Injury2.fit3)+1.96*(summary(Injury2.fit3)$coefficients[,"Std. Error"]))
+            coef(Injury2.fit3)+1.96*(summary(Injury2.fit3)$coefficients[,"Std. Error"]))
 
 round(ci, 3)
 
@@ -3295,35 +3297,21 @@ sample3 <- sample(c(TRUE, FALSE), nrow(undersample_df1), replace = T, prob = c(0
 undersample_df1.train3 <- undersample_df1[sample, ]
 undersample_df1.test3 <- undersample_df1[!sample, ]
 undersample_df1.fit.train3 <- glm(Injury2~Age+VehicleType+ContributingCircumstance1+Protection+
-                                   WeatherCondition1+MostHarmfulEvent+RoadFeature+
-                                   TrafficControlType+RoadClassification+PersonType+
-                                   AlcoholResultType+VisionObstruction, 
-                                 data=undersample_df1.train3, family="binomial") #fitting model on training set
+                                    WeatherCondition1+MostHarmfulEvent+RoadFeature+
+                                    TrafficControlType+RoadClassification+PersonType+
+                                    AlcoholResultType+VisionObstruction, 
+                                  data=undersample_df1.train3, family="binomial") #fitting model on training set
 undersample_df1.pred.prob3 <- predict(undersample_df1.fit.train3, newdata=undersample_df1.test3, 
-                                     type="response") #predicting prob. of default=1 for test set
+                                      type="response") #predicting prob. of default=1 for test set
 undersample_df1.pred3 <- ifelse(undersample_df1.pred.prob3>0.5, "Injury", "No injury") #predicting `default` based on prob estimates
 (tab3 <- table(pred=undersample_df1.pred3, actual=undersample_df1.test3$Injury2)) #confusion matrix: cross-tab of predictions vs actual class
 (accuracy3=mean(undersample_df1.pred3==undersample_df1.test3$Injury2, na.rm=T)*100) #percent of correct predictions in test data
 
-
-df_crashes_pm_Injury_ind <- which(crashes_pm$Injury2 == "Injury")
-df_crashes_pm_NoInjury_ind <- which(crashes_pm$Injury2 == "No injury")
-oversample_df1 <- crashes_pm[c(df_crashes_pm_NoInjury_ind, 
-                               rep(df_crashes_pm_Injury_ind, 5)), ]
-
-crashes_pm_no_injury = crashes_pm %>%
-  filter(Injury2 == "No injury")
-crashes_pm_injury = crashes_pm %>%
-  filter(Injury2 == "Injury")
-s = sample(1:nrow(crashes_pm_no_injury), 35000, replace = F)
-undersample_df1 = crashes_pm_injury %>%
-  bind_rows(crashes_pm_no_injury[s,])
+#Combination of over and under sampling
+library(ROSE)
+over <- ROSE::ovun.sample(Injury2~Age+VehicleType+ContributingCircumstance1+Protection+
+                            WeatherCondition1+MostHarmfulEvent+RoadFeature+
+                            TrafficControlType+RoadClassification+PersonType+VisionObstruction, 
+                          data = crashes_pm.train, method = "both", N = 245633)$data
 
 
-combosample_df1 = inner_join(oversample_df1, undersample_df1, by = "Injury2")
-
-
-
-
-
-  
