@@ -1809,7 +1809,7 @@ crashes.test_TBATS2.noncovid <- tbats(test_TBATS2.noncovid)
 accuracy(crashes.test_TBATS.noncovid)
 accuracy(crashes.test_TBATS2.noncovid)
 
-##Forecast Combinations (daily covid)
+##Forecast Combinations (daily covid) (WORKS)
 library(forecast)
 train <- window(crashests2, end=c(2019,12))
 h <- length(crashests2) - length(train)
@@ -1822,17 +1822,25 @@ TBATS <- forecast::forecast(tbats(train, biasadj=TRUE), h=h)
 Combination <- (ARIMA[["mean"]] + TBATS[["mean"]] + STL[["mean"]] + 
                   NNAR[["mean"]])/4
 
+true_noncovid_crashes <- crashes_ts %>%
+  filter(Date >= as.Date("2019/01/01") & Date <= as.Date("2021/05/31"))
+
+true_noncovid_crashes <- ts(true_noncovid_crashes$count, 
+                            start = c(2019,1), end = c(2021,153), 
+                            frequency = 365)
+
 library(RColorBrewer)
 
 autoplot(train) +
-  autolayer(NNAR, series="NNAR") +
-  autolayer(STL, series="STL", PI=F) +
-  autolayer(Combination, series="Combination") +
+  autolayer(true_noncovid_crashes) +
+  autolayer(NNAR, series="NNAR", alpha=0.8) +
+  autolayer(STL, series="STL", PI=F, alpha=0.8) +
+  autolayer(Combination, series="Combination", alpha=0.8) +
   autolayer(ARIMA, series="ARIMA", PI=F) +
   autolayer(TBATS, series="TBATS", PI=F) +
   scale_color_brewer(palette="RdYlBu") + 
   xlab("Year") + ylab("Crashes") +
-  ggtitle("Time Series Combination")
+  ggtitle("Time Series Combination (With Pandemic Data)")
 
 c(ARIMA = accuracy(ARIMA, crashests2)["Test set", "RMSE"],
   TBATS = accuracy(TBATS, crashests2)["Test set", "RMSE"],
@@ -1840,6 +1848,49 @@ c(ARIMA = accuracy(ARIMA, crashests2)["Test set", "RMSE"],
   STL = accuracy(STL, crashests2)["Test set", "RMSE"],
   Combination =
     accuracy(Combination, crashests2)["Test set", "RMSE"])
+
+##Forecast Combinations (daily noncovid) (WORKS)
+library(forecast)
+train.noncovid <- window(crashests2, end=c(2019,12))
+h.noncovid <- 426
+ARIMA.noncovid <- forecast::forecast(auto.arima(train.noncovid, lambda=0, 
+                                                biasadj=TRUE), h=h.noncovid)
+STL.noncovid <- stlf(train.noncovid, lambda=0, h=h.noncovid, biasadj=TRUE)
+NNAR.noncovid <- forecast::forecast(nnetar(train.noncovid), h=h.noncovid)
+TBATS.noncovid <- forecast::forecast(tbats(train.noncovid, biasadj=TRUE), 
+                                     h=h.noncovid)
+
+Combination.noncovid <- (ARIMA.noncovid[["mean"]] + TBATS.noncovid[["mean"]] + STL.noncovid[["mean"]] + 
+                  NNAR.noncovid[["mean"]])/4
+
+true_noncovid_crashes <- crashes_ts %>%
+  filter(Date >= as.Date("2019/01/01") & Date <= as.Date("2020/03/01"))
+
+true_noncovid_crashes <- ts(true_noncovid_crashes$count, 
+                            start = c(2019,1), end = c(2020,60), 
+                            frequency = 365)
+
+library(RColorBrewer)
+
+autoplot(train.noncovid) +
+  autolayer(true_noncovid_crashes) +
+  autolayer(NNAR.noncovid, series="NNAR", alpha=0.8) +
+  autolayer(STL.noncovid, series="STL", PI=F, alpha=0.8) +
+  autolayer(Combination.noncovid, series="Combination", alpha=0.8) +
+  autolayer(ARIMA.noncovid, series="ARIMA", PI=F) +
+  autolayer(TBATS.noncovid, series="TBATS", PI=F) +
+  scale_color_brewer(palette="RdYlBu") + 
+  xlab("Year") + ylab("Crashes") +
+  ggtitle("Time Series Combination (Without Pandemic Data)") + 
+  theme(legend.position = "bottom")
+
+c(ARIMA = accuracy(ARIMA.noncovid, crashests2)["Test set", "RMSE"],
+  TBATS = accuracy(TBATS.noncovid, crashests2)["Test set", "RMSE"],
+  NNAR = accuracy(NNAR.noncovid, crashests2)["Test set", "RMSE"],
+  STL = accuracy(STL.noncovid, crashests2)["Test set", "RMSE"],
+  Combination =
+    accuracy(Combination.noncovid, crashests2)["Test set", "RMSE"])
+
 
 ##Working with ets() daily (doesn't work)
 #(THIS GETS RID OF SEASONALITY DUE TO TOO HIGH OF FREQUENCY)
@@ -2421,7 +2472,7 @@ autoplot(training_STLF_noncovid_monthly, series="Training data") +
 #crashes.test_STLF_noncovid_monthly <- stlf(test_STLF_noncovid_monthly)
 #accuracy(crashes.test_STLF_noncovid_monthly)
 
-## Forecast combination (monthly covid)
+## Forecast combination (monthly covid) (DOES NOT WORK)
 train_monthly <- window(crashes_mts4, end=c(2018,12))
 h_monthly <- length(crashes_mts4) - length(train_monthly)
 #ETS <- forecast(ets(train), h=h)
