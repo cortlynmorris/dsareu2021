@@ -2116,15 +2116,23 @@ TBATS <- forecast::forecast(tbats(train, biasadj=TRUE), h=h)
 Combination <- (ARIMA[["mean"]] + TBATS[["mean"]] + STL[["mean"]] + 
                   NNAR[["mean"]])/4
 
+true_noncovid_crashes <- crashes_ts %>%
+  filter(Date >= as.Date("2019/01/01") & Date <= as.Date("2021/05/31"))
+
+true_noncovid_crashes <- ts(true_noncovid_crashes$count, 
+                            start = c(2019,1), end = c(2021,153), 
+                            frequency = 365)
+
 autoplot(train) +
-  autolayer(NNAR, series="NNAR") +
-  autolayer(STL, series="STL", PI=F) +
-  autolayer(Combination, series="Combination") +
+  autolayer(true_noncovid_crashes) +
+  autolayer(NNAR, series="NNAR", alpha=0.8) +
+  autolayer(STL, series="STL", PI=F, alpha=0.8) +
+  autolayer(Combination, series="Combination", alpha=0.8) +
   autolayer(ARIMA, series="ARIMA", PI=F) +
   autolayer(TBATS, series="TBATS", PI=F) +
   scale_color_brewer(palette="RdYlBu") + 
   xlab("Year") + ylab("Crashes") +
-  ggtitle("Multi-Model Combination Time Series Forecast Plot")
+  ggtitle("Combination Time Series Forecast Plot (With Pandemic Data)")
 
 c(ARIMA = accuracy(ARIMA, crashests2)["Test set", "RMSE"],
   TBATS = accuracy(TBATS, crashests2)["Test set", "RMSE"],
@@ -2132,6 +2140,48 @@ c(ARIMA = accuracy(ARIMA, crashests2)["Test set", "RMSE"],
   STL = accuracy(STL, crashests2)["Test set", "RMSE"],
   Combination =
     accuracy(Combination, crashests2)["Test set", "RMSE"])
+```
+
+```{r noncovid-combination, echo=FAlSE, message=FALSE}
+train.noncovid <- window(crashests2, end=c(2019,12))
+h.noncovid <- 426
+ARIMA.noncovid <- forecast::forecast(auto.arima(train.noncovid, lambda=0, 
+                                                biasadj=TRUE), h=h.noncovid)
+STL.noncovid <- stlf(train.noncovid, lambda=0, h=h.noncovid, biasadj=TRUE)
+NNAR.noncovid <- forecast::forecast(nnetar(train.noncovid), h=h.noncovid)
+TBATS.noncovid <- forecast::forecast(tbats(train.noncovid, biasadj=TRUE), 
+                                     h=h.noncovid)
+
+Combination.noncovid <- (ARIMA.noncovid[["mean"]] + TBATS.noncovid[["mean"]] + STL.noncovid[["mean"]] + 
+                  NNAR.noncovid[["mean"]])/4
+
+true_noncovid_crashes <- crashes_ts %>%
+  filter(Date >= as.Date("2019/01/01") & Date <= as.Date("2020/03/01"))
+
+true_noncovid_crashes <- ts(true_noncovid_crashes$count, 
+                            start = c(2019,1), end = c(2020,60), 
+                            frequency = 365)
+
+library(RColorBrewer)
+
+autoplot(train.noncovid) +
+  autolayer(true_noncovid_crashes) +
+  autolayer(NNAR.noncovid, series="NNAR", alpha=0.8) +
+  autolayer(STL.noncovid, series="STL", PI=F, alpha=0.8) +
+  autolayer(Combination.noncovid, series="Combination", alpha=0.8) +
+  autolayer(ARIMA.noncovid, series="ARIMA", PI=F) +
+  autolayer(TBATS.noncovid, series="TBATS", PI=F) +
+  scale_color_brewer(palette="RdYlBu") + 
+  xlab("Year") + ylab("Crashes") +
+  ggtitle("Time Series Combination (Without Pandemic Data)") + 
+  theme(legend.position = "bottom")
+
+c(ARIMA = accuracy(ARIMA.noncovid, crashests2)["Test set", "RMSE"],
+  TBATS = accuracy(TBATS.noncovid, crashests2)["Test set", "RMSE"],
+  NNAR = accuracy(NNAR.noncovid, crashests2)["Test set", "RMSE"],
+  STL = accuracy(STL.noncovid, crashests2)["Test set", "RMSE"],
+  Combination =
+    accuracy(Combination.noncovid, crashests2)["Test set", "RMSE"])
 ```
 
 ```{r noncovid-ms-HW-forecast-ts, echo=FALSE, message=FALSE, include=FALSE}
