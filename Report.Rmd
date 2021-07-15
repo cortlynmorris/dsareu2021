@@ -2142,7 +2142,7 @@ c(ARIMA = accuracy(ARIMA, crashests2)["Test set", "RMSE"],
     accuracy(Combination, crashests2)["Test set", "RMSE"])
 ```
 
-```{r noncovid-combination, echo=FAlSE, message=FALSE}
+```{r noncovid-combination, echo=FALSE, message=FALSE}
 train.noncovid <- window(crashests2, end=c(2019,12))
 h.noncovid <- 426
 ARIMA.noncovid <- forecast::forecast(auto.arima(train.noncovid, lambda=0, 

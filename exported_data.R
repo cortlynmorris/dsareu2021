@@ -1492,6 +1492,38 @@ daily_forecast_values_covid_STLF <- summary(m)
 rownames(daily_forecast_values_covid_STLF) <- seq(as.Date("2021/06/01"), 
                                                 as.Date("2021/12/31"), "day")
 
+#TBATS forecasting 
+y <- msts(crashes_ts$count, seasonal.periods=c(7,365.25))
+y2 <- msts(crashests2, seasonal.periods=c(7,365.25))
+
+fit_tbats_covid <- tbats(y)
+fit_tbats_covid2 <- tbats(y2)
+
+fc_tbats_covid <- forecast::forecast(fit_tbats_covid, h=214)
+fc_tbats_covid2 <- forecast::forecast(fit_tbats_covid2, h=214)
+
+daily_forecast_values_covid_TBATS <- summary(fc_tbats_covid)
+daily_forecast_values_covid_TBATS2 <- summary(fc_tbats_covid2)
+
+rownames(daily_forecast_values_covid_TBATS) <- seq(as.Date("2021/06/01"), 
+                                                   as.Date("2021/12/31"), "day")
+rownames(daily_forecast_values_covid_TBATS2) <- seq(as.Date("2021/06/01"), 
+                                                    as.Date("2021/12/31"), "day")
+
+head(daily_forecast_values_covid_TBATS)
+head(daily_forecast_values_covid_TBATS2)
+
+autoplot(fc_tbats_covid) + 
+  ggtitle("TBATS Forecasting Model for Daily Car Crashes (With Pandemic Data)") +
+  xlab("Year") + ylab("Crashes") + 
+  scale_x_continuous(breaks = c(1,2,3,4,5,6,7,8), 
+                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
+                                "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022")) + 
+  theme(axis.text.x = element_text(angle=90))
+autoplot(fc_tbats_covid2) + 
+  ggtitle("TBATS Forecasting Model for Daily Car Crashes (With Pandemic Data)") +
+  xlab("Year") + ylab("Crashes")
+
 ####Working with non COVID time series daily (THIS WORKS)
 #Regular non COVID time series daily 
 crashes_ts.noncovid = crashes %>%
@@ -1588,6 +1620,48 @@ daily_forecast_values_noncovid_STLF <- summary(p)
 rownames(daily_forecast_values_noncovid_STLF) <- seq(as.Date("2020/03/01"), 
                                                    as.Date("2021/12/31"), "day")
 
+#TBATS forecasting noncovid 
+y.noncovid <- msts(crashes_ts.noncovid$count, seasonal.periods=c(7,365.25))
+y2.noncovid <- msts(crashests.noncovid, seasonal.periods=c(7,365.25))
+
+fit_tbats_noncovid <- tbats(y.noncovid)
+fit_tbats_noncovid2 <- tbats(y2.noncovid)
+
+fc_tbats_noncovid <- forecast::forecast(fit_tbats_noncovid, h=671)
+fc_tbats_noncovid2 <- forecast::forecast(fit_tbats_noncovid2, h=671)
+
+daily_forecast_values_noncovid_TBATS <- summary(fc_tbats_noncovid)
+daily_forecast_values_noncovid_TBATS2 <- summary(fc_tbats_noncovid2)
+
+rownames(daily_forecast_values_noncovid_TBATS) <- seq(as.Date("2020/03/01"), 
+                                                      as.Date("2021/12/31"), "day")
+rownames(daily_forecast_values_noncovid_TBATS2) <- seq(as.Date("2020/03/01"), 
+                                                       as.Date("2021/12/31"), "day")
+
+head(daily_forecast_values_noncovid_TBATS)
+head(daily_forecast_values_noncovid_TBATS2)
+
+true_noncovid_crashes <- crashes_ts %>%
+  filter(Date >= as.Date("2020/03/01") & Date <= as.Date("2021/05/31"))
+
+true_noncovid_crashes <- ts(true_noncovid_crashes$count, 
+                            start = c(2020,3), end = c(2021,153), 
+                            frequency = 365)
+
+autoplot(fc_tbats_noncovid) + 
+  #autolayer(true_noncovid_crashes, alpha=0.8) + 
+  ggtitle("TBATS Forecasting Model for Daily Car Crashes (With Pandemic Data)") +
+  xlab("Year") + ylab("Crashes") + 
+  scale_x_continuous(breaks = c(1,2,3,4,5,6,7,8), 
+                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
+                                "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022")) + 
+  theme(axis.text.x = element_text(angle=90), legend.position = "bottom")
+autoplot(fc_tbats_noncovid2) + 
+  autolayer(true_noncovid_crashes, alpha=0.8) + 
+  ggtitle("TBATS Forecasting Model for Daily Car Crashes (With Pandemic Data)") +
+  xlab("Year") + ylab("Crashes") + 
+  theme(legend.position = "bottom")
+
 ##Multi-step forecasts on training data (daily)
 #HW (with covid)
 training_HW <- subset(crashests2, end=length(crashests2)-214)
@@ -1618,6 +1692,50 @@ autoplot(training_STLF, series="Training data") +
 
 crashes.test_STLF <- Arima(test_STLF)
 accuracy(crashes.test_STLF)
+
+#TBATS (with covid)
+y <- msts(crashes_ts$count, seasonal.periods=c(7,365.25))
+y2 <- msts(crashests2, seasonal.periods=c(7,365.25))
+
+training_TBATS <- subset(y, end=length(y)-151)
+training_TBATS2 <- subset(y2, end=length(y2)-151)
+
+test_TBATS <- subset(y, start=length(y)-150)
+test_TBATS2 <- subset(y2, start=length(y2)-150)
+
+crashes.train_TBATS <- tbats(training_TBATS)
+crashes.train_TBATS2 <- tbats(training_TBATS2)
+
+crashes.train_TBATS %>%
+  forecast(h=151) %>%
+  autoplot(alpha=0.2) + 
+  autolayer(test_TBATS, alpha=0.75) + 
+  scale_x_continuous(breaks = c(1,2,3,4,5,6,7,8), 
+                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
+                                "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022")) + 
+  theme(axis.text.x = element_text(angle=90), legend.position = "bottom") + 
+  ggtitle("Multi-Step TBATS Daily Forecasts of Crashes (Without Pandemic Data)") + 
+  xlab("Date") + ylab("Crashes") 
+crashes.train_TBATS2 %>%
+  forecast(h=151) %>%
+  autoplot(alpha=0.2) + 
+  ggtitle("Multi-Step TBATS Daily Forecasts of Crashes (Without Pandemic Data)") + 
+  xlab("Date") + ylab("Crashes") + 
+  autolayer(test_TBATS2, alpha=0.75) + 
+  theme(legend.position = "bottom")
+
+autoplot(training_TBATS, series="Training data") +
+  autolayer(fitted(crashes.train_TBATS, h=12),
+            series="12-step fitted values")
+autoplot(training_TBATS2, series="Training data") +
+  autolayer(fitted(crashes.train_TBATS2, h=12),
+            series="12-step fitted values")
+
+crashes.test_TBATS <- tbats(test_TBATS)
+crashes.test_TBATS2 <- tbats(test_TBATS2)
+
+accuracy(crashes.test_TBATS)
+accuracy(crashes.test_TBATS2)
 
 #HW (noncovid)
 training_HW_noncovid <- subset(crashests.noncovid , end=length(crashests.noncovid)-671)
@@ -1650,12 +1768,49 @@ autoplot(training_STLF_noncovid, series="Training data") +
 crashes.test_STLF_noncovid <- Arima(test_STLF_noncovid)
 accuracy(crashes.test_STLF_noncovid)
 
-<<<<<<< HEAD
-##Forecast Combinations (daily covid)
-=======
+#TBATS (noncovid)
+y.noncovid <- msts(crashes_ts.noncovid$count, seasonal.periods=c(7,365.25))
+y2.noncovid <- msts(crashests.noncovid, seasonal.periods=c(7,365.25))
+
+training_TBATS.noncovid <- subset(y.noncovid, end=length(y.noncovid)-671)
+training_TBATS2.noncovid <- subset(y2.noncovid, end=length(y2.noncovid)-671)
+
+test_TBATS.noncovid <- subset(y.noncovid, start=length(y.noncovid)-670)
+test_TBATS2.noncovid <- subset(y2.noncovid, start=length(y2.noncovid)-670)
+
+crashes.train_TBATS.noncovid <- tbats(training_TBATS.noncovid)
+crashes.train_TBATS2.noncovid <- tbats(training_TBATS2.noncovid)
+
+crashes.train_TBATS.noncovid %>%
+  forecast(h=671) %>%
+  autoplot(alpha=0.2) + 
+  autolayer(test_TBATS.noncovid, alpha=0.75) +
+  theme(legend.position = "bottom") + 
+  ggtitle("Multi-Step TBATS Daily Forecasts of Crashes (Without Pandemic Data)") + 
+  xlab("Date") + ylab("Crashes") 
+crashes.train_TBATS2.noncovid %>%
+  forecast(h=671) %>%
+  autoplot(alpha=0.2) + 
+  ggtitle("Multi-Step TBATS Daily Forecasts of Crashes (Without Pandemic Data)") + 
+  xlab("Date") + ylab("Crashes") + 
+  autolayer(test_TBATS2.noncovid, alpha=0.75) + 
+  theme(legend.position = "bottom")
+
+autoplot(training_TBATS.noncovid, series="Training data") +
+  autolayer(fitted(crashes.train_TBATS.noncovid, h=12),
+            series="12-step fitted values")
+autoplot(training_TBATS2.noncovid, series="Training data") +
+  autolayer(fitted(crashes.train_TBATS2.noncovid, h=12),
+            series="12-step fitted values")
+
+crashes.test_TBATS.noncovid <- tbats(test_TBATS.noncovid)
+crashes.test_TBATS2.noncovid <- tbats(test_TBATS2.noncovid)
+
+accuracy(crashes.test_TBATS.noncovid)
+accuracy(crashes.test_TBATS2.noncovid)
+
 ##Forecast Combinations (daily covid) (WORKS)
 library(forecast)
->>>>>>> bff9f8b2f507c632d54104f414e5c948d766663f
 train <- window(crashests2, end=c(2019,12))
 h <- length(crashests2) - length(train)
 #ETS <- forecast(ets(train), h=h)
@@ -1694,9 +1849,6 @@ c(ARIMA = accuracy(ARIMA, crashests2)["Test set", "RMSE"],
   Combination =
     accuracy(Combination, crashests2)["Test set", "RMSE"])
 
-<<<<<<< HEAD
-##Working with ets() daily (THIS GETS RID OF SEASONALITY DUE TO TOO HIGH OF FREQUENCY)
-=======
 ##Forecast Combinations (daily noncovid) (WORKS)
 library(forecast)
 train.noncovid <- window(crashests2, end=c(2019,12))
@@ -1709,7 +1861,7 @@ TBATS.noncovid <- forecast::forecast(tbats(train.noncovid, biasadj=TRUE),
                                      h=h.noncovid)
 
 Combination.noncovid <- (ARIMA.noncovid[["mean"]] + TBATS.noncovid[["mean"]] + STL.noncovid[["mean"]] + 
-                  NNAR.noncovid[["mean"]])/4
+                           NNAR.noncovid[["mean"]])/4
 
 true_noncovid_crashes <- crashes_ts %>%
   filter(Date >= as.Date("2019/01/01") & Date <= as.Date("2020/03/01"))
@@ -1739,10 +1891,8 @@ c(ARIMA = accuracy(ARIMA.noncovid, crashests2)["Test set", "RMSE"],
   Combination =
     accuracy(Combination.noncovid, crashests2)["Test set", "RMSE"])
 
-
 ##Working with ets() daily (doesn't work)
 #(THIS GETS RID OF SEASONALITY DUE TO TOO HIGH OF FREQUENCY)
->>>>>>> bff9f8b2f507c632d54104f414e5c948d766663f
 fit.ets.daily.covid <- ets(y=crashests2, model="MAM")
 
 summary(fit.ets.daily.covid)
@@ -1810,6 +1960,206 @@ crashes_Friday = crashes %>%
     TRUE ~ "Not Friday")) %>%
   group_by(key_crash,Crash_Date_DOW) %>%
   summarize(count = length(key_crash))
+
+##Adding dummy variables to dataset 
+#snow
+crashes_snow = crashes %>%
+  mutate(Snow = case_when(
+    WeatherCondition1 == "Snow" ~ 1, 
+    TRUE ~ 0)) 
+
+crashes_snow = crashes_snow %>%
+  filter(as.Date(crash_date) >= "2015/01/01" & as.Date(crash_date) <= "2021/05/31") %>%
+  separate(crash_date, 
+           into = c("Date", "Hour"), sep = 11) %>%
+  group_by(Date,Snow) %>% #am I grouping by the right things? 
+  summarize(count = length(unique(key_crash)))
+
+#Converting crashes_snow to a time series object 
+crashes_snow_ts2 <- ts(crashes_snow$count, start = c(2015,1), end = c(2021,153),
+                       frequency = 365)
+
+#Converting crashes_snow to a time series object (not the method to use)
+crashes_snow_ts <- as.ts(crashes_snow)
+
+##attempting blogpost code (works)
+y <- ts(crashes_snow$count, frequency=7)
+z <- fourier(ts(crashes_snow$count, frequency=365.25), K=5)
+zf <- fourier(ts(crashes_snow$count, frequency=365.25), K=5, h=100)
+fit <- auto.arima(y, xreg=cbind(z), seasonal=FALSE)
+fc <- forecast(fit, xreg=cbind(zf), h=100)
+
+autoplot(fc)
+
+##attempting textbook (Works)
+#crashes_snow_ts3 <- window(crashes_snow)
+crashes_snow_ts2 <- ts(crashes_snow$count, start = c(2015,1), end = c(2021,153),
+                       frequency = 365)
+plots <- list()
+for (i in seq(6)) {
+  fit <- auto.arima(crashes_snow_ts2, xreg = fourier(crashes_snow_ts2, K = i),
+                    seasonal = FALSE, lambda = 0)
+  plots[[i]] <- autoplot(forecast(fit,
+                                  xreg=fourier(crashes_snow_ts2, K=i, h=214))) +
+    xlab(paste("K=",i,"   AICC=",round(fit[["aicc"]],2))) +
+    ylab("")
+}
+
+#loading necessary packages
+#install.packages("gridExtra")
+library(gridExtra)
+
+gridExtra::grid.arrange(
+  plots[[1]],plots[[2]],plots[[3]],
+  plots[[4]],plots[[5]],plots[[6]], nrow=3)
+
+#diff attempt (TAKES A LONG TIME (because K=1-25) BUT IT DOES WORK)
+bestfit <- list(aicc=Inf)
+for(K in seq(25)) {
+  fit <- auto.arima(crashes_snow_ts2, xreg=fourier(crashes_snow_ts2, K=K),
+                    seasonal=FALSE)
+  if(fit[["aicc"]] < bestfit[["aicc"]]) {
+    bestfit <- fit
+    bestK <- K
+  }
+}
+
+fc <- forecast(bestfit,
+               xreg=fourier(crashes_snow_ts2, K=bestK, h=214))
+autoplot(fc)
+
+##friday dummy variable
+crashes_friday = crashes %>%
+  mutate(Friday = case_when(
+    Crash_Date_DOW == "Friday" ~ 1, 
+    TRUE ~ 0)) 
+
+crashes_friday = crashes_friday %>%
+  filter(as.Date(crash_date) >= "2015/01/01" & as.Date(crash_date) <= "2021/05/31") %>%
+  separate(crash_date, 
+           into = c("Date", "Hour"), sep = 11) %>%
+  group_by(Date,Friday) %>% #am I grouping by the right things? 
+  summarize(count = length(unique(key_crash)))
+
+#Converting crashes_ts to a time series object 
+crashes_friday_ts2 <- ts(crashes_friday$count, start = c(2015,1), end = c(2021,153),
+                         frequency = 365)
+
+#Converting crashes_ts to a time series object 
+crashes_friday_ts <- as.ts(crashes_friday)
+
+##attempting blogpost 
+y <- ts(crashes_friday$count, frequency=7)
+z <- fourier(ts(crashes_friday$count, frequency=365.25), K=5)
+zf <- fourier(ts(crashes_friday$count, frequency=365.25), K=5, h=100)
+fit <- auto.arima(y, xreg=cbind(z), seasonal=FALSE)
+fc <- forecast(fit, xreg=cbind(zf), h=100)
+autoplot(fc)
+
+##attempting textbook 
+#crashes_friday_ts3 <- window(crashes_friday)
+crashes_friday_ts2 <- ts(crashes_friday$count, start = c(2015,1), end = c(2021,153),
+                         frequency = 365)
+plots <- list()
+for (i in seq(6)) {
+  fit <- auto.arima(crashes_friday_ts2, xreg = fourier(crashes_friday_ts2, K = i),
+                    seasonal = FALSE, lambda = 0)
+  plots[[i]] <- autoplot(forecast(fit,
+                                  xreg=fourier(crashes_friday_ts2, K=i, h=214))) +
+    xlab(paste("K=",i,"   AICC=",round(fit[["aicc"]],2))) +
+    ylab("")
+}
+
+#loading necessary packages
+#install.packages("gridExtra")
+library(gridExtra)
+
+gridExtra::grid.arrange(
+  plots[[1]],plots[[2]],plots[[3]],
+  plots[[4]],plots[[5]],plots[[6]], nrow=3)
+
+#diff attempt (TAKES A LONG TIME BUT WORKS)
+bestfit <- list(aicc=Inf)
+for(K in seq(25)) {
+  fit <- auto.arima(crashes_friday_ts2, xreg=fourier(crashes_friday_ts2, K=K),
+                    seasonal=FALSE)
+  if(fit[["aicc"]] < bestfit[["aicc"]]) {
+    bestfit <- fit
+    bestK <- K
+  }
+}
+
+fc <- forecast(bestfit,
+               xreg=fourier(crashes_friday_ts2, K=bestK, h=214))
+autoplot(fc)
+
+##friday and snow together 
+crashes_snow_friday = crashes %>%
+  mutate(Friday = case_when(
+    Crash_Date_DOW == "Friday" ~ 1, 
+    TRUE ~ 0)) %>%
+  mutate(Snow = case_when(
+    WeatherCondition1 == "Snow" ~ 1, 
+    TRUE ~ 0))
+
+crashes_snow_friday = crashes_snow_friday %>%
+  filter(as.Date(crash_date) >= "2015/01/01" & as.Date(crash_date) <= "2021/05/31") %>%
+  separate(crash_date, 
+           into = c("Date", "Hour"), sep = 11) %>%
+  group_by(Date,Friday,Snow) %>% #am I grouping by the right things? 
+  summarize(count = length(unique(key_crash)))
+
+#Converting crashes_ts to a time series object 
+crashes_snow_friday_ts2 <- ts(crashes_snow_friday$count, start = c(2015,1), end = c(2021,153),
+                              frequency = 365)
+
+#Converting crashes_ts to a time series object 
+crashes_snow_friday_ts <- as.ts(crashes_snow_friday)
+
+##attempting blogpost 
+y <- ts(crashes_snow_friday$count, frequency=7)
+z <- fourier(ts(crashes_snow_friday$count, frequency=365.25), K=5)
+zf <- fourier(ts(crashes_snow_friday$count, frequency=365.25), K=5, h=100)
+fit <- auto.arima(y, xreg=cbind(z), seasonal=FALSE)
+fc <- forecast(fit, xreg=cbind(zf), h=100)
+autoplot(fc)
+
+##attempting textbook 
+#crashes_friday_ts3 <- window(crashes_friday)
+crashes_snow_friday_ts2 <- ts(crashes_snow_friday$count, start = c(2015,1), end = c(2021,153),
+                              frequency = 365)
+plots <- list()
+for (i in seq(6)) {
+  fit <- auto.arima(crashes_snow_friday_ts2, xreg = fourier(crashes_snow_friday_ts2, K = i),
+                    seasonal = FALSE, lambda = 0)
+  plots[[i]] <- autoplot(forecast(fit,
+                                  xreg=fourier(crashes_snow_friday_ts2, K=i, h=214))) +
+    xlab(paste("K=",i,"   AICC=",round(fit[["aicc"]],2))) +
+    ylab("")
+}
+
+#loading necessary packages
+#install.packages("gridExtra")
+library(gridExtra)
+
+gridExtra::grid.arrange(
+  plots[[1]],plots[[2]],plots[[3]],
+  plots[[4]],plots[[5]],plots[[6]], nrow=3)
+
+#diff attempt (TAKES A LONG TIME BUT WORKS)
+bestfit <- list(aicc=Inf)
+for(K in seq(25)) {
+  fit <- auto.arima(crashes_snow_friday_ts2, xreg=fourier(crashes_snow_friday_ts2, K=K),
+                    seasonal=FALSE)
+  if(fit[["aicc"]] < bestfit[["aicc"]]) {
+    bestfit <- fit
+    bestK <- K
+  }
+}
+
+fc <- forecast(bestfit,
+               xreg=fourier(crashes_snow_friday_ts2, K=bestK, h=214))
+autoplot(fc)
 
 ##Different attempt at forecasting for monthly (THIS WORKS)
 #install.packages("Mcomp")
