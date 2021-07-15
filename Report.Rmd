@@ -2078,12 +2078,12 @@ head(fcast.ms.TBATS.covid2)
 autoplot(training_TBATS, series="Training data") +
   autolayer(fitted(crashes.train_TBATS, h=12),
             series="12-step fitted values") + 
-  ggtitle("12-Step Fitted Values of TBATS Model (With Pandemic Data") + 
+  ggtitle("12-Step Fitted Values of TBATS Model (With Pandemic Data)") + 
   xlab("Date") + ylab("Crashes")
 autoplot(training_TBATS2, series="Training data") +
   autolayer(fitted(crashes.train_TBATS2, h=12),
             series="12-step fitted values") + 
-  ggtitle("12-Step Fitted Values of TBATS Model (With Pandemic Data") + 
+  ggtitle("12-Step Fitted Values of TBATS Model (With Pandemic Data)") + 
   xlab("Date") + ylab("Crashes")
 
 crashes.test_TBATS <- tbats(test_TBATS)
@@ -2095,7 +2095,21 @@ accuracy(crashes.test_TBATS2)
 
 ```{r combination, echo=FALSE, message=FALSE, warning=FALSE}
 #reload libraries 
-library(fpp2)
+library(reshape2)
+library(tidyverse)
+library(ggplot2)
+library(dplyr)
+library(forecast)
+library(forecast)
+
+crashes_ts = crashes %>%
+  separate(crash_date, 
+           into = c("Date", "Hour"), sep = 11) %>%
+  group_by(Date) %>%
+  summarize(count = length(unique(key_crash)))
+
+crashests2 <- ts(crashes_ts$count, start = c(2015,1), end = c(2021,153),
+                frequency = 365)
 
 train <- window(crashests2, end=c(2019,12))
 h <- length(crashests2) - length(train)
@@ -2154,8 +2168,6 @@ true_noncovid_crashes <- crashes_ts %>%
 true_noncovid_crashes <- ts(true_noncovid_crashes$count, 
                             start = c(2019,1), end = c(2020,60), 
                             frequency = 365)
-
-library(RColorBrewer)
 
 autoplot(train.noncovid) +
   autolayer(true_noncovid_crashes) +
@@ -2289,12 +2301,12 @@ crashes.train_TBATS2.noncovid %>%
 autoplot(training_TBATS.noncovid, series="Training data") +
   autolayer(fitted(crashes.train_TBATS.noncovid, h=12),
             series="12-step fitted values") + 
-  ggtitle("12-Step Fitted Values of TBATS Model (Without Pandemic Data") + 
+  ggtitle("12-Step Fitted Values of TBATS Model (Without Pandemic Data)") + 
   xlab("Date") + ylab("Crashes")
 autoplot(training_TBATS2.noncovid, series="Training data") +
   autolayer(fitted(crashes.train_TBATS2.noncovid, h=12),
             series="12-step fitted values") + 
-  ggtitle("12-Step Fitted Values of TBATS Model (Without Pandemic Data") + 
+  ggtitle("12-Step Fitted Values of TBATS Model (Without Pandemic Data)") + 
   xlab("Date") + ylab("Crashes")
 
 crashes.test_TBATS.noncovid <- tbats(test_TBATS.noncovid)
@@ -2780,7 +2792,7 @@ summary(fit.ets.monthly.covid.MMM)
 
 autoplot(fit.ets.monthly.covid.MMM) + 
   ggtitle("Components of ETS Multiplicative Seasonality, Trend, and Errors Method (With Pandemic Data)") + 
-  theme(title = element_text(size = 9)) + 
+  theme(title = element_text(size = 8)) + 
   scale_x_continuous(breaks = c(1,2,3,4,5,6,7,8), 
                      labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
                                 "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022")) +
@@ -2791,7 +2803,7 @@ cbind('Residuals' = residuals(fit.ets.monthly.covid.MMM),
       'Forecast errors' = residuals(fit.ets.monthly.covid.MMM,type='response')) %>%
   autoplot(facet=TRUE) + xlab("Year") + ylab("") + 
   ggtitle("Residuals of ETS Multiplicative Seasonality, Trend, and Errors Method (With Pandemic Data)") + 
-  theme(title = element_text(size=10)) + 
+  theme(title = element_text(size=9)) + 
   scale_x_continuous(breaks = c(1,2,3,4,5,6,7,8), 
                      labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
                                 "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022")) + 
@@ -2816,7 +2828,7 @@ summary(fit.ets.monthly.covid.MNA)
 
 autoplot(fit.ets.monthly.covid.MNA) + 
   ggtitle("Components of ETS Multiplicative Seasonality and Additive Errors Method (With Pandemic Data)") + 
-  theme(title = element_text(size = 9)) + 
+  theme(title = element_text(size = 8)) + 
   scale_x_continuous(breaks = c(1,2,3,4,5,6,7,8), 
                      labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
                                 "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022")) +
@@ -2836,7 +2848,7 @@ cbind('Residuals' = residuals(fit.ets.monthly.covid.MNA),
 fit.ets.monthly.covid.MNA %>% forecast(h=8) %>%
   autoplot() + 
   ggtitle("Forecasts from ETS Multiplicative Seasonality and Additive Errors Method (With Pandemic Data)") + 
-  theme(title = element_text(size=9)) + 
+  theme(title = element_text(size=8)) + 
   scale_x_continuous(breaks = c(1,2,3,4,5,6,7,8), 
                      labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
                                 "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022")) + 
