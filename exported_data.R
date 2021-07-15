@@ -1832,7 +1832,7 @@ autoplot(train) +
   autolayer(TBATS, series="TBATS", PI=F) +
   scale_color_brewer(palette="RdYlBu") + 
   xlab("Year") + ylab("Crashes") +
-  ggtitle("Crashes")
+  ggtitle("Time Series Combination")
 
 c(ARIMA = accuracy(ARIMA, crashests2)["Test set", "RMSE"],
   TBATS = accuracy(TBATS, crashests2)["Test set", "RMSE"],
