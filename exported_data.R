@@ -1492,38 +1492,6 @@ daily_forecast_values_covid_STLF <- summary(m)
 rownames(daily_forecast_values_covid_STLF) <- seq(as.Date("2021/06/01"), 
                                                 as.Date("2021/12/31"), "day")
 
-#TBATS forecasting 
-y <- msts(crashes_ts$count, seasonal.periods=c(7,365.25))
-y2 <- msts(crashests2, seasonal.periods=c(7,365.25))
-
-fit_tbats_covid <- tbats(y)
-fit_tbats_covid2 <- tbats(y2)
-
-fc_tbats_covid <- forecast::forecast(fit_tbats_covid, h=214)
-fc_tbats_covid2 <- forecast::forecast(fit_tbats_covid2, h=214)
-
-daily_forecast_values_covid_TBATS <- summary(fc_tbats_covid)
-daily_forecast_values_covid_TBATS2 <- summary(fc_tbats_covid2)
-
-rownames(daily_forecast_values_covid_TBATS) <- seq(as.Date("2021/06/01"), 
-                                                  as.Date("2021/12/31"), "day")
-rownames(daily_forecast_values_covid_TBATS2) <- seq(as.Date("2021/06/01"), 
-                                                  as.Date("2021/12/31"), "day")
-
-head(daily_forecast_values_covid_TBATS)
-head(daily_forecast_values_covid_TBATS2)
-
-autoplot(fc_tbats_covid) + 
-  ggtitle("TBATS Forecasting Model for Daily Car Crashes (With Pandemic Data)") +
-  xlab("Year") + ylab("Crashes") + 
-  scale_x_continuous(breaks = c(1,2,3,4,5,6,7,8), 
-                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
-                                "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022")) + 
-  theme(axis.text.x = element_text(angle=90))
-autoplot(fc_tbats_covid2) + 
-  ggtitle("TBATS Forecasting Model for Daily Car Crashes (With Pandemic Data)") +
-  xlab("Year") + ylab("Crashes")
-
 ####Working with non COVID time series daily (THIS WORKS)
 #Regular non COVID time series daily 
 crashes_ts.noncovid = crashes %>%
@@ -1620,48 +1588,6 @@ daily_forecast_values_noncovid_STLF <- summary(p)
 rownames(daily_forecast_values_noncovid_STLF) <- seq(as.Date("2020/03/01"), 
                                                    as.Date("2021/12/31"), "day")
 
-#TBATS forecasting noncovid 
-y.noncovid <- msts(crashes_ts.noncovid$count, seasonal.periods=c(7,365.25))
-y2.noncovid <- msts(crashests.noncovid, seasonal.periods=c(7,365.25))
-
-fit_tbats_noncovid <- tbats(y.noncovid)
-fit_tbats_noncovid2 <- tbats(y2.noncovid)
-
-fc_tbats_noncovid <- forecast::forecast(fit_tbats_noncovid, h=671)
-fc_tbats_noncovid2 <- forecast::forecast(fit_tbats_noncovid2, h=671)
-
-daily_forecast_values_noncovid_TBATS <- summary(fc_tbats_noncovid)
-daily_forecast_values_noncovid_TBATS2 <- summary(fc_tbats_noncovid2)
-
-rownames(daily_forecast_values_noncovid_TBATS) <- seq(as.Date("2020/03/01"), 
-                                                      as.Date("2021/12/31"), "day")
-rownames(daily_forecast_values_noncovid_TBATS2) <- seq(as.Date("2020/03/01"), 
-                                                       as.Date("2021/12/31"), "day")
-
-head(daily_forecast_values_noncovid_TBATS)
-head(daily_forecast_values_noncovid_TBATS2)
-
-true_noncovid_crashes <- crashes_ts %>%
-  filter(Date >= as.Date("2020/03/01") & Date <= as.Date("2021/05/31"))
-
-true_noncovid_crashes <- ts(true_noncovid_crashes$count, 
-                            start = c(2020,3), end = c(2021,153), 
-                            frequency = 365)
-
-autoplot(fc_tbats_noncovid) + 
-  #autolayer(true_noncovid_crashes, alpha=0.8) + 
-  ggtitle("TBATS Forecasting Model for Daily Car Crashes (With Pandemic Data)") +
-  xlab("Year") + ylab("Crashes") + 
-  scale_x_continuous(breaks = c(1,2,3,4,5,6,7,8), 
-                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
-                                "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022")) + 
-  theme(axis.text.x = element_text(angle=90), legend.position = "bottom")
-autoplot(fc_tbats_noncovid2) + 
-  autolayer(true_noncovid_crashes, alpha=0.8) + 
-  ggtitle("TBATS Forecasting Model for Daily Car Crashes (With Pandemic Data)") +
-  xlab("Year") + ylab("Crashes") + 
-  theme(legend.position = "bottom")
-
 ##Multi-step forecasts on training data (daily)
 #HW (with covid)
 training_HW <- subset(crashests2, end=length(crashests2)-214)
@@ -1675,8 +1601,8 @@ autoplot(training_HW, series="Training data") +
   autolayer(fitted(crashes.train_HW, h=12),
             series="12-step fitted values")
 
-#crashes.test_HW <- HoltWinters(test_HW)
-#accuracy(crashes.test_HW)
+crashes.test_HW <- Arima(test_HW)
+accuracy(crashes.test_HW)
 
 #STLF (with covid)
 training_STLF <- subset(crashests2, end=length(crashests2)-214)
@@ -1690,52 +1616,8 @@ autoplot(training_STLF, series="Training data") +
   autolayer(fitted(crashes.train_STLF, h=12),
             series="12-step fitted values")
 
-#crashes.test_STLF <- stlf(test_STLF)
-#accuracy(crashes.test_STLF)
-
-#TBATS (with covid)
-y <- msts(crashes_ts$count, seasonal.periods=c(7,365.25))
-y2 <- msts(crashests2, seasonal.periods=c(7,365.25))
-
-training_TBATS <- subset(y, end=length(y)-151)
-training_TBATS2 <- subset(y2, end=length(y2)-151)
-
-test_TBATS <- subset(y, start=length(y)-150)
-test_TBATS2 <- subset(y2, start=length(y2)-150)
-
-crashes.train_TBATS <- tbats(training_TBATS)
-crashes.train_TBATS2 <- tbats(training_TBATS2)
-
-crashes.train_TBATS %>%
-  forecast(h=151) %>%
-  autoplot(alpha=0.2) + 
-  autolayer(test_TBATS, alpha=0.75) + 
-  scale_x_continuous(breaks = c(1,2,3,4,5,6,7,8), 
-                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
-                                "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022")) + 
-  theme(axis.text.x = element_text(angle=90), legend.position = "bottom") + 
-  ggtitle("Multi-Step TBATS Daily Forecasts of Crashes (Without Pandemic Data)") + 
-  xlab("Date") + ylab("Crashes") 
-crashes.train_TBATS2 %>%
-  forecast(h=151) %>%
-  autoplot(alpha=0.2) + 
-  ggtitle("Multi-Step TBATS Daily Forecasts of Crashes (Without Pandemic Data)") + 
-  xlab("Date") + ylab("Crashes") + 
-  autolayer(test_TBATS2, alpha=0.75) + 
-  theme(legend.position = "bottom")
-
-autoplot(training_TBATS, series="Training data") +
-  autolayer(fitted(crashes.train_TBATS, h=12),
-            series="12-step fitted values")
-autoplot(training_TBATS2, series="Training data") +
-  autolayer(fitted(crashes.train_TBATS2, h=12),
-            series="12-step fitted values")
-
-crashes.test_TBATS <- tbats(test_TBATS)
-crashes.test_TBATS2 <- tbats(test_TBATS2)
-
-accuracy(crashes.test_TBATS)
-accuracy(crashes.test_TBATS2)
+crashes.test_STLF <- Arima(test_STLF)
+accuracy(crashes.test_STLF)
 
 #HW (noncovid)
 training_HW_noncovid <- subset(crashests.noncovid , end=length(crashests.noncovid)-671)
@@ -1750,8 +1632,8 @@ autoplot(training_HW_noncovid, series="Training data") +
   autolayer(fitted(crashes.train_HW_noncovid, h=12),
             series="12-step fitted values")
 
-#crashes.test_HW_noncovid <- HoltWinters(test_HW_noncovid)
-#accuracy(crashes.test_HW_noncovid)
+crashes.test_HW_noncovid <- Arima(test_HW_noncovid)
+accuracy(crashes.test_HW_noncovid)
 
 #STLF (non covid)
 training_STLF_noncovid <- subset(crashests.noncovid, end=length(crashests.noncovid)-671)
@@ -1765,52 +1647,10 @@ autoplot(training_STLF_noncovid, series="Training data") +
   autolayer(fitted(crashes.train_STLF_noncovid, h=12),
             series="12-step fitted values")
 
-#crashes.test_STLF_noncovid <- stlf(test_STLF_noncovid)
-#accuracy(crashes.test_STLF_noncovid)
-
-#TBATS (noncovid)
-y.noncovid <- msts(crashes_ts.noncovid$count, seasonal.periods=c(7,365.25))
-y2.noncovid <- msts(crashests.noncovid, seasonal.periods=c(7,365.25))
-
-training_TBATS.noncovid <- subset(y.noncovid, end=length(y.noncovid)-671)
-training_TBATS2.noncovid <- subset(y2.noncovid, end=length(y2.noncovid)-671)
-
-test_TBATS.noncovid <- subset(y.noncovid, start=length(y.noncovid)-670)
-test_TBATS2.noncovid <- subset(y2.noncovid, start=length(y2.noncovid)-670)
-
-crashes.train_TBATS.noncovid <- tbats(training_TBATS.noncovid)
-crashes.train_TBATS2.noncovid <- tbats(training_TBATS2.noncovid)
-
-crashes.train_TBATS.noncovid %>%
-  forecast(h=671) %>%
-  autoplot(alpha=0.2) + 
-  autolayer(test_TBATS.noncovid, alpha=0.75) +
-  theme(legend.position = "bottom") + 
-  ggtitle("Multi-Step TBATS Daily Forecasts of Crashes (Without Pandemic Data)") + 
-  xlab("Date") + ylab("Crashes") 
-crashes.train_TBATS2.noncovid %>%
-  forecast(h=671) %>%
-  autoplot(alpha=0.2) + 
-  ggtitle("Multi-Step TBATS Daily Forecasts of Crashes (Without Pandemic Data)") + 
-  xlab("Date") + ylab("Crashes") + 
-  autolayer(test_TBATS2.noncovid, alpha=0.75) + 
-  theme(legend.position = "bottom")
-
-autoplot(training_TBATS.noncovid, series="Training data") +
-  autolayer(fitted(crashes.train_TBATS.noncovid, h=12),
-            series="12-step fitted values")
-autoplot(training_TBATS2.noncovid, series="Training data") +
-  autolayer(fitted(crashes.train_TBATS2.noncovid, h=12),
-            series="12-step fitted values")
-
-crashes.test_TBATS.noncovid <- tbats(test_TBATS.noncovid)
-crashes.test_TBATS2.noncovid <- tbats(test_TBATS2.noncovid)
-
-accuracy(crashes.test_TBATS.noncovid)
-accuracy(crashes.test_TBATS2.noncovid)
+crashes.test_STLF_noncovid <- Arima(test_STLF_noncovid)
+accuracy(crashes.test_STLF_noncovid)
 
 ##Forecast Combinations (daily covid)
-library(forecast)
 train <- window(crashests2, end=c(2019,12))
 h <- length(crashests2) - length(train)
 #ETS <- forecast(ets(train), h=h)
@@ -1841,8 +1681,7 @@ c(ARIMA = accuracy(ARIMA, crashests2)["Test set", "RMSE"],
   Combination =
     accuracy(Combination, crashests2)["Test set", "RMSE"])
 
-##Working with ets() daily (doesn't work)
-#(THIS GETS RID OF SEASONALITY DUE TO TOO HIGH OF FREQUENCY)
+##Working with ets() daily (THIS GETS RID OF SEASONALITY DUE TO TOO HIGH OF FREQUENCY)
 fit.ets.daily.covid <- ets(y=crashests2, model="MAM")
 
 summary(fit.ets.daily.covid)
@@ -1857,13 +1696,11 @@ fit.ets.daily.covid %>% forecast(h=214) %>%
   autoplot()
 
 ##Looking at seasonality of data 
-#Working with TBATS daily 
-#Do I use crashes_ts (like I did with the ts() func or should I use crashests2?)
-y <- msts(crashes_ts$count, seasonal.periods=c(7,365.25))
-y2 <- msts(crashests2, seasonal.periods=c(7,365.25))
+#Working with TBATS daily (does not work)
+y <- msts(crashests2, seasonal.periods=c(7,365.25))
 fit <- tbats(y)
 fc <- forecast(fit, h=214)
-summary(fc) 
+summary(fc) # i believe this is still daily seasonality 
 plot(fc)
 
 #Working with ARIMA (doesn't work)
@@ -1912,206 +1749,6 @@ crashes_Friday = crashes %>%
     TRUE ~ "Not Friday")) %>%
   group_by(key_crash,Crash_Date_DOW) %>%
   summarize(count = length(key_crash))
-
-##Adding dummy variables to dataset 
-#snow
-crashes_snow = crashes %>%
-  mutate(Snow = case_when(
-    WeatherCondition1 == "Snow" ~ 1, 
-    TRUE ~ 0)) 
-
-crashes_snow = crashes_snow %>%
-  filter(as.Date(crash_date) >= "2015/01/01" & as.Date(crash_date) <= "2021/05/31") %>%
-  separate(crash_date, 
-           into = c("Date", "Hour"), sep = 11) %>%
-  group_by(Date,Snow) %>% #am I grouping by the right things? 
-  summarize(count = length(unique(key_crash)))
-
-#Converting crashes_snow to a time series object 
-crashes_snow_ts2 <- ts(crashes_snow$count, start = c(2015,1), end = c(2021,153),
-                 frequency = 365)
-
-#Converting crashes_snow to a time series object (not the method to use)
-crashes_snow_ts <- as.ts(crashes_snow)
-
-##attempting blogpost code (works)
-y <- ts(crashes_snow$count, frequency=7)
-z <- fourier(ts(crashes_snow$count, frequency=365.25), K=5)
-zf <- fourier(ts(crashes_snow$count, frequency=365.25), K=5, h=100)
-fit <- auto.arima(y, xreg=cbind(z), seasonal=FALSE)
-fc <- forecast(fit, xreg=cbind(zf), h=100)
-
-autoplot(fc)
-
-##attempting textbook (Works)
-#crashes_snow_ts3 <- window(crashes_snow)
-crashes_snow_ts2 <- ts(crashes_snow$count, start = c(2015,1), end = c(2021,153),
-                       frequency = 365)
-plots <- list()
-for (i in seq(6)) {
-  fit <- auto.arima(crashes_snow_ts2, xreg = fourier(crashes_snow_ts2, K = i),
-                    seasonal = FALSE, lambda = 0)
-  plots[[i]] <- autoplot(forecast(fit,
-                                  xreg=fourier(crashes_snow_ts2, K=i, h=214))) +
-    xlab(paste("K=",i,"   AICC=",round(fit[["aicc"]],2))) +
-    ylab("")
-}
-
-#loading necessary packages
-#install.packages("gridExtra")
-library(gridExtra)
-
-gridExtra::grid.arrange(
-  plots[[1]],plots[[2]],plots[[3]],
-  plots[[4]],plots[[5]],plots[[6]], nrow=3)
-
-#diff attempt (TAKES A LONG TIME (because K=1-25) BUT IT DOES WORK)
-bestfit <- list(aicc=Inf)
-for(K in seq(25)) {
-  fit <- auto.arima(crashes_snow_ts2, xreg=fourier(crashes_snow_ts2, K=K),
-                    seasonal=FALSE)
-  if(fit[["aicc"]] < bestfit[["aicc"]]) {
-    bestfit <- fit
-    bestK <- K
-  }
-}
-
-fc <- forecast(bestfit,
-               xreg=fourier(crashes_snow_ts2, K=bestK, h=214))
-autoplot(fc)
-
-##friday dummy variable
-crashes_friday = crashes %>%
-  mutate(Friday = case_when(
-    Crash_Date_DOW == "Friday" ~ 1, 
-    TRUE ~ 0)) 
-
-crashes_friday = crashes_friday %>%
-  filter(as.Date(crash_date) >= "2015/01/01" & as.Date(crash_date) <= "2021/05/31") %>%
-  separate(crash_date, 
-           into = c("Date", "Hour"), sep = 11) %>%
-  group_by(Date,Friday) %>% #am I grouping by the right things? 
-  summarize(count = length(unique(key_crash)))
-
-#Converting crashes_ts to a time series object 
-crashes_friday_ts2 <- ts(crashes_friday$count, start = c(2015,1), end = c(2021,153),
-                         frequency = 365)
-
-#Converting crashes_ts to a time series object 
-crashes_friday_ts <- as.ts(crashes_friday)
-
-##attempting blogpost 
-y <- ts(crashes_friday$count, frequency=7)
-z <- fourier(ts(crashes_friday$count, frequency=365.25), K=5)
-zf <- fourier(ts(crashes_friday$count, frequency=365.25), K=5, h=100)
-fit <- auto.arima(y, xreg=cbind(z), seasonal=FALSE)
-fc <- forecast(fit, xreg=cbind(zf), h=100)
-autoplot(fc)
-
-##attempting textbook 
-#crashes_friday_ts3 <- window(crashes_friday)
-crashes_friday_ts2 <- ts(crashes_friday$count, start = c(2015,1), end = c(2021,153),
-                       frequency = 365)
-plots <- list()
-for (i in seq(6)) {
-  fit <- auto.arima(crashes_friday_ts2, xreg = fourier(crashes_friday_ts2, K = i),
-                    seasonal = FALSE, lambda = 0)
-  plots[[i]] <- autoplot(forecast(fit,
-                                  xreg=fourier(crashes_friday_ts2, K=i, h=214))) +
-    xlab(paste("K=",i,"   AICC=",round(fit[["aicc"]],2))) +
-    ylab("")
-}
-
-#loading necessary packages
-#install.packages("gridExtra")
-library(gridExtra)
-
-gridExtra::grid.arrange(
-  plots[[1]],plots[[2]],plots[[3]],
-  plots[[4]],plots[[5]],plots[[6]], nrow=3)
-
-#diff attempt (TAKES A LONG TIME BUT WORKS)
-bestfit <- list(aicc=Inf)
-for(K in seq(25)) {
-  fit <- auto.arima(crashes_friday_ts2, xreg=fourier(crashes_friday_ts2, K=K),
-                    seasonal=FALSE)
-  if(fit[["aicc"]] < bestfit[["aicc"]]) {
-    bestfit <- fit
-    bestK <- K
-  }
-}
-
-fc <- forecast(bestfit,
-               xreg=fourier(crashes_friday_ts2, K=bestK, h=214))
-autoplot(fc)
-
-##friday and snow together 
-crashes_snow_friday = crashes %>%
-  mutate(Friday = case_when(
-    Crash_Date_DOW == "Friday" ~ 1, 
-    TRUE ~ 0)) %>%
-  mutate(Snow = case_when(
-    WeatherCondition1 == "Snow" ~ 1, 
-    TRUE ~ 0))
-
-crashes_snow_friday = crashes_snow_friday %>%
-  filter(as.Date(crash_date) >= "2015/01/01" & as.Date(crash_date) <= "2021/05/31") %>%
-  separate(crash_date, 
-           into = c("Date", "Hour"), sep = 11) %>%
-  group_by(Date,Friday,Snow) %>% #am I grouping by the right things? 
-  summarize(count = length(unique(key_crash)))
-
-#Converting crashes_ts to a time series object 
-crashes_snow_friday_ts2 <- ts(crashes_snow_friday$count, start = c(2015,1), end = c(2021,153),
-                         frequency = 365)
-
-#Converting crashes_ts to a time series object 
-crashes_snow_friday_ts <- as.ts(crashes_snow_friday)
-
-##attempting blogpost 
-y <- ts(crashes_snow_friday$count, frequency=7)
-z <- fourier(ts(crashes_snow_friday$count, frequency=365.25), K=5)
-zf <- fourier(ts(crashes_snow_friday$count, frequency=365.25), K=5, h=100)
-fit <- auto.arima(y, xreg=cbind(z), seasonal=FALSE)
-fc <- forecast(fit, xreg=cbind(zf), h=100)
-autoplot(fc)
-
-##attempting textbook 
-#crashes_friday_ts3 <- window(crashes_friday)
-crashes_snow_friday_ts2 <- ts(crashes_snow_friday$count, start = c(2015,1), end = c(2021,153),
-                         frequency = 365)
-plots <- list()
-for (i in seq(6)) {
-  fit <- auto.arima(crashes_snow_friday_ts2, xreg = fourier(crashes_snow_friday_ts2, K = i),
-                    seasonal = FALSE, lambda = 0)
-  plots[[i]] <- autoplot(forecast(fit,
-                                  xreg=fourier(crashes_snow_friday_ts2, K=i, h=214))) +
-    xlab(paste("K=",i,"   AICC=",round(fit[["aicc"]],2))) +
-    ylab("")
-}
-
-#loading necessary packages
-#install.packages("gridExtra")
-library(gridExtra)
-
-gridExtra::grid.arrange(
-  plots[[1]],plots[[2]],plots[[3]],
-  plots[[4]],plots[[5]],plots[[6]], nrow=3)
-
-#diff attempt (TAKES A LONG TIME BUT WORKS)
-bestfit <- list(aicc=Inf)
-for(K in seq(25)) {
-  fit <- auto.arima(crashes_snow_friday_ts2, xreg=fourier(crashes_snow_friday_ts2, K=K),
-                    seasonal=FALSE)
-  if(fit[["aicc"]] < bestfit[["aicc"]]) {
-    bestfit <- fit
-    bestK <- K
-  }
-}
-
-fc <- forecast(bestfit,
-               xreg=fourier(crashes_snow_friday_ts2, K=bestK, h=214))
-autoplot(fc)
 
 ##Different attempt at forecasting for monthly (THIS WORKS)
 #install.packages("Mcomp")
@@ -2373,8 +2010,8 @@ autoplot(training_HW_monthly, series="Training data") +
   autolayer(fitted(crashes.train_HW_monthly, h=12),
             series="12-step fitted values")
 
-#crashes.test_HW_monthly <- HoltWinters(test_HW_monthly)
-#accuracy(crashes.test_HW_monthly)
+crashes.test_HW_monthly <- Arima(test_HW_monthly)
+accuracy(crashes.test_HW_monthly)
 
 #STLF (with covid)
 training_STLF_monthly <- subset(crashes_mts4, end=length(crashes_mts4)-8)
@@ -2388,8 +2025,8 @@ autoplot(training_STLF_monthly, series="Training data") +
   autolayer(fitted(crashes.train_STLF_monthly, h=12),
             series="12-step fitted values")
 
-#crashes.test_STLF_monthly <- stlf(test_STLF_monthly)
-#accuracy(crashes.test_STLF_monthly)
+crashes.test_STLF_monthly <- Arima(test_STLF_monthly)
+accuracy(crashes.test_STLF_monthly)
 
 #HW (noncovid)
 training_HW_noncovid_monthly <- subset(crashes_mts4.noncovid, end=length(crashes_mts4.noncovid)-23)
@@ -2403,8 +2040,8 @@ autoplot(training_HW_noncovid_monthly, series="Training data") +
   autolayer(fitted(crashes.train_HW_noncovid_monthly, h=12),
             series="12-step fitted values")
 
-#crashes.test_HW_noncovid_monthly <- HoltWinters(test_HW_noncovid_monthly)
-#accuracy(crashes.test_HW_noncovid_monthly)
+crashes.test_HW_noncovid_monthly <- Arima(test_HW_noncovid_monthly)
+accuracy(crashes.test_HW_noncovid_monthly)
 
 #STLF (non covid)
 training_STLF_noncovid_monthly <- subset(crashes_mts4.noncovid, end=length(crashes_mts4.noncovid)-23)
@@ -2418,8 +2055,8 @@ autoplot(training_STLF_noncovid_monthly, series="Training data") +
   autolayer(fitted(crashes.train_STLF_noncovid_monthly, h=12),
             series="12-step fitted values")
 
-#crashes.test_STLF_noncovid_monthly <- stlf(test_STLF_noncovid_monthly)
-#accuracy(crashes.test_STLF_noncovid_monthly)
+crashes.test_STLF_noncovid_monthly <- Arima(test_STLF_noncovid_monthly)
+accuracy(crashes.test_STLF_noncovid_monthly)
 
 ## Forecast combination (monthly covid)
 train_monthly <- window(crashes_mts4, end=c(2018,12))
@@ -2972,18 +2609,37 @@ crashes_rain %>%
   geom_text(stat="count", aes(x=WeatherCondition1, label=..count..), vjust=-0.25)
 
 ### Modeling Injury Outcome
-
-crashes_pm = crashes %>%
+#Includes AlcoholResultType
+crashes_pm2 = crashes %>%
   filter(Injury != "", Injury != "Unknown", VehicleType != "Unknown", 
-         ContributingCircumstance1 != "Unknown", ContributingCircumstance1 != "", 
-         Protection != "Unknown", Protection != "", WeatherCondition1 != "Unknown",
+         VehicleType != "", ContributingCircumstance1 != "Unknown", 
+         ContributingCircumstance1 != "", Protection != "Unknown", 
+         Protection != "", WeatherCondition1 != "Unknown",
          WeatherCondition1 != "", MostHarmfulEvent != "Unknown",
          MostHarmfulEvent != "", RoadFeature != "Unknown", RoadFeature != "",
          TrafficControlType != "Unknown", TrafficControlType != "",
          RoadClassification != "Unkown", RoadClassification != "",
          PersonType != "", PersonType != "Unknown", AlcoholResultType != "",
          AlcoholResultType != "Unknown", VisionObstruction != "", 
-         VisionObstruction != "Unknown") %>%
+         VisionObstruction != "Unknown", VehicleType != "All terrain vehicle (ATV)",
+         VehicleType != "Farm equipment", VehicleType != "Farm tractor",
+         VehicleType != "Military", VehicleType != "Motor scooter or motor bike",
+         VehicleType != "Motor home/recreational vehicle", 
+         VehicleType != "Tractor/doubles", VehicleType != "Truck/tractor (i.e., bobtail)",
+         ContributingCircumstance1 != "Passed stopped school bus", 
+         ContributingCircumstance1 != "Passed on hill", 
+         ContributingCircumstance1 != "Passed on curve",
+         ContributingCircumstance1 != "Driver distracted by other electronic 
+         device (navigation device, DVD player, etc.) ",
+         Protection != "Lighting", Protection != "Protective pads",
+         Protection != "Reflective clothing", WeatherCondition1 != "Blowing sand, dirt, snow",
+         WeatherCondition1 != "Severe crosswinds", MostHarmfulEvent != "Jackknife",
+         MostHarmfulEvent != "RR train, engine", TrafficControlType != "RR cross bucks only",
+         TrafficControlType != "RR flasher", TrafficControlType != "RR gate and flasher",
+         TrafficControlType != "School zone signs", AlcoholResultType != "Contaminated sample/unusable",
+         AlcoholResultType != "Other drugs reported", VisionObstruction != "Blinded, headlights",
+         VisionObstruction != "Blinded, other lights", VisionObstruction != "Building(s)",
+         VisionObstruction != "Embankment", VisionObstruction != "Sign(s)") %>%
   mutate(Injury = as.factor(Injury)) %>%
   mutate(Injury2 = if_else(Injury == "No injury", "No injury", "Injury"), 
          Injury2 = as.factor(Injury2)) %>%
@@ -2999,7 +2655,48 @@ crashes_pm = crashes %>%
   mutate(AlcoholResultType = as.factor(AlcoholResultType)) %>%
   mutate(VisionObstruction = as.factor(VisionObstruction))
   
-
+#Does NOT Include AlcoholResultType
+crashes_pm = crashes %>%
+  filter(Injury != "", Injury != "Unknown", VehicleType != "Unknown", 
+         VehicleType != "", ContributingCircumstance1 != "Unknown", 
+         ContributingCircumstance1 != "", Protection != "Unknown", 
+         Protection != "", WeatherCondition1 != "Unknown",
+         WeatherCondition1 != "", MostHarmfulEvent != "Unknown",
+         MostHarmfulEvent != "", RoadFeature != "Unknown", RoadFeature != "",
+         TrafficControlType != "Unknown", TrafficControlType != "",
+         RoadClassification != "Unkown", RoadClassification != "",
+         PersonType != "", PersonType != "Unknown", VisionObstruction != "", 
+         VisionObstruction != "Unknown", VehicleType != "All terrain vehicle (ATV)",
+         VehicleType != "Farm equipment", VehicleType != "Farm tractor",
+         VehicleType != "Military", VehicleType != "Motor scooter or motor bike",
+         VehicleType != "Motor home/recreational vehicle", 
+         VehicleType != "Tractor/doubles", VehicleType != "Truck/tractor (i.e., bobtail)",
+         ContributingCircumstance1 != "Passed stopped school bus", 
+         ContributingCircumstance1 != "Passed on hill", 
+         ContributingCircumstance1 != "Passed on curve",
+         ContributingCircumstance1 != "Driver distracted by other electronic 
+         device (navigation device, DVD player, etc.) ",
+         Protection != "Lighting", Protection != "Protective pads",
+         Protection != "Reflective clothing", WeatherCondition1 != "Blowing sand, dirt, snow",
+         WeatherCondition1 != "Severe crosswinds", MostHarmfulEvent != "Jackknife",
+         MostHarmfulEvent != "RR train, engine", TrafficControlType != "RR cross bucks only",
+         TrafficControlType != "RR flasher", TrafficControlType != "RR gate and flasher",
+         TrafficControlType != "School zone signs", VisionObstruction != "Blinded, headlights",
+         VisionObstruction != "Blinded, other lights", VisionObstruction != "Building(s)",
+         VisionObstruction != "Embankment", VisionObstruction != "Sign(s)") %>%
+  mutate(Injury = as.factor(Injury)) %>%
+  mutate(Injury2 = if_else(Injury == "No injury", "No injury", "Injury"), 
+         Injury2 = as.factor(Injury2)) %>%
+  mutate(VehicleType = as.factor(VehicleType)) %>%
+  mutate(ContributingCircumstance1 = as.factor(ContributingCircumstance1)) %>%
+  mutate(Protection = as.factor(Protection)) %>%
+  mutate(WeatherCondition1 = as.factor(WeatherCondition1)) %>%
+  mutate(MostHarmfulEvent = as.factor(MostHarmfulEvent)) %>%
+  mutate(RoadFeature = as.factor(RoadFeature)) %>%
+  mutate(TrafficControlType = as.factor(TrafficControlType)) %>%
+  mutate(RoadClassification = as.factor(RoadClassification)) %>%
+  mutate(PersonType = as.factor(PersonType)) %>%
+  mutate(VisionObstruction = as.factor(VisionObstruction))
   
 summary(crashes_pm$Injury)
 summary(crashes_pm$Injury2)
@@ -3074,17 +2771,6 @@ oversample_df1 <- crashes_pm[c(df_crashes_pm_NoInjury_ind,
  
 table(oversample_df1$Injury2)
 
-#Undersampling model
-crashes_pm_no_injury = crashes_pm %>%
-  filter(Injury2 == "No injury")
-
-crashes_pm_injury = crashes_pm %>%
-  filter(Injury2 == "Injury")
-
-s = sample(1:nrow(crashes_pm_no_injury), 35000, replace = F)
-
-undersample_df1 = crashes_pm_injury %>%
-  bind_rows(crashes_pm_no_injury[s,])
 
 ### Modeling Injury Outcome Using Oversampled Data
 
@@ -3129,7 +2815,7 @@ oversample_df1.train2 <- oversample_df1[sample, ]
 oversample_df1.test2 <- oversample_df1[!sample, ]
 oversample_df1.fit.train2 <- glm(Injury2~Age+VehicleType+ContributingCircumstance1+Protection+
                                    WeatherCondition1+MostHarmfulEvent+RoadFeature+
-                                   TrafficControlType+RoadClassification+PersonType+Ejection+
+                                   TrafficControlType+RoadClassification+PersonType+
                                    AlcoholResultType+VisionObstruction, 
                             data=oversample_df1.train2, family="binomial") #fitting model on training set
 oversample_df1.pred.prob2 <- predict(oversample_df1.fit.train2, newdata=oversample_df1.test2, 
@@ -3137,6 +2823,89 @@ oversample_df1.pred.prob2 <- predict(oversample_df1.fit.train2, newdata=oversamp
 oversample_df1.pred2 <- ifelse(oversample_df1.pred.prob2>0.5, "Injury", "No injury") #predicting `default` based on prob estimates
 (tab2 <- table(pred=oversample_df1.pred2, actual=oversample_df1.test2$Injury2)) #confusion matrix: cross-tab of predictions vs actual class
 (accuracy2=mean(oversample_df1.pred2==oversample_df1.test2$Injury2, na.rm=T)*100) #percent of correct predictions in test data
+
+
+#Undersampling model
+crashes_pm_no_injury = crashes_pm %>%
+  filter(Injury2 == "No injury")
+
+crashes_pm_injury = crashes_pm %>%
+  filter(Injury2 == "Injury")
+
+s = sample(1:nrow(crashes_pm_no_injury), 35000, replace = F)
+
+undersample_df1 = crashes_pm_injury %>%
+  bind_rows(crashes_pm_no_injury[s,])
+
+### Modeling Injury Outcome Using Undersampled Data
+
+Injury2.fit3 <- glm(Injury2~Age+VehicleType+ContributingCircumstance1+Protection+
+                      WeatherCondition1+MostHarmfulEvent+RoadFeature+
+                      TrafficControlType+RoadClassification+PersonType+
+                      AlcoholResultType+VisionObstruction,
+                    data=undersample_df1, family = "binomial")
+summary(Injury2.fit3)
+
+ci2 = cbind(coef(Injury2.fit3)-1.96*(summary(Injury2.fit3)$coefficients[,"Std. Error"]),
+           coef(Injury2.fit3)+1.96*(summary(Injury2.fit3)$coefficients[,"Std. Error"]))
+
+round(ci, 3)
+
+#Model coefficients
+coef(Injury2.fit3) #extract coefficients
+round(coef(Injury2.fit3), digits = 4) #get rounded coefficients
+round(confint(Injury2.fit3), digits = 4) #TAKES REALLY LONG get confidence intervals (CI) for coefs
+
+#Odds ratios
+round(exp(coef(Injury2.fit3)), digits = 4) #OR=exp(coef)
+(round(exp(coef(Injury2.fit3)), digits = 4)-1)*100 #percent change in odds
+round(exp(confint(Injury2.fit3)), digits = 4) #TAKES REALLY LONG confidence intervals for ORs
+round(data.frame(OR=exp(coef(Injury2.fit3)), exp(confint(Injury2.fit3))), digits = 4) #TAKES REALLY LONG ORs & their CIs
+
+#Model selection based on AIC
+#install.packages("MASS") #run once: installing package needed for the `stepAIC` function
+library(MASS) 
+Injury2.select3 <- stepAIC(Injury2.fit3)
+summary(Injury2.select3)
+
+#Get a pseudo R^2 
+#install.packages("pscl") #package for computing the McFadden R^2
+library(pscl)
+pR2(Injury2.select3)
+
+#Prediction accuracy on test data
+set.seed(101) #for reproducibility of results
+sample3 <- sample(c(TRUE, FALSE), nrow(undersample_df1), replace = T, prob = c(0.7,0.3)) #70/30% training/test sets
+undersample_df1.train3 <- undersample_df1[sample, ]
+undersample_df1.test3 <- undersample_df1[!sample, ]
+undersample_df1.fit.train3 <- glm(Injury2~Age+VehicleType+ContributingCircumstance1+Protection+
+                                   WeatherCondition1+MostHarmfulEvent+RoadFeature+
+                                   TrafficControlType+RoadClassification+PersonType+
+                                   AlcoholResultType+VisionObstruction, 
+                                 data=undersample_df1.train3, family="binomial") #fitting model on training set
+undersample_df1.pred.prob3 <- predict(undersample_df1.fit.train3, newdata=undersample_df1.test3, 
+                                     type="response") #predicting prob. of default=1 for test set
+undersample_df1.pred3 <- ifelse(undersample_df1.pred.prob3>0.5, "Injury", "No injury") #predicting `default` based on prob estimates
+(tab3 <- table(pred=undersample_df1.pred3, actual=undersample_df1.test3$Injury2)) #confusion matrix: cross-tab of predictions vs actual class
+(accuracy3=mean(undersample_df1.pred3==undersample_df1.test3$Injury2, na.rm=T)*100) #percent of correct predictions in test data
+
+
+df_crashes_pm_Injury_ind <- which(crashes_pm$Injury2 == "Injury")
+df_crashes_pm_NoInjury_ind <- which(crashes_pm$Injury2 == "No injury")
+oversample_df1 <- crashes_pm[c(df_crashes_pm_NoInjury_ind, 
+                               rep(df_crashes_pm_Injury_ind, 5)), ]
+
+crashes_pm_no_injury = crashes_pm %>%
+  filter(Injury2 == "No injury")
+crashes_pm_injury = crashes_pm %>%
+  filter(Injury2 == "Injury")
+s = sample(1:nrow(crashes_pm_no_injury), 35000, replace = F)
+undersample_df1 = crashes_pm_injury %>%
+  bind_rows(crashes_pm_no_injury[s,])
+
+
+combosample_df1 = inner_join(oversample_df1, undersample_df1, by = "Injury2")
+
 
 
 
