@@ -2125,9 +2125,9 @@ true_noncovid_crashes <- ts(true_noncovid_crashes$count,
 
 autoplot(train) +
   autolayer(true_noncovid_crashes) +
-  autolayer(NNAR, series="NNAR") +
-  autolayer(STL, series="STL", PI=F) +
-  autolayer(Combination, series="Combination") +
+  autolayer(NNAR, series="NNAR", alpha=0.8) +
+  autolayer(STL, series="STL", PI=F, alpha=0.8) +
+  autolayer(Combination, series="Combination", alpha=0.8) +
   autolayer(ARIMA, series="ARIMA", PI=F) +
   autolayer(TBATS, series="TBATS", PI=F) +
   scale_color_brewer(palette="RdYlBu") + 
