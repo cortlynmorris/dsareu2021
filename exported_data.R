@@ -2815,9 +2815,15 @@ oversample_df2 <- crashes_pm[c(df_crashes_pm_NoInjury_ind,
 
 #install.packages("ROSE")
 library(ROSE)
-over <- ovun.sample(Injury2~., data = crashes_pm.train, method = "both")$crashes_pm
+over <- ovun.sample(Injury2~Age+VehicleType+ContributingCircumstance1+Protection+
+                      WeatherCondition1+MostHarmfulEvent+RoadFeature+
+                      TrafficControlType+RoadClassification+PersonType+VisionObstruction, 
+                    data = crashes_pm.train, method = "both")$crashes_pm
 
-rose <- ROSE(Injury2~., data = crashes_pm.train, N = 500000, seed=2021)$crashes_pm
+rose <- ROSE(Injury2~Age+VehicleType+ContributingCircumstance1+Protection+
+               WeatherCondition1+MostHarmfulEvent+RoadFeature+
+               TrafficControlType+RoadClassification+PersonType+VisionObstruction, 
+             data = crashes_pm.train, N = 500000, seed=2021)$crashes_pm
 
 #install.packages("Amelia")
 library(Amelia)
@@ -2837,8 +2843,7 @@ table(oversample_df1$Injury2)
 
 Injury2.fit2 <- glm(Injury2~Age+VehicleType+ContributingCircumstance1+Protection+
                       WeatherCondition1+MostHarmfulEvent+RoadFeature+
-                      TrafficControlType+RoadClassification+PersonType+
-                      AlcoholResultType+VisionObstruction,
+                      TrafficControlType+RoadClassification+PersonType+VisionObstruction,
                    data=oversample_df1, family = "binomial")
 summary(Injury2.fit2)
 
