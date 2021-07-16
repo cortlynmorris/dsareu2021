@@ -2141,6 +2141,9 @@ autoplot(train) +
   ggtitle("Combination Time Series Forecast Plot (With Pandemic Data)") + 
   theme(legend.position = "bottom")
 
+```
+
+```{r}
 c(ARIMA = accuracy(ARIMA, crashests2)["Test set", "RMSE"],
   TBATS = accuracy(TBATS, crashests2)["Test set", "RMSE"],
   NNAR = accuracy(NNAR, crashests2)["Test set", "RMSE"],
