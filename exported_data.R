@@ -2024,8 +2024,7 @@ for(K in seq(25)) {
   }
 }
 
-fc <- forecast(bestfit,
-               xreg=fourier(crashes_snow_ts2, K=bestK, h=214))
+fc <- forecast(bestfit,xreg=fourier(crashes_snow_ts2, K=bestK, h=214))
 autoplot(fc)
 
 ##friday dummy variable
