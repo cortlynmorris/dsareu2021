@@ -2078,12 +2078,12 @@ head(fcast.ms.TBATS.covid2)
 autoplot(training_TBATS, series="Training data") +
   autolayer(fitted(crashes.train_TBATS, h=12),
             series="12-step fitted values") + 
-  ggtitle("12-Step Fitted Values of TBATS Model (With Pandemic Data") + 
+  ggtitle("12-Step Fitted Values of TBATS Model (With Pandemic Data)") + 
   xlab("Date") + ylab("Crashes")
 autoplot(training_TBATS2, series="Training data") +
   autolayer(fitted(crashes.train_TBATS2, h=12),
             series="12-step fitted values") + 
-  ggtitle("12-Step Fitted Values of TBATS Model (With Pandemic Data") + 
+  ggtitle("12-Step Fitted Values of TBATS Model (With Pandemic Data)") + 
   xlab("Date") + ylab("Crashes")
 
 crashes.test_TBATS <- tbats(test_TBATS)
@@ -2093,17 +2093,23 @@ accuracy(crashes.test_TBATS)
 accuracy(crashes.test_TBATS2)
 ```
 
-```{r combination, echo=FALSE, message=FALSE}
+```{r combination, echo=FALSE, message=FALSE, warning=FALSE}
 #reload libraries 
 library(reshape2)
 library(tidyverse)
 library(ggplot2)
 library(dplyr)
-library(dslabs)
-library(ggrepel)
-library(ggthemes)
-library(maps)
-library(scales)
+library(forecast)
+library(forecast)
+
+crashes_ts = crashes %>%
+  separate(crash_date, 
+           into = c("Date", "Hour"), sep = 11) %>%
+  group_by(Date) %>%
+  summarize(count = length(unique(key_crash)))
+
+crashests2 <- ts(crashes_ts$count, start = c(2015,1), end = c(2021,153),
+                frequency = 365)
 
 train <- window(crashests2, end=c(2019,12))
 h <- length(crashests2) - length(train)
@@ -2132,7 +2138,8 @@ autoplot(train) +
   autolayer(TBATS, series="TBATS", PI=F) +
   scale_color_brewer(palette="RdYlBu") + 
   xlab("Year") + ylab("Crashes") +
-  ggtitle("Combination Time Series Forecast Plot (With Pandemic Data)")
+  ggtitle("Combination Time Series Forecast Plot (With Pandemic Data)") + 
+  theme(legend.position = "bottom")
 
 c(ARIMA = accuracy(ARIMA, crashests2)["Test set", "RMSE"],
   TBATS = accuracy(TBATS, crashests2)["Test set", "RMSE"],
@@ -2142,7 +2149,7 @@ c(ARIMA = accuracy(ARIMA, crashests2)["Test set", "RMSE"],
     accuracy(Combination, crashests2)["Test set", "RMSE"])
 ```
 
-```{r noncovid-combination, echo=FALSE, message=FALSE}
+```{r noncovid-combination, echo=FALSE, message=FALSE, warning = FALSE}
 train.noncovid <- window(crashests2, end=c(2019,12))
 h.noncovid <- 426
 ARIMA.noncovid <- forecast::forecast(auto.arima(train.noncovid, lambda=0, 
@@ -2161,8 +2168,6 @@ true_noncovid_crashes <- crashes_ts %>%
 true_noncovid_crashes <- ts(true_noncovid_crashes$count, 
                             start = c(2019,1), end = c(2020,60), 
                             frequency = 365)
-
-library(RColorBrewer)
 
 autoplot(train.noncovid) +
   autolayer(true_noncovid_crashes) +
@@ -2277,7 +2282,7 @@ head(fcast.ms.TBATS.noncovid2)
 crashes.train_TBATS.noncovid %>%
   forecast(h=426) %>%
   autoplot(alpha=0.2) + 
-  autolayer(test_TBATS.noncovid, alpha=0.75) +
+  autolayer(test_TBATS.noncovid, alpha=0.75, series="test_TBATS") +
   theme(legend.position = "bottom") + 
   scale_x_continuous(breaks = c(1,2,3,4,5,6,7,8), 
                      labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
@@ -2290,18 +2295,18 @@ crashes.train_TBATS2.noncovid %>%
   autoplot(alpha=0.2) + 
   ggtitle("Multi-Step TBATS Daily Forecasts of Crashes (Without Pandemic Data)") + 
   xlab("Date") + ylab("Crashes") + 
-  autolayer(test_TBATS2.noncovid, alpha=0.75) + 
+  autolayer(test_TBATS2.noncovid, alpha=0.75, series="test_TBATS") + 
   theme(legend.position = "bottom")
 
 autoplot(training_TBATS.noncovid, series="Training data") +
   autolayer(fitted(crashes.train_TBATS.noncovid, h=12),
             series="12-step fitted values") + 
-  ggtitle("12-Step Fitted Values of TBATS Model (Without Pandemic Data") + 
+  ggtitle("12-Step Fitted Values of TBATS Model (Without Pandemic Data)") + 
   xlab("Date") + ylab("Crashes")
 autoplot(training_TBATS2.noncovid, series="Training data") +
   autolayer(fitted(crashes.train_TBATS2.noncovid, h=12),
             series="12-step fitted values") + 
-  ggtitle("12-Step Fitted Values of TBATS Model (Without Pandemic Data") + 
+  ggtitle("12-Step Fitted Values of TBATS Model (Without Pandemic Data)") + 
   xlab("Date") + ylab("Crashes")
 
 crashes.test_TBATS.noncovid <- tbats(test_TBATS.noncovid)
@@ -2620,82 +2625,6 @@ autoplot(training_STLF_monthly, series="Training data") +
   theme(axis.text.x = element_text(angle = 90), legend.position = "bottom")
 ```
 
-```{r ets-covid, echo=FALSE, message=FALSE}
-##Working with ets() monthly covid MAM model 
-fit.ets.monthly.covid <- ets(y=crashes_mts4, model="MAM")
-
-summary(fit.ets.monthly.covid)
-
-autoplot(fit.ets.monthly.covid)
-
-cbind('Residuals' = residuals(fit.ets.monthly.covid),
-      'Forecast errors' = residuals(fit.ets.monthly.covid,type='response')) %>%
-  autoplot(facet=TRUE) + xlab("Year") + ylab("")
-
-fit.ets.monthly.covid %>% forecast(h=8) %>%
-  autoplot()
-
-##Working with ets() monthly noncovid MAM model 
-fit.ets.monthly.noncovid <- ets(y=crashes_mts4.noncovid, model="MAM")
-
-summary(fit.ets.monthly.noncovid)
-
-autoplot(fit.ets.monthly.noncovid)
-
-cbind('Residuals' = residuals(fit.ets.monthly.noncovid),
-      'Forecast errors' = residuals(fit.ets.monthly.noncovid,type='response')) %>%
-  autoplot(facet=TRUE) + xlab("Year") + ylab("")
-
-fit.ets.monthly.noncovid %>% forecast(h=8) %>%
-  autoplot()
-
-##Working with ets() monthly MNM covid model 
-
-fit.ets.monthly.covid.MNM <-ets(y=crashes_mts4, model="ZZM")
-#automatically selects MNM
-
-summary(fit.ets.monthly.covid.MNM)
-#alpha = 0.3386, gamma = 2e-04
-
-autoplot(fit.ets.monthly.covid.MNM)
-
-cbind('Residuals' = residuals(fit.ets.monthly.covid.MNM),
-      'Forecast errors' = residuals(fit.ets.monthly.covid.MNM,type='response')) %>%
-  autoplot(facet=TRUE) + xlab("Year") + ylab("")
-
-fit.ets.monthly.covid.MNM %>% forecast(h=8) %>%
-  autoplot()
-
-##Working with ets() monthly MMM covid model 
-
-fit.ets.monthly.covid.MMM <-ets(y=crashes_mts4, model="MMM")
-
-summary(fit.ets.monthly.covid.MMM)
-
-autoplot(fit.ets.monthly.covid.MMM)
-
-cbind('Residuals' = residuals(fit.ets.monthly.covid.MMM),
-      'Forecast errors' = residuals(fit.ets.monthly.covid.MMM,type='response')) %>%
-  autoplot(facet=TRUE) + xlab("Year") + ylab("")
-
-fit.ets.monthly.covid.MMM %>% forecast(h=8) %>%
-  autoplot()
-
-##Working with ets() monthly MNA covid model 
-
-fit.ets.monthly.covid.MNA <-ets(y=crashes_mts4, model="MNA")
-summary(fit.ets.monthly.covid.MNA)
-
-autoplot(fit.ets.monthly.covid.MNA)
-
-cbind('Residuals' = residuals(fit.ets.monthly.covid.MNA),
-      'Forecast errors' = residuals(fit.ets.monthly.covid.MNA,type='response')) %>%
-  autoplot(facet=TRUE) + xlab("Year") + ylab("")
-
-fit.ets.monthly.covid.MNA %>% forecast(h=8) %>%
-  autoplot()
-```
-
 ```{r noncovid-ms-HW-monthly-forecast-ts, echo=FALSE, message=FALSE}
 training_HW_noncovid_monthly <- subset(crashes_mts4.noncovid, 
                                        end=length(crashes_mts4.noncovid)-14)
@@ -2777,6 +2706,380 @@ autoplot(training_STLF_noncovid_monthly, series="Training data") +
                      labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
                                 "Jan 2019", "Jan 2020", "Jan 2021")) + 
   theme(axis.text.x = element_text(angle = 90), legend.position = "bottom")
+```
+
+```{r ets-MAM-covid, echo=FALSE, message=FALSE}
+##Working with ets() monthly covid MAM model 
+fit.ets.monthly.covid <- ets(y=crashes_mts4, model="MAM")
+
+summary(fit.ets.monthly.covid)
+
+autoplot(fit.ets.monthly.covid) + 
+  ggtitle("Components of ETS Multiplicative HoltWinters Method with Multiplicative Errors (With Pandemic Data)") + 
+  theme(title = element_text(size = 7)) + 
+  scale_x_continuous(breaks = c(1,2,3,4,5,6,7,8), 
+                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
+                                "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022")) +
+  theme(axis.text.x = element_text(angle=90)) + 
+  xlab("Date") + ylab("Crashes")
+
+cbind('Residuals' = residuals(fit.ets.monthly.covid),
+      'Forecast errors' = residuals(fit.ets.monthly.covid,type='response')) %>%
+  autoplot(facet=TRUE) + xlab("Year") + ylab("") + 
+  ggtitle("Residuals of ETS Multiplicative HoltWinters Method with Multiplicative Errors (With Pandemic Data)") + 
+  theme(title = element_text(size=8)) + 
+  scale_x_continuous(breaks = c(1,2,3,4,5,6,7,8), 
+                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
+                                "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022")) + 
+  theme(axis.text.x = element_text(angle=90))
+
+fit.ets.monthly.covid %>% forecast(h=8) %>%
+  autoplot() + 
+  ggtitle("Forecasts from ETS Multiplicative HoltWinters Method with Multiplicative Errors (With Pandemic Data)") + 
+  theme(title = element_text(size=8)) + 
+  scale_x_continuous(breaks = c(1,2,3,4,5,6,7,8), 
+                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
+                                "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022")) + 
+  theme(axis.text.x = element_text(angle=90)) + 
+  xlab("Date") + ylab("Crashes")
+```
+
+```{r ets-MNM-covid, echo=FALSE, message=FALSE}
+##Working with ets() monthly MNM covid model 
+
+fit.ets.monthly.covid.MNM <-ets(y=crashes_mts4, model="ZZM")
+#automatically selects MNM
+
+summary(fit.ets.monthly.covid.MNM)
+#alpha = 0.3386, gamma = 2e-04
+
+autoplot(fit.ets.monthly.covid.MNM) + 
+  ggtitle("Components of ETS Multiplicative Seasonality and Errors Method (With Pandemic Data)") + 
+  theme(title = element_text(size = 9)) + 
+  scale_x_continuous(breaks = c(1,2,3,4,5,6,7,8), 
+                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
+                                "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022")) +
+  theme(axis.text.x = element_text(angle=90)) + 
+  xlab("Date") + ylab("Crashes")
+
+cbind('Residuals' = residuals(fit.ets.monthly.covid.MNM),
+      'Forecast errors' = residuals(fit.ets.monthly.covid.MNM,type='response')) %>%
+  autoplot(facet=TRUE) + xlab("Year") + ylab("") + 
+  ggtitle("Residuals of ETS Multiplicative Seasonality and Errors Method (With Pandemic Data)") + 
+  theme(title = element_text(size=10)) + 
+  scale_x_continuous(breaks = c(1,2,3,4,5,6,7,8), 
+                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
+                                "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022")) + 
+  theme(axis.text.x = element_text(angle=90))
+
+fit.ets.monthly.covid.MNM %>% forecast(h=8) %>%
+  autoplot() + 
+  ggtitle("Forecasts from ETS Multiplicative Seasonality and Errors Method (With Pandemic Data)") + 
+  theme(title = element_text(size=10)) + 
+  scale_x_continuous(breaks = c(1,2,3,4,5,6,7,8), 
+                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
+                                "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022")) + 
+  theme(axis.text.x = element_text(angle=90)) + 
+  xlab("Date") + ylab("Crashes")
+```
+
+```{r ets-MMM-covid, echo=FALSE, message=FALSE}
+##Working with ets() monthly MMM covid model 
+
+fit.ets.monthly.covid.MMM <-ets(y=crashes_mts4, model="MMM")
+
+summary(fit.ets.monthly.covid.MMM)
+
+autoplot(fit.ets.monthly.covid.MMM) + 
+  ggtitle("Components of ETS Multiplicative Seasonality, Trend, and Errors Method (With Pandemic Data)") + 
+  theme(title = element_text(size = 8)) + 
+  scale_x_continuous(breaks = c(1,2,3,4,5,6,7,8), 
+                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
+                                "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022")) +
+  theme(axis.text.x = element_text(angle=90)) + 
+  xlab("Date") + ylab("Crashes")
+
+cbind('Residuals' = residuals(fit.ets.monthly.covid.MMM),
+      'Forecast errors' = residuals(fit.ets.monthly.covid.MMM,type='response')) %>%
+  autoplot(facet=TRUE) + xlab("Year") + ylab("") + 
+  ggtitle("Residuals of ETS Multiplicative Seasonality, Trend, and Errors Method (With Pandemic Data)") + 
+  theme(title = element_text(size=9)) + 
+  scale_x_continuous(breaks = c(1,2,3,4,5,6,7,8), 
+                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
+                                "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022")) + 
+  theme(axis.text.x = element_text(angle=90))
+
+fit.ets.monthly.covid.MMM %>% forecast(h=8) %>%
+  autoplot() + 
+  ggtitle("Forecasts from ETS Multiplicative Seasonality, Trend, and Errors Method (With Pandemic Data)") + 
+  theme(title = element_text(size=9)) + 
+  scale_x_continuous(breaks = c(1,2,3,4,5,6,7,8), 
+                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
+                                "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022")) + 
+  theme(axis.text.x = element_text(angle=90)) + 
+  xlab("Date") + ylab("Crashes")
+```
+
+```{r ets-MNA-covid, echo=FALSE, message=FALSE}
+##Working with ets() monthly MNA covid model 
+
+fit.ets.monthly.covid.MNA <-ets(y=crashes_mts4, model="MNA")
+summary(fit.ets.monthly.covid.MNA)
+
+autoplot(fit.ets.monthly.covid.MNA) + 
+  ggtitle("Components of ETS Multiplicative Seasonality and Additive Errors Method (With Pandemic Data)") + 
+  theme(title = element_text(size = 8)) + 
+  scale_x_continuous(breaks = c(1,2,3,4,5,6,7,8), 
+                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
+                                "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022")) +
+  theme(axis.text.x = element_text(angle=90)) + 
+  xlab("Date") + ylab("Crashes")
+
+cbind('Residuals' = residuals(fit.ets.monthly.covid.MNA),
+      'Forecast errors' = residuals(fit.ets.monthly.covid.MNA,type='response')) %>%
+  autoplot(facet=TRUE) + xlab("Year") + ylab("") + 
+  ggtitle("Residuals of ETS Multiplicative Seasonality and Additive Errors Method (With Pandemic Data)") + 
+  theme(title = element_text(size=9)) + 
+  scale_x_continuous(breaks = c(1,2,3,4,5,6,7,8), 
+                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
+                                "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022")) + 
+  theme(axis.text.x = element_text(angle=90))
+
+fit.ets.monthly.covid.MNA %>% forecast(h=8) %>%
+  autoplot() + 
+  ggtitle("Forecasts from ETS Multiplicative Seasonality and Additive Errors Method (With Pandemic Data)") + 
+  theme(title = element_text(size=8)) + 
+  scale_x_continuous(breaks = c(1,2,3,4,5,6,7,8), 
+                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
+                                "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022")) + 
+  theme(axis.text.x = element_text(angle=90)) + 
+  xlab("Date") + ylab("Crashes")
+```
+
+### Forecasting with Covariates 
+
+```{r snow-dummy, echo=FALSE, message=FALSE}
+##Adding dummy variables to dataset 
+#snow
+crashes_snow = crashes %>%
+  mutate(Snow = case_when(
+    WeatherCondition1 == "Snow" ~ 1, 
+    TRUE ~ 0)) 
+
+crashes_snow = crashes_snow %>%
+  filter(as.Date(crash_date) >= "2015/01/01" & as.Date(crash_date) <= "2021/05/31") %>%
+  separate(crash_date, 
+           into = c("Date", "Hour"), sep = 11) %>%
+  group_by(Date,Snow) %>% #am I grouping by the right things? 
+  summarize(count = length(unique(key_crash)))
+
+#Converting crashes_snow to a time series object 
+crashes_snow_ts2 <- ts(crashes_snow$count, start = c(2015,1), end = c(2021,153),
+                       frequency = 365)
+
+#Converting crashes_snow to a time series object (not the method to use)
+crashes_snow_ts <- as.ts(crashes_snow)
+```
+
+```{r snow-forecast-attempt, echo=FALSE, message=FALSE, eval=FALSE}
+##attempting blogpost code (works)
+y <- ts(crashes_snow$count, frequency=7)
+z <- fourier(ts(crashes_snow$count, frequency=365.25), K=5)
+zf <- fourier(ts(crashes_snow$count, frequency=365.25), K=5, h=100)
+fit <- auto.arima(y, xreg=cbind(z), seasonal=FALSE)
+fc <- forecast(fit, xreg=cbind(zf), h=100)
+
+autoplot(fc)
+```
+
+```{r snow-forecast, echo=FALSE, message=FALSE}
+##attempting textbook (Works)
+#crashes_snow_ts3 <- window(crashes_snow)
+crashes_snow_ts2 <- ts(crashes_snow$count, start = c(2015,1), end = c(2021,153),
+                       frequency = 365)
+plots <- list()
+for (i in seq(6)) {
+  fit <- auto.arima(crashes_snow_ts2, xreg = fourier(crashes_snow_ts2, K = i),
+                    seasonal = FALSE, lambda = 0)
+  plots[[i]] <- autoplot(forecast(fit,
+                                  xreg=fourier(crashes_snow_ts2, K=i, h=214))) +
+    xlab(paste("K=",i,"   AICC=",round(fit[["aicc"]],2))) +
+    ylab("")
+}
+
+#loading necessary packages
+#install.packages("gridExtra")
+library(gridExtra)
+
+gridExtra::grid.arrange(
+  plots[[1]],plots[[2]],plots[[3]],
+  plots[[4]],plots[[5]],plots[[6]], nrow=3)
+```
+
+```{r snow-forecast-attempt2, echo=FALSE, message=FALSE, eval=FALSE}
+#diff attempt (TAKES A LONG TIME (because K=1-25) BUT IT DOES WORK)
+bestfit <- list(aicc=Inf)
+for(K in seq(25)) {
+  fit <- auto.arima(crashes_snow_ts2, xreg=fourier(crashes_snow_ts2, K=K),
+                    seasonal=FALSE)
+  if(fit[["aicc"]] < bestfit[["aicc"]]) {
+    bestfit <- fit
+    bestK <- K
+  }
+}
+
+fc <- forecast(bestfit,
+               xreg=fourier(crashes_snow_ts2, K=bestK, h=214))
+autoplot(fc)
+```
+
+```{r friday-dummy, echo=FALSE, message=FALSE}
+##friday dummy variable
+crashes_friday = crashes %>%
+  mutate(Friday = case_when(
+    Crash_Date_DOW == "Friday" ~ 1, 
+    TRUE ~ 0)) 
+
+crashes_friday = crashes_friday %>%
+  filter(as.Date(crash_date) >= "2015/01/01" & as.Date(crash_date) <= "2021/05/31") %>%
+  separate(crash_date, 
+           into = c("Date", "Hour"), sep = 11) %>%
+  group_by(Date,Friday) %>% #am I grouping by the right things? 
+  summarize(count = length(unique(key_crash)))
+
+#Converting crashes_ts to a time series object 
+crashes_friday_ts2 <- ts(crashes_friday$count, start = c(2015,1), end = c(2021,153),
+                         frequency = 365)
+
+#Converting crashes_ts to a time series object 
+crashes_friday_ts <- as.ts(crashes_friday)
+```
+
+```{r friday-forecast-attempt, echo=FALSE, message=FALSE, eval=FALSE}
+##attempting blogpost 
+y <- ts(crashes_friday$count, frequency=7)
+z <- fourier(ts(crashes_friday$count, frequency=365.25), K=5)
+zf <- fourier(ts(crashes_friday$count, frequency=365.25), K=5, h=100)
+fit <- auto.arima(y, xreg=cbind(z), seasonal=FALSE)
+fc <- forecast(fit, xreg=cbind(zf), h=100)
+autoplot(fc)
+```
+
+```{r friday-forecast, echo=FALSE, message=FALSE}
+##attempting textbook 
+#crashes_friday_ts3 <- window(crashes_friday)
+crashes_friday_ts2 <- ts(crashes_friday$count, start = c(2015,1), end = c(2021,153),
+                         frequency = 365)
+plots <- list()
+for (i in seq(6)) {
+  fit <- auto.arima(crashes_friday_ts2, xreg = fourier(crashes_friday_ts2, K = i),
+                    seasonal = FALSE, lambda = 0)
+  plots[[i]] <- autoplot(forecast(fit,
+                                  xreg=fourier(crashes_friday_ts2, K=i, h=214))) +
+    xlab(paste("K=",i,"   AICC=",round(fit[["aicc"]],2))) +
+    ylab("")
+}
+
+#loading necessary packages
+#install.packages("gridExtra")
+#library(gridExtra)
+
+gridExtra::grid.arrange(
+  plots[[1]],plots[[2]],plots[[3]],
+  plots[[4]],plots[[5]],plots[[6]], nrow=3)
+```
+
+```{r friday-forecast-attempt2, echo=FALSE, message=FALSE, eval=FALSE}
+#diff attempt (TAKES A LONG TIME BUT WORKS)
+bestfit <- list(aicc=Inf)
+for(K in seq(25)) {
+  fit <- auto.arima(crashes_friday_ts2, xreg=fourier(crashes_friday_ts2, K=K),
+                    seasonal=FALSE)
+  if(fit[["aicc"]] < bestfit[["aicc"]]) {
+    bestfit <- fit
+    bestK <- K
+  }
+}
+
+fc <- forecast(bestfit,
+               xreg=fourier(crashes_friday_ts2, K=bestK, h=214))
+autoplot(fc)
+```
+
+```{r snow-friday-dummy, echo=FALSE, message=FALSE}
+##friday and snow together 
+crashes_snow_friday = crashes %>%
+  mutate(Friday = case_when(
+    Crash_Date_DOW == "Friday" ~ 1, 
+    TRUE ~ 0)) %>%
+  mutate(Snow = case_when(
+    WeatherCondition1 == "Snow" ~ 1, 
+    TRUE ~ 0))
+
+crashes_snow_friday = crashes_snow_friday %>%
+  filter(as.Date(crash_date) >= "2015/01/01" & as.Date(crash_date) <= "2021/05/31") %>%
+  separate(crash_date, 
+           into = c("Date", "Hour"), sep = 11) %>%
+  group_by(Date,Friday,Snow) %>% #am I grouping by the right things? 
+  summarize(count = length(unique(key_crash)))
+
+#Converting crashes_ts to a time series object 
+crashes_snow_friday_ts2 <- ts(crashes_snow_friday$count, start = c(2015,1), end = c(2021,153),
+                              frequency = 365)
+
+#Converting crashes_ts to a time series object 
+crashes_snow_friday_ts <- as.ts(crashes_snow_friday)
+```
+
+```{r snow-friday-forecast-attempt, echo=FALSE, message=FALSE, eval=FALSE}
+##attempting blogpost 
+y <- ts(crashes_snow_friday$count, frequency=7)
+z <- fourier(ts(crashes_snow_friday$count, frequency=365.25), K=5)
+zf <- fourier(ts(crashes_snow_friday$count, frequency=365.25), K=5, h=100)
+fit <- auto.arima(y, xreg=cbind(z), seasonal=FALSE)
+fc <- forecast(fit, xreg=cbind(zf), h=100)
+autoplot(fc)
+```
+
+```{r snow-friday-forecast, echo=FALSE, message=FALSE}
+##attempting textbook 
+#crashes_friday_ts3 <- window(crashes_friday)
+crashes_snow_friday_ts2 <- ts(crashes_snow_friday$count, start = c(2015,1), end = c(2021,153),
+                              frequency = 365)
+plots <- list()
+for (i in seq(6)) {
+  fit <- auto.arima(crashes_snow_friday_ts2, xreg = fourier(crashes_snow_friday_ts2, K = i),
+                    seasonal = FALSE, lambda = 0)
+  plots[[i]] <- autoplot(forecast(fit,
+                                  xreg=fourier(crashes_snow_friday_ts2, K=i, h=214))) +
+    xlab(paste("K=",i,"   AICC=",round(fit[["aicc"]],2))) +
+    ylab("")
+}
+
+#loading necessary packages
+#install.packages("gridExtra")
+#library(gridExtra)
+
+gridExtra::grid.arrange(
+  plots[[1]],plots[[2]],plots[[3]],
+  plots[[4]],plots[[5]],plots[[6]], nrow=3)
+```
+
+```{r snow-friday-forecast-attempt2, echo=FALSE, message=FALSE, eval=FALSE}
+#diff attempt (TAKES A LONG TIME BUT WORKS)
+bestfit <- list(aicc=Inf)
+for(K in seq(25)) {
+  fit <- auto.arima(crashes_snow_friday_ts2, xreg=fourier(crashes_snow_friday_ts2, K=K),
+                    seasonal=FALSE)
+  if(fit[["aicc"]] < bestfit[["aicc"]]) {
+    bestfit <- fit
+    bestK <- K
+  }
+}
+
+fc <- forecast(bestfit,
+               xreg=fourier(crashes_snow_friday_ts2, K=bestK, h=214))
+autoplot(fc)
 ```
 
 ### Advanced Forecasting Methods 

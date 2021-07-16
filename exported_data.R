@@ -2161,6 +2161,58 @@ fc <- forecast(bestfit,
                xreg=fourier(crashes_snow_friday_ts2, K=bestK, h=214))
 autoplot(fc)
 
+##Looking at stationarity of crashests2 time series 
+library(urca)
+acf(crashests2)
+summary(ur.kpss(crashests2))
+
+ndiffs(crashests2) #1
+nsdiffs(crashests2) #0
+
+#Attempt at differencing 
+dif_crashests2 <- diff(crashests2)
+
+#Looking at stationarity of first difference 
+acf(dif_crashests2)
+summary(ur.kpss(dif_crashests2))
+
+ndiffs(dif_crashests2) #0
+nsdiffs(dif_crashests2) #0
+
+cbind("Crashes" = crashests2,
+      "Logs" = log(crashests2),
+      "First differenced" = diff(crashests2),
+      "First differenced logs" = diff(log(crashests2))) %>%
+  autoplot(facets=TRUE) +
+  xlab("Year") + ylab("") +
+  ggtitle("Crashes")
+
+##Looking at stationarity of crashests.noncovid time series 
+library(urca)
+acf(crashests.noncovid)
+summary(ur.kpss(crashests.noncovid))
+
+ndiffs(crashests.noncovid) #1
+nsdiffs(crashests.noncovid) #0
+
+#Attempt at differencing (noncovid)
+dif_crashests.noncovid <- diff(crashests.noncovid)
+
+#Looking at stationarity of first difference (noncovid)
+acf(dif_crashests.noncovid)
+summary(ur.kpss(dif_crashests.noncovid))
+
+ndiffs(dif_crashests.noncovid) #0
+nsdiffs(dif_crashests.noncovid) #0
+
+cbind("Crashes" = crashests.noncovid,
+      "Logs" = log(crashests.noncovid),
+      "First differenced" = diff(crashests.noncovid),
+      "First differenced logs" = diff(log(crashests.noncovid))) %>%
+  autoplot(facets=TRUE) +
+  xlab("Year") + ylab("") +
+  ggtitle("Crashes (Without Pandemic Data)")
+
 ##Different attempt at forecasting for monthly (THIS WORKS)
 #install.packages("Mcomp")
 #install.packages("smooth")
