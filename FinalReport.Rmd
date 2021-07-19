@@ -47,17 +47,45 @@ When it comes to car crashes, people assume that the driver was either speeding 
 
 ### Exploratory Data Analysis 
 
-### Identifying Hot Spots of Crashes in Wake County, North Carolina 
+#### Bivariate Explorations 
+
+#### Univariate Explorations 
+
+### Identifying Hot Spots of Crashes
 
 ### Time Series Visualization 
 
 ### Time Series Forecasting 
 
+#### Stationary Transformation 
+
 ### Statistical Analyses 
 
-### Modeling Injury 
+### Predictive Models 
 
 # Results 
+
+## Time Series Analysis Results 
+
+### Time Series Forecasting 
+
+### Forecasting with Covariates 
+
+#### Daily with Pandemic Data 
+
+#### Daily without Pandemic Data 
+
+#### Monthly with Pandemic Data
+
+#### Monthly without Pandemic Data 
+
+## Predictive Modeling Results 
+
+### Under Sampling 
+
+### Over Sampling 
+
+### Combination 
 
 # Conclusion 
 
