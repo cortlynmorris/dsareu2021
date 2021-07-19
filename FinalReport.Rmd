@@ -3,6 +3,8 @@ title:
   \vspace{3in} "Visualizing, Modeling, and Forecasting Crashes in Wake County, North Carolina"
 author: "Cortlyn Morris, Kelly Wenzlof, Ayan Gulzar"
 date: "7/14/2021"
+header-includes:
+    - \usepackage{setspace}\doublespacing
 output: 
   pdf_document
 ---
