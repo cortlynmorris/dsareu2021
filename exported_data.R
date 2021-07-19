@@ -2160,7 +2160,7 @@ fc <- forecast(bestfit,
                xreg=fourier(crashes_snow_friday_ts2, K=bestK, h=214))
 autoplot(fc)
 
-##Looking at stationarity of crashests2 time series 
+##Looking at stationarity of crashests2 daily time series 
 library(urca)
 acf(crashests2)
 summary(ur.kpss(crashests2))
@@ -2186,7 +2186,7 @@ cbind("Crashes" = crashests2,
   xlab("Year") + ylab("") +
   ggtitle("Crashes")
 
-##Looking at stationarity of crashests.noncovid time series 
+##Looking at stationarity of crashests.noncovid daily time series 
 library(urca)
 acf(crashests.noncovid)
 summary(ur.kpss(crashests.noncovid))
@@ -2668,6 +2668,54 @@ cbind('Residuals' = residuals(fit.ets.monthly.noncovid.MNA),
 
 fit.ets.monthly.noncovid.MNA %>% forecast(h=8) %>%
   autoplot()
+
+##Looking at stationarity of crashes_mts4 monthly time series 
+library(urca)
+acf(crashes_mts4)
+summary(ur.kpss(crashes_mts4))
+
+ndiffs(crashes_mts4) #1
+nsdiffs(crashes_mts4) #0
+
+#Attempt at differencing 
+dif_crashes_mts4 <- diff(crashes_mts4)
+
+#Looking at stationarity of first difference 
+acf(dif_crashes_mts4)
+summary(ur.kpss(dif_crashes_mts4))
+
+ndiffs(dif_crashes_mts4) #0
+nsdiffs(dif_crashes_mts4) #0
+
+cbind("Crashes" = crashes_mts4,
+      "First differenced" = diff(crashes_mts4)) %>%
+  autoplot(facets=TRUE) +
+  xlab("Year") + ylab("") +
+  ggtitle("Crashes")
+
+##Looking at stationarity of crashes_mts4.noncovid monthly time series 
+library(urca)
+acf(crashes_mts4.noncovid)
+summary(ur.kpss(crashes_mts4.noncovid))
+
+ndiffs(crashes_mts4.noncovid) #1
+nsdiffs(crashes_mts4.noncovid) #1
+
+#Attempt at seasonal differencing (noncovid)
+season_dif_crashes_mts4.noncovid <- diff(crashes_mts4.noncovid,12)
+
+#Looking at stationarity of seasonal difference (noncovid)
+acf(season_dif_crashes_mts4.noncovid)
+summary(ur.kpss(season_dif_crashes_mts4.noncovid))
+
+ndiffs(season_dif_crashes_mts4.noncovid) #0
+nsdiffs(season_dif_crashes_mts4.noncovid) #0
+
+cbind("Crashes" = crashes_mts4.noncovid,
+      "Seasonally\n differenced" = diff(crashes_mts4.noncovid, 12)) %>%
+  autoplot(facets=TRUE) +
+  xlab("Year") + ylab("") +
+  ggtitle("Crashes (Without Pandemic Data)")
 
 ##Advanced Forecasting Methods
 
