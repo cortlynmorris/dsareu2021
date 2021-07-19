@@ -3412,5 +3412,5 @@ overunder.pred.prob4 <- predict(overunder.fit.train4, newdata=overunder.test4,
                                 type="response") #predicting prob. of default=1 for test set
 overunder.pred4 <- ifelse(overunder.pred.prob4>0.5, "Injury", "No injury") #predicting `default` based on prob estimates
 (tab4 <- table(pred=overunder.pred4, actual=overunder.test4$Injury2)) #confusion matrix: cross-tab of predictions vs actual class
-(accuracy4=mean(overunder.pred4==overunder.test4$Injury2, na.rm=T)*100) #percent of correct predictions in test data
+(accuracy4=mean(overunder.pred4==overunder.test4$Injury2, na.rm=T)*100) #percent of correct predictions in test
 
