@@ -1494,7 +1494,7 @@ rownames(daily_forecast_values_covid_STLF) <- seq(as.Date("2021/06/01"),
 
 #TBATS forecasting 
 y <- msts(crashes_ts$count, seasonal.periods=c(7,365.25))
-y2 <- msts(crashests2, seasonal.periods=c(7,365.25))
+y2 <- msts(crashests2, seasonal.periods=c(7,365.25)) #keep y2 
 
 fit_tbats_covid <- tbats(y)
 fit_tbats_covid2 <- tbats(y2)

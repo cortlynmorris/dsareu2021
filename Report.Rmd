@@ -2093,7 +2093,7 @@ accuracy(crashes.test_TBATS)
 accuracy(crashes.test_TBATS2)
 ```
 
-```{r combination, echo=FALSE, message=FALSE, warning=FALSE}
+```{r combination, echo=FALSE, message=FALSE}
 #reload libraries 
 library(reshape2)
 library(tidyverse)
