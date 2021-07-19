@@ -2095,21 +2095,9 @@ accuracy(crashes.test_TBATS2)
 
 ```{r combination, echo=FALSE, message=FALSE}
 #reload libraries 
-library(reshape2)
-library(tidyverse)
-library(ggplot2)
-library(dplyr)
 library(forecast)
-library(forecast)
-
-crashes_ts = crashes %>%
-  separate(crash_date, 
-           into = c("Date", "Hour"), sep = 11) %>%
-  group_by(Date) %>%
-  summarize(count = length(unique(key_crash)))
-
-crashests2 <- ts(crashes_ts$count, start = c(2015,1), end = c(2021,153),
-                frequency = 365)
+library(TTR)
+library(fpp2)
 
 train <- window(crashests2, end=c(2019,12))
 h <- length(crashests2) - length(train)
@@ -2129,6 +2117,8 @@ true_noncovid_crashes <- ts(true_noncovid_crashes$count,
                             start = c(2019,1), end = c(2021,153), 
                             frequency = 365)
 
+library(RColorBrewer)
+
 autoplot(train) +
   autolayer(true_noncovid_crashes) +
   autolayer(NNAR, series="NNAR", alpha=0.8) +
@@ -2138,9 +2128,14 @@ autoplot(train) +
   autolayer(TBATS, series="TBATS", PI=F) +
   scale_color_brewer(palette="RdYlBu") + 
   xlab("Year") + ylab("Crashes") +
-  ggtitle("Combination Time Series Forecast Plot (With Pandemic Data)") + 
-  theme(legend.position = "bottom")
+  ggtitle("Time Series Combination (With Pandemic Data)")
 
+c(ARIMA = accuracy(ARIMA, crashests2)["Test set", "RMSE"],
+  TBATS = accuracy(TBATS, crashests2)["Test set", "RMSE"],
+  NNAR = accuracy(NNAR, crashests2)["Test set", "RMSE"],
+  STL = accuracy(STL, crashests2)["Test set", "RMSE"],
+  Combination =
+    accuracy(Combination, crashests2)["Test set", "RMSE"])
 ```
 
 ```{r}
@@ -2162,8 +2157,7 @@ NNAR.noncovid <- forecast::forecast(nnetar(train.noncovid), h=h.noncovid)
 TBATS.noncovid <- forecast::forecast(tbats(train.noncovid, biasadj=TRUE), 
                                      h=h.noncovid)
 
-Combination.noncovid <- (ARIMA.noncovid[["mean"]] + TBATS.noncovid[["mean"]] + STL.noncovid[["mean"]] + 
-                  NNAR.noncovid[["mean"]])/4
+Combination.noncovid <- (ARIMA.noncovid[["mean"]] + TBATS.noncovid[["mean"]] + STL.noncovid[["mean"]] + NNAR.noncovid[["mean"]])/4
 
 true_noncovid_crashes <- crashes_ts %>%
   filter(Date >= as.Date("2019/01/01") & Date <= as.Date("2020/03/01"))
@@ -2900,14 +2894,15 @@ autoplot(fc)
 #crashes_snow_ts3 <- window(crashes_snow)
 crashes_snow_ts2 <- ts(crashes_snow$count, start = c(2015,1), end = c(2021,153),
                        frequency = 365)
-plots <- list()
+plots_snow <- list()
 for (i in seq(6)) {
   fit <- auto.arima(crashes_snow_ts2, xreg = fourier(crashes_snow_ts2, K = i),
                     seasonal = FALSE, lambda = 0)
-  plots[[i]] <- autoplot(forecast(fit,
+  plots_snow[[i]] <- autoplot(forecast(fit,
                                   xreg=fourier(crashes_snow_ts2, K=i, h=214))) +
     xlab(paste("K=",i,"   AICC=",round(fit[["aicc"]],2))) +
-    ylab("")
+    ylab("") + 
+    theme(title = element_text(size = 8))
 }
 
 #loading necessary packages
@@ -2915,8 +2910,12 @@ for (i in seq(6)) {
 library(gridExtra)
 
 gridExtra::grid.arrange(
-  plots[[1]],plots[[2]],plots[[3]],
-  plots[[4]],plots[[5]],plots[[6]], nrow=3)
+  plots_snow[[1]],plots_snow[[2]],plots_snow[[3]],
+  plots_snow[[4]],plots_snow[[5]],plots_snow[[6]], nrow=3)
+```
+
+```{r snow-best-forecast, echo=FALSE, message=FALSE}
+plots_snow[[4]]
 ```
 
 ```{r snow-forecast-attempt2, echo=FALSE, message=FALSE, eval=FALSE}
@@ -2973,14 +2972,15 @@ autoplot(fc)
 #crashes_friday_ts3 <- window(crashes_friday)
 crashes_friday_ts2 <- ts(crashes_friday$count, start = c(2015,1), end = c(2021,153),
                          frequency = 365)
-plots <- list()
+plots_friday <- list()
 for (i in seq(6)) {
   fit <- auto.arima(crashes_friday_ts2, xreg = fourier(crashes_friday_ts2, K = i),
                     seasonal = FALSE, lambda = 0)
-  plots[[i]] <- autoplot(forecast(fit,
+  plots_friday[[i]] <- autoplot(forecast(fit,
                                   xreg=fourier(crashes_friday_ts2, K=i, h=214))) +
     xlab(paste("K=",i,"   AICC=",round(fit[["aicc"]],2))) +
-    ylab("")
+    ylab("") + 
+    theme(title = element_text(size = 8))
 }
 
 #loading necessary packages
@@ -2988,8 +2988,12 @@ for (i in seq(6)) {
 #library(gridExtra)
 
 gridExtra::grid.arrange(
-  plots[[1]],plots[[2]],plots[[3]],
-  plots[[4]],plots[[5]],plots[[6]], nrow=3)
+  plots_friday[[1]],plots_friday[[2]],plots_friday[[3]],
+  plots_friday[[4]],plots_friday[[5]],plots_friday[[6]], nrow=3)
+```
+
+```{r friday-best-forecast, echo=FALSE, message=FALSE}
+plots_friday[[1]]
 ```
 
 ```{r friday-forecast-attempt2, echo=FALSE, message=FALSE, eval=FALSE}
@@ -3049,14 +3053,15 @@ autoplot(fc)
 #crashes_friday_ts3 <- window(crashes_friday)
 crashes_snow_friday_ts2 <- ts(crashes_snow_friday$count, start = c(2015,1), end = c(2021,153),
                               frequency = 365)
-plots <- list()
+plots_snow_friday <- list()
 for (i in seq(6)) {
   fit <- auto.arima(crashes_snow_friday_ts2, xreg = fourier(crashes_snow_friday_ts2, K = i),
                     seasonal = FALSE, lambda = 0)
-  plots[[i]] <- autoplot(forecast(fit,
+  plots_snow_friday[[i]] <- autoplot(forecast(fit,
                                   xreg=fourier(crashes_snow_friday_ts2, K=i, h=214))) +
     xlab(paste("K=",i,"   AICC=",round(fit[["aicc"]],2))) +
-    ylab("")
+    ylab("") + 
+    theme(title = element_text(size = 8))
 }
 
 #loading necessary packages
@@ -3064,8 +3069,12 @@ for (i in seq(6)) {
 #library(gridExtra)
 
 gridExtra::grid.arrange(
-  plots[[1]],plots[[2]],plots[[3]],
-  plots[[4]],plots[[5]],plots[[6]], nrow=3)
+  plots_snow_friday[[1]],plots_snow_friday[[2]],plots_snow_friday[[3]],
+  plots_snow_friday[[4]],plots_snow_friday[[5]],plots_snow_friday[[6]], nrow=3)
+```
+
+```{r snow-friday-best-forecast, echo=FALSE, message=FALSE}
+plots_snow_friday[[1]]
 ```
 
 ```{r snow-friday-forecast-attempt2, echo=FALSE, message=FALSE, eval=FALSE}
