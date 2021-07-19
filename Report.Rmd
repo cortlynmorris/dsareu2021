@@ -2095,21 +2095,9 @@ accuracy(crashes.test_TBATS2)
 
 ```{r combination, echo=FALSE, message=FALSE}
 #reload libraries 
-library(reshape2)
-library(tidyverse)
-library(ggplot2)
-library(dplyr)
 library(forecast)
-library(forecast)
-
-crashes_ts = crashes %>%
-  separate(crash_date, 
-           into = c("Date", "Hour"), sep = 11) %>%
-  group_by(Date) %>%
-  summarize(count = length(unique(key_crash)))
-
-crashests2 <- ts(crashes_ts$count, start = c(2015,1), end = c(2021,153),
-                frequency = 365)
+library(TTR)
+library(fpp2)
 
 train <- window(crashests2, end=c(2019,12))
 h <- length(crashests2) - length(train)
@@ -2129,6 +2117,8 @@ true_noncovid_crashes <- ts(true_noncovid_crashes$count,
                             start = c(2019,1), end = c(2021,153), 
                             frequency = 365)
 
+library(RColorBrewer)
+
 autoplot(train) +
   autolayer(true_noncovid_crashes) +
   autolayer(NNAR, series="NNAR", alpha=0.8) +
@@ -2138,9 +2128,14 @@ autoplot(train) +
   autolayer(TBATS, series="TBATS", PI=F) +
   scale_color_brewer(palette="RdYlBu") + 
   xlab("Year") + ylab("Crashes") +
-  ggtitle("Combination Time Series Forecast Plot (With Pandemic Data)") + 
-  theme(legend.position = "bottom")
+  ggtitle("Time Series Combination (With Pandemic Data)")
 
+c(ARIMA = accuracy(ARIMA, crashests2)["Test set", "RMSE"],
+  TBATS = accuracy(TBATS, crashests2)["Test set", "RMSE"],
+  NNAR = accuracy(NNAR, crashests2)["Test set", "RMSE"],
+  STL = accuracy(STL, crashests2)["Test set", "RMSE"],
+  Combination =
+    accuracy(Combination, crashests2)["Test set", "RMSE"])
 ```
 
 ```{r}
@@ -2162,8 +2157,7 @@ NNAR.noncovid <- forecast::forecast(nnetar(train.noncovid), h=h.noncovid)
 TBATS.noncovid <- forecast::forecast(tbats(train.noncovid, biasadj=TRUE), 
                                      h=h.noncovid)
 
-Combination.noncovid <- (ARIMA.noncovid[["mean"]] + TBATS.noncovid[["mean"]] + STL.noncovid[["mean"]] + 
-                  NNAR.noncovid[["mean"]])/4
+Combination.noncovid <- (ARIMA.noncovid[["mean"]] + TBATS.noncovid[["mean"]] + STL.noncovid[["mean"]] + NNAR.noncovid[["mean"]])/4
 
 true_noncovid_crashes <- crashes_ts %>%
   filter(Date >= as.Date("2019/01/01") & Date <= as.Date("2020/03/01"))
