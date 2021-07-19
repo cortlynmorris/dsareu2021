@@ -1767,9 +1767,68 @@ autoplot(crashests.noncovid2[,'count'], series="Data") +
   theme(axis.text.x = element_text(angle = 90))
 ```
 
+### Stationarity Transformations (Daily Data)
+
+```{r stationarity-trans-daily-covid, echo=FALSE}
+##Looking at stationarity of crashests2 daily time series 
+library(urca)
+acf(crashests2)
+summary(ur.kpss(crashests2))
+
+ndiffs(crashests2) #1
+nsdiffs(crashests2) #0
+
+#Attempt at differencing 
+dif_crashests2 <- diff(crashests2)
+
+#Looking at stationarity of first difference 
+acf(dif_crashests2)
+summary(ur.kpss(dif_crashests2))
+
+ndiffs(dif_crashests2) #0
+nsdiffs(dif_crashests2) #0
+
+cbind("Crashes" = crashests2,
+      "Logs" = log(crashests2),
+      "First differenced" = diff(crashests2),
+      "First differenced logs" = diff(log(crashests2))) %>%
+  autoplot(facets=TRUE) +
+  xlab("Year") + ylab("") +
+  ggtitle("Crashes")
+```
+
+```{r stationarity-trans-daily-noncovid, echo=FALSE}
+##Looking at stationarity of crashests.noncovid daily time series 
+library(urca)
+acf(crashests.noncovid)
+summary(ur.kpss(crashests.noncovid))
+
+ndiffs(crashests.noncovid) #1
+nsdiffs(crashests.noncovid) #0
+
+#Attempt at differencing (noncovid)
+dif_crashests.noncovid <- diff(crashests.noncovid)
+
+#Looking at stationarity of first difference (noncovid)
+acf(dif_crashests.noncovid)
+summary(ur.kpss(dif_crashests.noncovid))
+
+ndiffs(dif_crashests.noncovid) #0
+nsdiffs(dif_crashests.noncovid) #0
+
+cbind("Crashes" = crashests.noncovid,
+      "Logs" = log(crashests.noncovid),
+      "First differenced" = diff(crashests.noncovid),
+      "First differenced logs" = diff(log(crashests.noncovid))) %>%
+  autoplot(facets=TRUE) +
+  xlab("Year") + ylab("") +
+  ggtitle("Crashes (Without Pandemic Data)")
+```
+
 ## Time Series Forecasting
 
-```{r HW-fcast-box-decomp, echo=FALSE, include=FALSE}
+```{r HW-fcast-box-decomp, echo=FALSE, eval=FALSE}
+#DONT USE
 covid <- HoltWinters(crashests2)
 
 summary(covid)
@@ -1779,14 +1838,16 @@ plot(fitted(covid), main = "Box Jenkins Decomposition of Daily Crashes (With Pan
 fcast <- forecast::forecast(covid, h=214, level=c(80,95))
 ```
 
-```{r rename-HW-fcast-column, echo=FALSE, include=FALSE}
+```{r rename-HW-fcast-column, echo=FALSE, eval=FALSE}
+#DONT USE
 daily_forecast_values_covid_HW <- summary(fcast)
 
 rownames(daily_forecast_values_covid_HW) <- seq(as.Date("2021/06/01"), 
                                                 as.Date("2021/12/31"), "day")
 ```
 
-```{r HW_fcast-filter-forecast-ts, echo=FALSE, message=FALSE, include=FALSE}
+```{r HW_fcast-filter-forecast-ts, echo=FALSE, message=FALSE, eval=FALSE}
+#DONT USE 
 head(daily_forecast_values_covid_HW)
 
 autoplot(fcast) +
@@ -1795,20 +1856,22 @@ autoplot(fcast) +
 ```
 
 ```{r STLF-decomp-forecast-ts, echo=FALSE, message=FALSE}
+#Nonstationary 
 crashests2 %>% mstl() %>%
   autoplot() + 
-  ggtitle("Time Series Decomposition (With Pandemic Data)")
+  ggtitle("Time Series Decomposition (With Non-Stationary Pandemic Data)")
 
 m <- crashests2 %>%
   stlf(lambda = 0, h = 214, level=c(80,95)) 
 
 m %>%
   autoplot() + 
-  ggtitle("STLF Model for Daily Car Crashes (With Pandemic Data)") +
+  ggtitle("STLF Model for Daily Car Crashes (With Non-Stationary Pandemic Data)") +
   xlab("Year") + ylab("Crashes") 
 ```
 
 ```{r rename-STLF-fcast, echo=FALSE, include=FALSE}
+#Nonstationary
 daily_forecast_values_covid_STLF <- summary(m)
 
 rownames(daily_forecast_values_covid_STLF) <- seq(as.Date("2021/06/01"), 
@@ -1816,45 +1879,75 @@ rownames(daily_forecast_values_covid_STLF) <- seq(as.Date("2021/06/01"),
 ```
 
 ```{r STLF-fcast-filter, echo=FALSE}
+#Nonstationary 
+head(daily_forecast_values_covid_STLF)
+```
+
+```{r STLF-decomp-forecast-ts-stationary, echo=FALSE, message=FALSE, eval=FALSE}
+#Stationary (Doesn't work)
+dif_crashests2 %>% mstl() %>%
+  autoplot() + 
+  ggtitle("Time Series Decomposition (With Stationary Pandemic Data)")
+
+m <- dif_crashests2 %>%
+  stlf(lambda = 0, h = 214, level=c(80,95)) 
+
+m %>%
+  autoplot() + 
+  ggtitle("STLF Model for Daily Car Crashes (With Stationary Pandemic Data)") +
+  xlab("Year") + ylab("Crashes") 
+```
+
+```{r rename-STLF-fcast-stationary, echo=FALSE, include=FALSE}
+#Stationary
+daily_forecast_values_covid_STLF <- summary(m)
+
+rownames(daily_forecast_values_covid_STLF) <- seq(as.Date("2021/06/01"), 
+                                                as.Date("2021/12/31"), "day")
+```
+
+```{r STLF-fcast-filter-stationary, echo=FALSE}
+#Stationary
 head(daily_forecast_values_covid_STLF)
 ```
 
 ```{r tbats, echo-FALSE, message=FALSE, include=FALSE}
-y <- msts(crashes_ts$count, seasonal.periods=c(7,365.25))
+#y <- msts(crashes_ts$count, seasonal.periods=c(7,365.25))
 y2 <- msts(crashests2, seasonal.periods=c(7,365.25))
 
-fit_tbats_covid <- tbats(y)
+#fit_tbats_covid <- tbats(y)
 fit_tbats_covid2 <- tbats(y2)
 
-fc_tbats_covid <- forecast::forecast(fit_tbats_covid, h=214)
+#fc_tbats_covid <- forecast::forecast(fit_tbats_covid, h=214)
 fc_tbats_covid2 <- forecast::forecast(fit_tbats_covid2, h=214)
 
-daily_forecast_values_covid_TBATS <- summary(fc_tbats_covid)
+#daily_forecast_values_covid_TBATS <- summary(fc_tbats_covid)
 daily_forecast_values_covid_TBATS2 <- summary(fc_tbats_covid2)
 
-rownames(daily_forecast_values_covid_TBATS) <- seq(as.Date("2021/06/01"), 
-                                                  as.Date("2021/12/31"), "day")
+# rownames(daily_forecast_values_covid_TBATS) <- seq(as.Date("2021/06/01"), 
+#                                                   as.Date("2021/12/31"), "day")
 rownames(daily_forecast_values_covid_TBATS2) <- seq(as.Date("2021/06/01"), 
                                                   as.Date("2021/12/31"), "day")
 ```
 
 ```{r tbats-plot, echo=FALSE, message=FALSE}
-head(daily_forecast_values_covid_TBATS)
+#head(daily_forecast_values_covid_TBATS)
 head(daily_forecast_values_covid_TBATS2)
 
-autoplot(fc_tbats_covid) + 
-  ggtitle("TBATS Forecasting Model for Daily Car Crashes (With Pandemic Data)") +
-  xlab("Year") + ylab("Crashes") + 
-  scale_x_continuous(breaks = c(1,2,3,4,5,6,7,8), 
-                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
-                                "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022")) + 
-  theme(axis.text.x = element_text(angle=90))
+# autoplot(fc_tbats_covid) + 
+#   ggtitle("TBATS Forecasting Model for Daily Car Crashes (With Pandemic Data)") +
+#   xlab("Year") + ylab("Crashes") + 
+#   scale_x_continuous(breaks = c(1,2,3,4,5,6,7,8), 
+#                      labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
+#                                 "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022")) + 
+#   theme(axis.text.x = element_text(angle=90))
 autoplot(fc_tbats_covid2) + 
   ggtitle("TBATS Forecasting Model for Daily Car Crashes (With Pandemic Data)") +
   xlab("Year") + ylab("Crashes")
 ```
 
-```{r HW-noncovid-fcast-decomp, echo=FALSE, include=FALSE}
+```{r HW-noncovid-fcast-decomp, echo=FALSE, eval=FALSE}
+#DONT USE
 noncovid <- HoltWinters(crashests.noncovid)
 
 summary(noncovid)
@@ -1864,14 +1957,16 @@ plot(fitted(noncovid), main="Box Jenkins Decomposition of Daily Crashes (Without
 fcast.noncovid <- forecast(noncovid, h=671, level=c(80,95))
 ```
 
-```{r rename-noncovid-HW-fcast, echo=FALSE, include=FALSE}
+```{r rename-noncovid-HW-fcast, echo=FALSE, eval=FALSE}
+#DONT USE
 daily_forecast_values_noncovid_HW <- summary(fcast.noncovid)
 
 rownames(daily_forecast_values_noncovid_HW) <- seq(as.Date("2020/03/01"), 
                                                   as.Date("2021/12/31"), "day")
 ```
 
-```{r noncovid-HW-fcast-filter-forecast-ts, echo=FALSE, include=FALSE}
+```{r noncovid-HW-fcast-filter-forecast-ts, echo=FALSE, eval=FALSE}
+#DONT USE
 head(daily_forecast_values_noncovid_HW)
 
 true_crashes <- crashes_ts %>%
@@ -1923,43 +2018,43 @@ head(daily_forecast_values_noncovid_STLF)
 ```
 
 ```{r tbats-noncovid, echo=FALSE, message=FALSE, include=FALSE}
-y.noncovid <- msts(crashes_ts.noncovid$count, seasonal.periods=c(7,365.25))
+#y.noncovid <- msts(crashes_ts.noncovid$count, seasonal.periods=c(7,365.25))
 y2.noncovid <- msts(crashests.noncovid, seasonal.periods=c(7,365.25))
 
-fit_tbats_noncovid <- tbats(y.noncovid)
+#fit_tbats_noncovid <- tbats(y.noncovid)
 fit_tbats_noncovid2 <- tbats(y2.noncovid)
 
-fc_tbats_noncovid <- forecast::forecast(fit_tbats_noncovid, h=671)
+# fc_tbats_noncovid <- forecast::forecast(fit_tbats_noncovid, h=671)
 fc_tbats_noncovid2 <- forecast::forecast(fit_tbats_noncovid2, h=671)
 
-daily_forecast_values_noncovid_TBATS <- summary(fc_tbats_noncovid)
+# daily_forecast_values_noncovid_TBATS <- summary(fc_tbats_noncovid)
 daily_forecast_values_noncovid_TBATS2 <- summary(fc_tbats_noncovid2)
 
-rownames(daily_forecast_values_noncovid_TBATS) <- seq(as.Date("2020/03/01"), 
-                                                      as.Date("2021/12/31"), "day")
+# rownames(daily_forecast_values_noncovid_TBATS) <- seq(as.Date("2020/03/01"), 
+#                                                       as.Date("2021/12/31"), "day")
 rownames(daily_forecast_values_noncovid_TBATS2) <- seq(as.Date("2020/03/01"), 
                                                        as.Date("2021/12/31"), "day")
 ```
 
 ```{r tbats-noncovid-plot, echo=FALSE, message=FALSE}
-head(daily_forecast_values_noncovid_TBATS)
+# head(daily_forecast_values_noncovid_TBATS)
 head(daily_forecast_values_noncovid_TBATS2)
 
-true_noncovid_crashes <- crashes_ts %>%
-  filter(Date >= as.Date("2020/03/01") & Date <= as.Date("2021/05/31"))
+# true_noncovid_crashes <- crashes_ts %>%
+#   filter(Date >= as.Date("2020/03/01") & Date <= as.Date("2021/05/31"))
 
 true_noncovid_crashes <- ts(true_noncovid_crashes$count, 
                             start = c(2020,3), end = c(2021,153), 
                             frequency = 365)
 
-autoplot(fc_tbats_noncovid) + 
-  #autolayer(true_noncovid_crashes, alpha=0.8) + 
-  ggtitle("TBATS Forecasting Model for Daily Car Crashes (Without Pandemic Data)") +
-  xlab("Year") + ylab("Crashes") + 
-  scale_x_continuous(breaks = c(1,2,3,4,5,6,7,8), 
-                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
-                                "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022")) + 
-  theme(axis.text.x = element_text(angle=90), legend.position = "bottom")
+# autoplot(fc_tbats_noncovid) + 
+#   #autolayer(true_noncovid_crashes, alpha=0.8) + 
+#   ggtitle("TBATS Forecasting Model for Daily Car Crashes (Without Pandemic Data)") +
+#   xlab("Year") + ylab("Crashes") + 
+#   scale_x_continuous(breaks = c(1,2,3,4,5,6,7,8), 
+#                      labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
+#                                 "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022")) + 
+#   theme(axis.text.x = element_text(angle=90), legend.position = "bottom")
 autoplot(fc_tbats_noncovid2) + 
   autolayer(true_noncovid_crashes, alpha=0.8) + 
   ggtitle("TBATS Forecasting Model for Daily Car Crashes (Without Pandemic Data)") +
@@ -2030,28 +2125,28 @@ autoplot(training_STLF, series="Training data") +
 ```
 
 ```{r tbats-ms, echo=FALSE, message=FALSE}
-y <- msts(crashes_ts$count, seasonal.periods=c(7,365.25))
+# y <- msts(crashes_ts$count, seasonal.periods=c(7,365.25))
 y2 <- msts(crashests2, seasonal.periods=c(7,365.25))
 
-training_TBATS <- subset(y, end=length(y)-151)
+# training_TBATS <- subset(y, end=length(y)-151)
 training_TBATS2 <- subset(y2, end=length(y2)-151)
 
-test_TBATS <- subset(y, start=length(y)-150)
+# test_TBATS <- subset(y, start=length(y)-150)
 test_TBATS2 <- subset(y2, start=length(y2)-150)
 
-crashes.train_TBATS <- tbats(training_TBATS)
+# crashes.train_TBATS <- tbats(training_TBATS)
 crashes.train_TBATS2 <- tbats(training_TBATS2)
 
-crashes.train_TBATS %>%
-  forecast(h=151) %>%
-  autoplot(alpha=0.2) + 
-  autolayer(test_TBATS, alpha=0.75) + 
-  scale_x_continuous(breaks = c(1,2,3,4,5,6,7,8), 
-                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
-                                "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022")) + 
-  theme(axis.text.x = element_text(angle=90), legend.position = "bottom") + 
-  ggtitle("Multi-Step TBATS Daily Forecasts of Crashes (With Pandemic Data)") + 
-  xlab("Date") + ylab("Crashes") 
+# crashes.train_TBATS %>%
+#   forecast(h=151) %>%
+#   autoplot(alpha=0.2) + 
+#   autolayer(test_TBATS, alpha=0.75) + 
+#   scale_x_continuous(breaks = c(1,2,3,4,5,6,7,8), 
+#                      labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
+#                                 "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022")) + 
+#   theme(axis.text.x = element_text(angle=90), legend.position = "bottom") + 
+#   ggtitle("Multi-Step TBATS Daily Forecasts of Crashes (With Pandemic Data)") + 
+#   xlab("Date") + ylab("Crashes") 
 crashes.train_TBATS2 %>%
   forecast(h=151) %>%
   autoplot(alpha=0.2) + 
@@ -2062,34 +2157,34 @@ crashes.train_TBATS2 %>%
 ```
 
 ```{r tbats-ms-fcast-covid, echo=FALSE, message=FALSE, include=FALSE}
-fcast.ms.TBATS.covid <- summary(forecast::forecast(crashes.train_TBATS, h=152, level=c(80,95)))
-
-rownames(fcast.ms.TBATS.covid) <- seq(as.Date("2021/01/01"), as.Date("2021/06/01"), "day")
+# fcast.ms.TBATS.covid <- summary(forecast::forecast(crashes.train_TBATS, h=152, level=c(80,95)))
+# 
+# rownames(fcast.ms.TBATS.covid) <- seq(as.Date("2021/01/01"), as.Date("2021/06/01"), "day")
 
 fcast.ms.TBATS.covid2 <- summary(forecast::forecast(crashes.train_TBATS2, h=152, level=c(80,95)))
 
 rownames(fcast.ms.TBATS.covid2) <- seq(as.Date("2021/01/01"), as.Date("2021/06/01"), "day")
 ```
 
-```{r, tbats-ms-plot, echo=FALSE, message=FALSE, warning=FALSE}
-head(fcast.ms.TBATS.covid)
+```{r tbats-ms-plot, echo=FALSE, message=FALSE, warning=FALSE}
+# head(fcast.ms.TBATS.covid)
 head(fcast.ms.TBATS.covid2)
 
-autoplot(training_TBATS, series="Training data") +
-  autolayer(fitted(crashes.train_TBATS, h=12),
-            series="12-step fitted values") + 
-  ggtitle("12-Step Fitted Values of TBATS Model (With Pandemic Data)") + 
-  xlab("Date") + ylab("Crashes")
+# autoplot(training_TBATS, series="Training data") +
+#   autolayer(fitted(crashes.train_TBATS, h=12),
+#             series="12-step fitted values") + 
+#   ggtitle("12-Step Fitted Values of TBATS Model (With Pandemic Data)") + 
+#   xlab("Date") + ylab("Crashes")
 autoplot(training_TBATS2, series="Training data") +
   autolayer(fitted(crashes.train_TBATS2, h=12),
             series="12-step fitted values") + 
   ggtitle("12-Step Fitted Values of TBATS Model (With Pandemic Data)") + 
   xlab("Date") + ylab("Crashes")
 
-crashes.test_TBATS <- tbats(test_TBATS)
+# crashes.test_TBATS <- tbats(test_TBATS)
 crashes.test_TBATS2 <- tbats(test_TBATS2)
 
-accuracy(crashes.test_TBATS)
+# accuracy(crashes.test_TBATS)
 accuracy(crashes.test_TBATS2)
 ```
 
@@ -2138,7 +2233,7 @@ c(ARIMA = accuracy(ARIMA, crashests2)["Test set", "RMSE"],
     accuracy(Combination, crashests2)["Test set", "RMSE"])
 ```
 
-```{r}
+```{r combination-statistics, echo=FALSE}
 c(ARIMA = accuracy(ARIMA, crashests2)["Test set", "RMSE"],
   TBATS = accuracy(TBATS, crashests2)["Test set", "RMSE"],
   NNAR = accuracy(NNAR, crashests2)["Test set", "RMSE"],
@@ -2249,44 +2344,44 @@ autoplot(training_STLF_noncovid, series="Training data") +
 ```
 
 ```{r tbats-ms-noncovid, echo=FALSE, message=FALSE, include=FALSE}
-y.noncovid <- msts(crashes_ts.noncovid$count, seasonal.periods=c(7,365.25))
+# y.noncovid <- msts(crashes_ts.noncovid$count, seasonal.periods=c(7,365.25))
 y2.noncovid <- msts(crashests.noncovid, seasonal.periods=c(7,365.25))
 
-training_TBATS.noncovid <- subset(y.noncovid, end=length(y.noncovid)-426)
+# training_TBATS.noncovid <- subset(y.noncovid, end=length(y.noncovid)-426)
 training_TBATS2.noncovid <- subset(y2.noncovid, end=length(y2.noncovid)-426)
 
-test_TBATS.noncovid <- subset(y.noncovid, start=length(y.noncovid)-425)
+# test_TBATS.noncovid <- subset(y.noncovid, start=length(y.noncovid)-425)
 test_TBATS2.noncovid <- subset(y2.noncovid, start=length(y2.noncovid)-425)
 
-crashes.train_TBATS.noncovid <- tbats(training_TBATS.noncovid)
+# crashes.train_TBATS.noncovid <- tbats(training_TBATS.noncovid)
 crashes.train_TBATS2.noncovid <- tbats(training_TBATS2.noncovid)
 
-fcast.ms.TBATS.noncovid <- summary(crashes.train_TBATS.noncovid%>%forecast::forecast(h=426))
+# fcast.ms.TBATS.noncovid <- summary(crashes.train_TBATS.noncovid%>%forecast::forecast(h=426))
 
 fcast.ms.TBATS.noncovid2 <- summary(crashes.train_TBATS2.noncovid%>%forecast::forecast(h=426))
 
-rownames(fcast.ms.TBATS.noncovid) <- seq(as.Date("2019/01/01"), 
-                                         as.Date("2020/03/01"), "day")
+# rownames(fcast.ms.TBATS.noncovid) <- seq(as.Date("2019/01/01"), 
+#                                          as.Date("2020/03/01"), "day")
 
 rownames(fcast.ms.TBATS.noncovid2) <- seq(as.Date("2019/01/01"), 
                                          as.Date("2020/03/01"), "day")
 ```
 
 ```{r tbats-noncovid-plots, echo=FALSE, message=FALSE, warning=FALSE}
-head(fcast.ms.TBATS.noncovid)
+# head(fcast.ms.TBATS.noncovid)
 head(fcast.ms.TBATS.noncovid2)
 
-crashes.train_TBATS.noncovid %>%
-  forecast(h=426) %>%
-  autoplot(alpha=0.2) + 
-  autolayer(test_TBATS.noncovid, alpha=0.75, series="test_TBATS") +
-  theme(legend.position = "bottom") + 
-  scale_x_continuous(breaks = c(1,2,3,4,5,6,7,8), 
-                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
-                                "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022")) + 
-  theme(axis.text.x = element_text(angle=90), legend.position = "bottom") + 
-  ggtitle("Multi-Step TBATS Daily Forecasts of Crashes (Without Pandemic Data)") + 
-  xlab("Date") + ylab("Crashes") 
+# crashes.train_TBATS.noncovid %>%
+#   forecast(h=426) %>%
+#   autoplot(alpha=0.2) + 
+#   autolayer(test_TBATS.noncovid, alpha=0.75, series="test_TBATS") +
+#   theme(legend.position = "bottom") + 
+#   scale_x_continuous(breaks = c(1,2,3,4,5,6,7,8), 
+#                      labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
+#                                 "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022")) + 
+#   theme(axis.text.x = element_text(angle=90), legend.position = "bottom") + 
+#   ggtitle("Multi-Step TBATS Daily Forecasts of Crashes (Without Pandemic Data)") + 
+#   xlab("Date") + ylab("Crashes") 
 crashes.train_TBATS2.noncovid %>%
   forecast(h=426) %>%
   autoplot(alpha=0.2) + 
@@ -2295,21 +2390,21 @@ crashes.train_TBATS2.noncovid %>%
   autolayer(test_TBATS2.noncovid, alpha=0.75, series="test_TBATS") + 
   theme(legend.position = "bottom")
 
-autoplot(training_TBATS.noncovid, series="Training data") +
-  autolayer(fitted(crashes.train_TBATS.noncovid, h=12),
-            series="12-step fitted values") + 
-  ggtitle("12-Step Fitted Values of TBATS Model (Without Pandemic Data)") + 
-  xlab("Date") + ylab("Crashes")
+# autoplot(training_TBATS.noncovid, series="Training data") +
+#   autolayer(fitted(crashes.train_TBATS.noncovid, h=12),
+#             series="12-step fitted values") + 
+#   ggtitle("12-Step Fitted Values of TBATS Model (Without Pandemic Data)") + 
+#   xlab("Date") + ylab("Crashes")
 autoplot(training_TBATS2.noncovid, series="Training data") +
   autolayer(fitted(crashes.train_TBATS2.noncovid, h=12),
             series="12-step fitted values") + 
   ggtitle("12-Step Fitted Values of TBATS Model (Without Pandemic Data)") + 
   xlab("Date") + ylab("Crashes")
 
-crashes.test_TBATS.noncovid <- tbats(test_TBATS.noncovid)
+# crashes.test_TBATS.noncovid <- tbats(test_TBATS.noncovid)
 crashes.test_TBATS2.noncovid <- tbats(test_TBATS2.noncovid)
 
-accuracy(crashes.test_TBATS.noncovid)
+# accuracy(crashes.test_TBATS.noncovid)
 accuracy(crashes.test_TBATS2.noncovid)
 ```
 
@@ -2412,6 +2507,60 @@ autoplot(fcast.noncovid) +
                                 "Jan 2019", "Jan 2020", "Jan 2021", 
                                 "Jan 2022")) + 
   theme(axis.text.x = element_text(angle = 90), title = element_text(size = 10))
+```
+
+### Stationarity Transformations (Monthly Data)
+
+```{r stationarity-trans-monthly-covid, echo=FALSE}
+##Looking at stationarity of crashes_mts4 monthly time series 
+library(urca)
+acf(crashes_mts4)
+summary(ur.kpss(crashes_mts4))
+
+ndiffs(crashes_mts4) #1
+nsdiffs(crashes_mts4) #0
+
+#Attempt at differencing 
+dif_crashes_mts4 <- diff(crashes_mts4)
+
+#Looking at stationarity of first difference 
+acf(dif_crashes_mts4)
+summary(ur.kpss(dif_crashes_mts4))
+
+ndiffs(dif_crashes_mts4) #0
+nsdiffs(dif_crashes_mts4) #0
+
+cbind("Crashes" = crashes_mts4,
+      "First differenced" = diff(crashes_mts4)) %>%
+  autoplot(facets=TRUE) +
+  xlab("Year") + ylab("") +
+  ggtitle("Crashes")
+```
+
+```{r stationarity-trans-monthly-noncovid, echo=FALSE}
+##Looking at stationarity of crashes_mts4.noncovid monthly time series 
+library(urca)
+acf(crashes_mts4.noncovid)
+summary(ur.kpss(crashes_mts4.noncovid))
+
+ndiffs(crashes_mts4.noncovid) #1
+nsdiffs(crashes_mts4.noncovid) #1
+
+#Attempt at seasonal differencing (noncovid)
+season_dif_crashes_mts4.noncovid <- diff(crashes_mts4.noncovid,12)
+
+#Looking at stationarity of seasonal difference (noncovid)
+acf(season_dif_crashes_mts4.noncovid)
+summary(ur.kpss(season_dif_crashes_mts4.noncovid))
+
+ndiffs(season_dif_crashes_mts4.noncovid) #0
+nsdiffs(season_dif_crashes_mts4.noncovid) #0
+
+cbind("Crashes" = crashes_mts4.noncovid,
+      "Seasonally\n differenced" = diff(crashes_mts4.noncovid, 12)) %>%
+  autoplot(facets=TRUE) +
+  xlab("Year") + ylab("") +
+  ggtitle("Crashes (Without Pandemic Data)")
 ```
 
 ```{r monthly-HW-fcast-decomp, echo=FALSE}
