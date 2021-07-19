@@ -2197,9 +2197,37 @@ accuracy(crashes.test_TBATS2)
 
 ```{r combination, echo=FALSE, message=FALSE}
 #reload libraries 
+library(reshape2)
+library(tidyverse)
+library(ggplot2)
+library(dplyr)
+library(dslabs)
+library(ggrepel)
+library(ggthemes)
+library(maps)
+library(scales)
+library(maps)
+library(sf)
+library(ggplot2)
+library(ggmap)
+library(RColorBrewer)
+library(plotly)
+library(wordcloud2)
+library(fpp2)
+library(zoo)
 library(forecast)
 library(TTR)
-library(fpp2)
+
+crashes_ts = crashes %>%
+  filter(as.Date(crash_date) >= "2015/01/01" & as.Date(crash_date) <= "2021/05/31") %>%
+  separate(crash_date, 
+           into = c("Date", "Hour"), sep = 11) %>%
+  group_by(Date) %>%
+  summarize(count = length(unique(key_crash)))
+
+#Converting crashes_ts to a time series object 
+crashests2 <- ts(crashes_ts$count, start = c(2015,1), end = c(2021,153),
+                frequency = 365)
 
 train <- window(crashests2, end=c(2019,12))
 h <- length(crashests2) - length(train)
@@ -2233,15 +2261,6 @@ autoplot(train) +
   ggtitle("Time Series Combination (With Pandemic Data)") + 
   theme(legend.position = "bottom")
 
-c(ARIMA = accuracy(ARIMA, crashests2)["Test set", "RMSE"],
-  TBATS = accuracy(TBATS, crashests2)["Test set", "RMSE"],
-  NNAR = accuracy(NNAR, crashests2)["Test set", "RMSE"],
-  STL = accuracy(STL, crashests2)["Test set", "RMSE"],
-  Combination =
-    accuracy(Combination, crashests2)["Test set", "RMSE"])
-```
-
-```{r combination-statistics, echo=FALSE}
 c(ARIMA = accuracy(ARIMA, crashests2)["Test set", "RMSE"],
   TBATS = accuracy(TBATS, crashests2)["Test set", "RMSE"],
   NNAR = accuracy(NNAR, crashests2)["Test set", "RMSE"],
