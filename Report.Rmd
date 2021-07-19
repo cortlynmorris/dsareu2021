@@ -2853,6 +2853,152 @@ fit.ets.monthly.covid.MNA %>% forecast(h=8) %>%
   xlab("Date") + ylab("Crashes")
 ```
 
+```{r ets-MAM-noncovid, echo=FALSE, message=FALSE}
+##Working with ets() monthly noncovid MAM model 
+fit.ets.monthly.noncovid <- ets(y=crashes_mts4.noncovid, model="MAM")
+
+summary(fit.ets.monthly.noncovid)
+
+autoplot(fit.ets.monthly.noncovid) + 
+  ggtitle("Components of ETS Multiplicative HoltWinters Method with Multiplicative Errors (Without Pandemic Data)") + 
+  theme(title = element_text(size = 6)) + 
+  scale_x_continuous(breaks = c(1,2,3,4,5,6,7,8), 
+                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
+                                "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022")) +
+  theme(axis.text.x = element_text(angle=90)) + 
+  xlab("Date") + ylab("Crashes")
+
+cbind('Residuals' = residuals(fit.ets.monthly.noncovid),
+      'Forecast errors' = residuals(fit.ets.monthly.noncovid,type='response')) %>%
+  autoplot(facet=TRUE) + xlab("Year") + ylab("") + 
+  ggtitle("Residuals of ETS Multiplicative HoltWinters Method with Multiplicative Errors (Without Pandemic Data)") + 
+  theme(title = element_text(size=7)) + 
+  scale_x_continuous(breaks = c(1,2,3,4,5,6,7,8), 
+                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
+                                "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022")) + 
+  theme(axis.text.x = element_text(angle=90))
+
+fit.ets.monthly.noncovid %>% forecast(h=23) %>%
+  autoplot() + 
+  ggtitle("Forecasts from ETS Multiplicative HoltWinters Method with Multiplicative Errors (Without Pandemic Data)") + 
+  theme(title = element_text(size=7)) + 
+  scale_x_continuous(breaks = c(1,2,3,4,5,6,7,8), 
+                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
+                                "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022")) + 
+  theme(axis.text.x = element_text(angle=90)) + 
+  xlab("Date") + ylab("Crashes")
+```
+
+```{r ets-MNM-noncovid, echo=FALSE, message=FALSE}
+##Working with ets() monthly MNM noncovid model 
+
+fit.ets.monthly.noncovid.MNM <-ets(y=crashes_mts4.noncovid, model="MNM")
+
+summary(fit.ets.monthly.noncovid.MNM)
+
+autoplot(fit.ets.monthly.noncovid.MNM) + 
+  ggtitle("Components of ETS Multiplicative Seasonality and Errors Method (Without Pandemic Data)") + 
+  theme(title = element_text(size = 8)) + 
+  scale_x_continuous(breaks = c(1,2,3,4,5,6,7,8), 
+                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
+                                "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022")) +
+  theme(axis.text.x = element_text(angle=90)) + 
+  xlab("Date") + ylab("Crashes")
+
+cbind('Residuals' = residuals(fit.ets.monthly.noncovid.MNM),
+      'Forecast errors' = residuals(fit.ets.monthly.noncovid.MNM,type='response')) %>%
+  autoplot(facet=TRUE) + xlab("Year") + ylab("") + 
+  ggtitle("Residuals of ETS Multiplicative Seasonality and Errors Method (Without Pandemic Data)") + 
+  theme(title = element_text(size=9)) + 
+  scale_x_continuous(breaks = c(1,2,3,4,5,6,7,8), 
+                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
+                                "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022")) + 
+  theme(axis.text.x = element_text(angle=90))
+
+fit.ets.monthly.noncovid.MNM %>% forecast(h=23) %>%
+  autoplot() + 
+  ggtitle("Forecasts from ETS Multiplicative Seasonality and Errors Method (Without Pandemic Data)") + 
+  theme(title = element_text(size=9)) + 
+  scale_x_continuous(breaks = c(1,2,3,4,5,6,7,8), 
+                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
+                                "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022")) + 
+  theme(axis.text.x = element_text(angle=90)) + 
+  xlab("Date") + ylab("Crashes")
+```
+
+```{r ets-MMM-noncovid, echo=FALSE, message=FALSE}
+##Working with ets() monthly MMM noncovid model 
+
+fit.ets.monthly.noncovid.MMM <-ets(y=crashes_mts4.noncovid, model="MMM")
+
+summary(fit.ets.monthly.noncovid.MMM)
+
+autoplot(fit.ets.monthly.noncovid.MMM) + 
+  ggtitle("Components of ETS Multiplicative Seasonality, Trend, and Errors Method (Without Pandemic Data)") + 
+  theme(title = element_text(size = 7)) + 
+  scale_x_continuous(breaks = c(1,2,3,4,5,6,7,8), 
+                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
+                                "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022")) +
+  theme(axis.text.x = element_text(angle=90)) + 
+  xlab("Date") + ylab("Crashes")
+
+cbind('Residuals' = residuals(fit.ets.monthly.noncovid.MMM),
+      'Forecast errors' = residuals(fit.ets.monthly.noncovid.MMM,type='response')) %>%
+  autoplot(facet=TRUE) + xlab("Year") + ylab("") + 
+  ggtitle("Residuals of ETS Multiplicative Seasonality, Trend, and Errors Method (Without Pandemic Data)") + 
+  theme(title = element_text(size=8)) + 
+  scale_x_continuous(breaks = c(1,2,3,4,5,6,7,8), 
+                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
+                                "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022")) + 
+  theme(axis.text.x = element_text(angle=90))
+
+fit.ets.monthly.noncovid.MMM %>% forecast(h=23) %>%
+  autoplot() + 
+  ggtitle("Forecasts from ETS Multiplicative Seasonality, Trend, and Errors Method (Without Pandemic Data)") + 
+  theme(title = element_text(size=8)) + 
+  scale_x_continuous(breaks = c(1,2,3,4,5,6,7,8), 
+                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
+                                "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022")) + 
+  theme(axis.text.x = element_text(angle=90)) + 
+  xlab("Date") + ylab("Crashes")
+```
+
+```{r ets-MNA-noncovid, echo=FALSE, message=FALSE}
+##Working with ets() monthly MNA noncovid model 
+
+fit.ets.monthly.noncovid.MNA <-ets(y=crashes_mts4.noncovid, model="MNA")
+summary(fit.ets.monthly.noncovid.MNA)
+
+autoplot(fit.ets.monthly.noncovid.MNA) + 
+  ggtitle("Components of ETS Multiplicative Seasonality and Additive Errors Method (Without Pandemic Data)") + 
+  theme(title = element_text(size = 7)) + 
+  scale_x_continuous(breaks = c(1,2,3,4,5,6,7,8), 
+                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
+                                "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022")) +
+  theme(axis.text.x = element_text(angle=90)) + 
+  xlab("Date") + ylab("Crashes")
+
+cbind('Residuals' = residuals(fit.ets.monthly.noncovid.MNA),
+      'Forecast errors' = residuals(fit.ets.monthly.noncovid.MNA,type='response')) %>%
+  autoplot(facet=TRUE) + xlab("Year") + ylab("") + 
+  ggtitle("Residuals of ETS Multiplicative Seasonality and Additive Errors Method (Without Pandemic Data)") + 
+  theme(title = element_text(size=8)) + 
+  scale_x_continuous(breaks = c(1,2,3,4,5,6,7,8), 
+                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
+                                "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022")) + 
+  theme(axis.text.x = element_text(angle=90))
+
+fit.ets.monthly.noncovid.MNA %>% forecast(h=23) %>%
+  autoplot() + 
+  ggtitle("Forecasts from ETS Multiplicative Seasonality and Additive Errors Method (Without Pandemic Data)") + 
+  theme(title = element_text(size=8)) + 
+  scale_x_continuous(breaks = c(1,2,3,4,5,6,7,8), 
+                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
+                                "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022")) + 
+  theme(axis.text.x = element_text(angle=90)) + 
+  xlab("Date") + ylab("Crashes")
+```
+
 ### Forecasting with Covariates 
 
 ```{r snow-dummy, echo=FALSE, message=FALSE}
