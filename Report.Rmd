@@ -1767,9 +1767,11 @@ autoplot(crashests.noncovid2[,'count'], series="Data") +
   theme(axis.text.x = element_text(angle = 90))
 ```
 
+## Time Series Forecasting
+
 ### Stationarity Transformations (Daily Data)
 
-```{r stationarity-trans-daily-covid, echo=FALSE}
+```{r stationarity-trans-daily-covid, echo=FALSE, include=FALSE}
 ##Looking at stationarity of crashests2 daily time series 
 library(urca)
 acf(crashests2)
@@ -1787,17 +1789,19 @@ summary(ur.kpss(dif_crashests2))
 
 ndiffs(dif_crashests2) #0
 nsdiffs(dif_crashests2) #0
+```
 
+```{r stat-trans-daily-covid-plot, echo=FALSE}
 cbind("Crashes" = crashests2,
       "Logs" = log(crashests2),
       "First differenced" = diff(crashests2),
       "First differenced logs" = diff(log(crashests2))) %>%
   autoplot(facets=TRUE) +
-  xlab("Year") + ylab("") +
-  ggtitle("Crashes")
+  xlab("Date") + ylab("") +
+  ggtitle("Stationarity Transformations of Daily Pandemic Data")
 ```
 
-```{r stationarity-trans-daily-noncovid, echo=FALSE}
+```{r stationarity-trans-daily-noncovid, echo=FALSE, include=FALSE}
 ##Looking at stationarity of crashests.noncovid daily time series 
 library(urca)
 acf(crashests.noncovid)
@@ -1815,17 +1819,17 @@ summary(ur.kpss(dif_crashests.noncovid))
 
 ndiffs(dif_crashests.noncovid) #0
 nsdiffs(dif_crashests.noncovid) #0
-
-cbind("Crashes" = crashests.noncovid,
-      "Logs" = log(crashests.noncovid),
-      "First differenced" = diff(crashests.noncovid),
-      "First differenced logs" = diff(log(crashests.noncovid))) %>%
-  autoplot(facets=TRUE) +
-  xlab("Year") + ylab("") +
-  ggtitle("Crashes (Without Pandemic Data)")
 ```
 
-## Time Series Forecasting
+```{r stat-trans-daily-noncovid-plot, echo=FALSE}
+cbind("Crashes" = crashests.noncovid,
+      "First differenced" = diff(crashests.noncovid)) %>%
+  autoplot(facets=TRUE) +
+  xlab("Date") + ylab("") +
+  ggtitle("Stationarity Transformation of Daily NonPandemic Data")
+```
+
+### Basic Forecasting
 
 ```{r HW-fcast-box-decomp, echo=FALSE, eval=FALSE}
 #DONT USE
@@ -1852,7 +1856,7 @@ head(daily_forecast_values_covid_HW)
 
 autoplot(fcast) +
   ggtitle("Forecasts of Daily Car Crashes Using HoltWinters (With Pandemic Data)") +
-  xlab("Year") + ylab("Crashes") 
+  xlab("Date") + ylab("Crashes") 
 ```
 
 ```{r STLF-decomp-forecast-ts, echo=FALSE, message=FALSE}
@@ -1867,7 +1871,7 @@ m <- crashests2 %>%
 m %>%
   autoplot() + 
   ggtitle("STLF Model for Daily Car Crashes (With Non-Stationary Pandemic Data)") +
-  xlab("Year") + ylab("Crashes") 
+  xlab("Date") + ylab("Crashes") 
 ```
 
 ```{r rename-STLF-fcast, echo=FALSE, include=FALSE}
@@ -1895,7 +1899,7 @@ dif_m <- dif_crashests2 %>%
 dif_m %>%
   autoplot() + 
   ggtitle("STLF Model for Daily Car Crashes (With Stationary Pandemic Data)") +
-  xlab("Year") + ylab("Crashes") 
+  xlab("Date") + ylab("Crashes") 
 ```
 
 ```{r rename-STLF-fcast-stationary, echo=FALSE, eval=FALSE}
@@ -1943,7 +1947,7 @@ head(daily_forecast_values_covid_TBATS2)
 #   theme(axis.text.x = element_text(angle=90))
 autoplot(fc_tbats_covid2) + 
   ggtitle("TBATS Forecasting Model for Daily Car Crashes (With Pandemic Data)") +
-  xlab("Year") + ylab("Crashes")
+  xlab("Date") + ylab("Crashes")
 ```
 
 ```{r HW-noncovid-fcast-decomp, echo=FALSE, eval=FALSE}
@@ -1979,7 +1983,7 @@ true_crashes <- ts(true_crashes$count,
 autoplot(fcast.noncovid) +
   autolayer(true_crashes, alpha=0.8) + 
   ggtitle("Forecasts of Daily Car Crashes Using HoltWinters (Without Pandemic Data)") +
-  xlab("Year") + ylab("Crashes") + 
+  xlab("Date") + ylab("Crashes") + 
   theme(legend.position = "bottom")
 ```
 
@@ -2001,8 +2005,8 @@ true_crashes <- ts(true_crashes$count,
 p %>%
   autoplot() + 
   autolayer(true_crashes, alpha=0.8) + 
-  ggtitle("Seasonal and Trend Decomposition Using Loess Forecasting Model for Daily Car Crashes (Without Pandemic Data)") +
-  xlab("Year") + ylab("Daily Crashes") + 
+  ggtitle("STLF Model for Daily Car Crashes (Without Pandemic Data)") +
+  xlab("Date") + ylab("Daily Crashes") + 
   theme(legend.position = "bottom")
 ```
 
@@ -2040,8 +2044,8 @@ rownames(daily_forecast_values_noncovid_TBATS2) <- seq(as.Date("2020/03/01"),
 # head(daily_forecast_values_noncovid_TBATS)
 head(daily_forecast_values_noncovid_TBATS2)
 
-# true_noncovid_crashes <- crashes_ts %>%
-#   filter(Date >= as.Date("2020/03/01") & Date <= as.Date("2021/05/31"))
+true_noncovid_crashes <- crashes_ts %>%
+  filter(Date >= as.Date("2020/03/01") & Date <= as.Date("2021/05/31"))
 
 true_noncovid_crashes <- ts(true_noncovid_crashes$count, 
                             start = c(2020,3), end = c(2021,153), 
@@ -2058,7 +2062,7 @@ true_noncovid_crashes <- ts(true_noncovid_crashes$count,
 autoplot(fc_tbats_noncovid2) + 
   autolayer(true_noncovid_crashes, alpha=0.8) + 
   ggtitle("TBATS Forecasting Model for Daily Car Crashes (Without Pandemic Data)") +
-  xlab("Year") + ylab("Crashes") + 
+  xlab("Date") + ylab("Crashes") + 
   theme(legend.position = "bottom")
 ```
 
@@ -2155,7 +2159,7 @@ crashes.train_TBATS2 %>%
   autoplot(alpha=0.2) + 
   ggtitle("Multi-Step TBATS Daily Forecasts of Crashes (With Pandemic Data)") + 
   xlab("Date") + ylab("Crashes") + 
-  autolayer(test_TBATS2, alpha=0.75) + 
+  autolayer(test_TBATS2, alpha=0.75, series="test set") + 
   theme(legend.position = "bottom")
 ```
 
@@ -2225,8 +2229,9 @@ autoplot(train) +
   autolayer(ARIMA, series="ARIMA", PI=F) +
   autolayer(TBATS, series="TBATS", PI=F) +
   scale_color_brewer(palette="RdYlBu") + 
-  xlab("Year") + ylab("Crashes") +
-  ggtitle("Time Series Combination (With Pandemic Data)")
+  xlab("Date") + ylab("Crashes") +
+  ggtitle("Time Series Combination (With Pandemic Data)") + 
+  theme(legend.position = "bottom")
 
 c(ARIMA = accuracy(ARIMA, crashests2)["Test set", "RMSE"],
   TBATS = accuracy(TBATS, crashests2)["Test set", "RMSE"],
@@ -2272,7 +2277,7 @@ autoplot(train.noncovid) +
   autolayer(ARIMA.noncovid, series="ARIMA", PI=F) +
   autolayer(TBATS.noncovid, series="TBATS", PI=F) +
   scale_color_brewer(palette="RdYlBu") + 
-  xlab("Year") + ylab("Crashes") +
+  xlab("Date") + ylab("Crashes") +
   ggtitle("Time Series Combination (Without Pandemic Data)") + 
   theme(legend.position = "bottom")
 
@@ -2456,7 +2461,7 @@ rownames(monthly_forecast_values_covid_lin) <- seq(as.Date("2021/06/01"),
 monthly_forecast_values_covid_lin
 
 autoplot(fcast) +
-  ggtitle("Forecasts of Monthly Car Crashes Using Linear Model (With Pandemic Data)") + xlab("Year") + ylab("Monthly Crashes") + 
+  ggtitle("Forecasts of Monthly Car Crashes Using Linear Model (With Pandemic Data)") + xlab("Date") + ylab("Monthly Crashes") + 
   scale_x_continuous(breaks = c(1,2,3,4,5,6,7,8), 
                      labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
                                 "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022")) + 
@@ -2506,7 +2511,7 @@ head(monthly_forecast_values_noncovid_lin)
 
 autoplot(fcast.noncovid) +
   ggtitle("Forecasts of Monthly Car Crashes Using Linear Model (Without Pandemic Data)") +
-  xlab("Year") + ylab("Monthly Crashes") + 
+  xlab("Date") + ylab("Monthly Crashes") + 
   scale_x_continuous(breaks = c(1,2,3,4,5,6,7, 8), 
                      labels = c("Jan 2015", "Jan 2016", "Jan 2017", 
                                 "Jan 2018", 
@@ -2517,7 +2522,7 @@ autoplot(fcast.noncovid) +
 
 ### Stationarity Transformations (Monthly Data)
 
-```{r stationarity-trans-monthly-covid, echo=FALSE}
+```{r stationarity-trans-monthly-covid, echo=FALSE, include=FALSE}
 ##Looking at stationarity of crashes_mts4 monthly time series 
 library(urca)
 acf(crashes_mts4)
@@ -2535,15 +2540,17 @@ summary(ur.kpss(dif_crashes_mts4))
 
 ndiffs(dif_crashes_mts4) #0
 nsdiffs(dif_crashes_mts4) #0
+```
 
+```{r stat-trans-monthly-covid-plot, echo=FALSE}
 cbind("Crashes" = crashes_mts4,
       "First differenced" = diff(crashes_mts4)) %>%
   autoplot(facets=TRUE) +
-  xlab("Year") + ylab("") +
-  ggtitle("Crashes")
+  xlab("Date") + ylab("") +
+  ggtitle("Stationarity Transformation of Monthly Pandemic Data")
 ```
 
-```{r stationarity-trans-monthly-noncovid, echo=FALSE}
+```{r stationarity-trans-monthly-noncovid, echo=FALSE, include=FALSE}
 ##Looking at stationarity of crashes_mts4.noncovid monthly time series 
 library(urca)
 acf(crashes_mts4.noncovid)
@@ -2561,12 +2568,14 @@ summary(ur.kpss(season_dif_crashes_mts4.noncovid))
 
 ndiffs(season_dif_crashes_mts4.noncovid) #0
 nsdiffs(season_dif_crashes_mts4.noncovid) #0
+```
 
+```{r stat-trans-monthly-noncovid-plot, echo=FALSE}
 cbind("Crashes" = crashes_mts4.noncovid,
       "Seasonally\n differenced" = diff(crashes_mts4.noncovid, 12)) %>%
   autoplot(facets=TRUE) +
-  xlab("Year") + ylab("") +
-  ggtitle("Crashes (Without Pandemic Data)")
+  xlab("Date") + ylab("") +
+  ggtitle("Stationarity Transformation of Monthly NonPandemic Data")
 ```
 
 ```{r monthly-HW-fcast-decomp, echo=FALSE}
@@ -2592,7 +2601,7 @@ monthly_forecast_values_covid_HW
 
 autoplot(fcast.covid.monthly) +
   ggtitle("Forecasts of Monthly Car Crashes Using HoltWinters (With Pandemic Data)") +
-  xlab("Year") + ylab("Crashes") +
+  xlab("Date") + ylab("Crashes") +
   scale_x_continuous(breaks = c(1,2,3,4,5,6,7, 8), 
                      labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
                                 "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022")) + 
@@ -2622,7 +2631,7 @@ head(monthly_forecast_values_noncovid_HW)
 
 autoplot(fcast.noncovid.monthly) +
   ggtitle("Forecasts of Monthly Car Crashes Using HoltWinters (Without Pandemic Data)") +
-  xlab("Year") + ylab("Crashes") + 
+  xlab("Date") + ylab("Crashes") + 
   scale_x_continuous(breaks = c(1,2,3,4,5,6,7, 8), 
                      labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
                                 "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022")) + 
@@ -2632,7 +2641,7 @@ autoplot(fcast.noncovid.monthly) +
 ```{r monthly-STLF-forecast-ts-decomp, echo=FALSE, message=FALSE}
 crashes_mts4 %>% mstl() %>%
   autoplot() + 
-  ggtitle("Box Jenkins Decomposition") + 
+  ggtitle("Time Series Decomposition") + 
   xlab("Date") + 
   scale_x_continuous(breaks = c(1,2,3,4,5,6,7,8), 
                      labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
@@ -2645,7 +2654,7 @@ t <- crashes_mts4 %>%
 t %>%
   autoplot() + 
   ggtitle("SLTF Model for Monthly Car Crashes (With Pandemic Data)") +
-  xlab("Year") + ylab("Crashes") + 
+  xlab("Date") + ylab("Crashes") + 
   scale_x_continuous(breaks = c(1,2,3,4,5,6,7,8), 
                      labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
                                 "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022")) + 
@@ -2666,7 +2675,7 @@ monthly_forecast_values_covid_STLF
 ```{r noncovid-monthly-STLF-forecast-ts-decomp, echo=FALSE, message=FALSE}
 crashes_mts4.noncovid %>% mstl() %>%
   autoplot() + 
-  ggtitle("Box Jenkins Decomposition") + 
+  ggtitle("Time Series Decomposition") + 
   xlab("Date") + 
   scale_x_continuous(breaks = c(1,2,3,4,5,6,7,8), 
                      labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
@@ -2679,7 +2688,7 @@ q <- crashes_mts4.noncovid %>%
 q %>%
   autoplot() + 
   ggtitle("STLF Model for Monthly Car Crashes (Without Pandemic Data)") +
-  xlab("Year") + ylab("Crashes") + 
+  xlab("Date") + ylab("Crashes") + 
   scale_x_continuous(breaks = c(1,2,3,4,5,6,7,8), 
                      labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
                                 "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022")) + 
@@ -2729,7 +2738,7 @@ autoplot(training_HW_monthly, series="Training data") +
   autolayer(fitted(crashes.train_HW_monthly, h=12),
             series="12-step fitted values") + 
   theme(legend.position = "bottom") + 
-  ggtitle("Box Decomposition") + 
+  ggtitle("Time Series Decomposition") + 
   xlab("Date") + ylab("Crashes") + 
   scale_x_continuous(breaks = c(1,2,3,4,5,6,7), 
                      labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
@@ -2813,7 +2822,7 @@ autoplot(training_HW_noncovid_monthly, series="Training data") +
   autolayer(fitted(crashes.train_HW_noncovid_monthly, h=12),
             series="12-step fitted values") + 
   theme(legend.position = "bottom") + 
-  ggtitle("Box Decomposition") + 
+  ggtitle("Time Series Decomposition") + 
   xlab("Date") + ylab("Crashes") + 
   scale_x_continuous(breaks = c(1,2,3,4,5,6,7), 
                      labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
@@ -2877,7 +2886,7 @@ autoplot(fit.ets.monthly.covid) +
 
 cbind('Residuals' = residuals(fit.ets.monthly.covid),
       'Forecast errors' = residuals(fit.ets.monthly.covid,type='response')) %>%
-  autoplot(facet=TRUE) + xlab("Year") + ylab("") + 
+  autoplot(facet=TRUE) + xlab("Date") + ylab("") + 
   ggtitle("Residuals of ETS Multiplicative HoltWinters Method with Multiplicative Errors (With Pandemic Data)") + 
   theme(title = element_text(size=8)) + 
   scale_x_continuous(breaks = c(1,2,3,4,5,6,7,8), 
@@ -2916,7 +2925,7 @@ autoplot(fit.ets.monthly.covid.MNM) +
 
 cbind('Residuals' = residuals(fit.ets.monthly.covid.MNM),
       'Forecast errors' = residuals(fit.ets.monthly.covid.MNM,type='response')) %>%
-  autoplot(facet=TRUE) + xlab("Year") + ylab("") + 
+  autoplot(facet=TRUE) + xlab("Date") + ylab("") + 
   ggtitle("Residuals of ETS Multiplicative Seasonality and Errors Method (With Pandemic Data)") + 
   theme(title = element_text(size=10)) + 
   scale_x_continuous(breaks = c(1,2,3,4,5,6,7,8), 
@@ -2953,7 +2962,7 @@ autoplot(fit.ets.monthly.covid.MMM) +
 
 cbind('Residuals' = residuals(fit.ets.monthly.covid.MMM),
       'Forecast errors' = residuals(fit.ets.monthly.covid.MMM,type='response')) %>%
-  autoplot(facet=TRUE) + xlab("Year") + ylab("") + 
+  autoplot(facet=TRUE) + xlab("Date") + ylab("") + 
   ggtitle("Residuals of ETS Multiplicative Seasonality, Trend, and Errors Method (With Pandemic Data)") + 
   theme(title = element_text(size=9)) + 
   scale_x_continuous(breaks = c(1,2,3,4,5,6,7,8), 
@@ -2989,7 +2998,7 @@ autoplot(fit.ets.monthly.covid.MNA) +
 
 cbind('Residuals' = residuals(fit.ets.monthly.covid.MNA),
       'Forecast errors' = residuals(fit.ets.monthly.covid.MNA,type='response')) %>%
-  autoplot(facet=TRUE) + xlab("Year") + ylab("") + 
+  autoplot(facet=TRUE) + xlab("Date") + ylab("") + 
   ggtitle("Residuals of ETS Multiplicative Seasonality and Additive Errors Method (With Pandemic Data)") + 
   theme(title = element_text(size=9)) + 
   scale_x_continuous(breaks = c(1,2,3,4,5,6,7,8), 
@@ -3025,7 +3034,7 @@ autoplot(fit.ets.monthly.noncovid) +
 
 cbind('Residuals' = residuals(fit.ets.monthly.noncovid),
       'Forecast errors' = residuals(fit.ets.monthly.noncovid,type='response')) %>%
-  autoplot(facet=TRUE) + xlab("Year") + ylab("") + 
+  autoplot(facet=TRUE) + xlab("Date") + ylab("") + 
   ggtitle("Residuals of ETS Multiplicative HoltWinters Method with Multiplicative Errors (Without Pandemic Data)") + 
   theme(title = element_text(size=7)) + 
   scale_x_continuous(breaks = c(1,2,3,4,5,6,7,8), 
@@ -3062,7 +3071,7 @@ autoplot(fit.ets.monthly.noncovid.MNM) +
 
 cbind('Residuals' = residuals(fit.ets.monthly.noncovid.MNM),
       'Forecast errors' = residuals(fit.ets.monthly.noncovid.MNM,type='response')) %>%
-  autoplot(facet=TRUE) + xlab("Year") + ylab("") + 
+  autoplot(facet=TRUE) + xlab("Date") + ylab("") + 
   ggtitle("Residuals of ETS Multiplicative Seasonality and Errors Method (Without Pandemic Data)") + 
   theme(title = element_text(size=9)) + 
   scale_x_continuous(breaks = c(1,2,3,4,5,6,7,8), 
@@ -3099,7 +3108,7 @@ autoplot(fit.ets.monthly.noncovid.MMM) +
 
 cbind('Residuals' = residuals(fit.ets.monthly.noncovid.MMM),
       'Forecast errors' = residuals(fit.ets.monthly.noncovid.MMM,type='response')) %>%
-  autoplot(facet=TRUE) + xlab("Year") + ylab("") + 
+  autoplot(facet=TRUE) + xlab("Date") + ylab("") + 
   ggtitle("Residuals of ETS Multiplicative Seasonality, Trend, and Errors Method (Without Pandemic Data)") + 
   theme(title = element_text(size=8)) + 
   scale_x_continuous(breaks = c(1,2,3,4,5,6,7,8), 
@@ -3135,7 +3144,7 @@ autoplot(fit.ets.monthly.noncovid.MNA) +
 
 cbind('Residuals' = residuals(fit.ets.monthly.noncovid.MNA),
       'Forecast errors' = residuals(fit.ets.monthly.noncovid.MNA,type='response')) %>%
-  autoplot(facet=TRUE) + xlab("Year") + ylab("") + 
+  autoplot(facet=TRUE) + xlab("Date") + ylab("") + 
   ggtitle("Residuals of ETS Multiplicative Seasonality and Additive Errors Method (Without Pandemic Data)") + 
   theme(title = element_text(size=8)) + 
   scale_x_continuous(breaks = c(1,2,3,4,5,6,7,8), 
@@ -3203,7 +3212,7 @@ for (i in seq(6)) {
                                   xreg=fourier(crashes_snow_ts2, K=i, h=214))) +
     xlab(paste("K=",i,"   AICC=",round(fit[["aicc"]],2))) +
     ylab("") + 
-    theme(title = element_text(size = 8))
+    theme(title = element_text(size = 7))
 }
 
 #loading necessary packages
@@ -3281,7 +3290,7 @@ for (i in seq(6)) {
                                   xreg=fourier(crashes_friday_ts2, K=i, h=214))) +
     xlab(paste("K=",i,"   AICC=",round(fit[["aicc"]],2))) +
     ylab("") + 
-    theme(title = element_text(size = 8))
+    theme(title = element_text(size = 7))
 }
 
 #loading necessary packages
@@ -3362,7 +3371,7 @@ for (i in seq(6)) {
                                   xreg=fourier(crashes_snow_friday_ts2, K=i, h=214))) +
     xlab(paste("K=",i,"   AICC=",round(fit[["aicc"]],2))) +
     ylab("") + 
-    theme(title = element_text(size = 8))
+    theme(title = element_text(size = 7))
 }
 
 #loading necessary packages
@@ -3550,7 +3559,7 @@ twenty_nineteen_daily_forecast_values_HW
 
 autoplot(fcast.2019) +
   ggtitle("2015-2019 Forecasts of Daily Car Crashes Using HoltWinters") +
-  xlab("Year") + ylab("Crashes") 
+  xlab("Date") + ylab("Crashes") 
 ```
 
 ```{r 2015-2019-STLF-fit-forecast-ts, echo=FALSE, eval=FALSE}
@@ -3629,7 +3638,7 @@ twenty_nineteen_monthly_forecast_values_lin
 
 autoplot(fcast.2019) +
   ggtitle("2015-2019 Forecasts of Monthly Car Crashes Using Linear Model") +
-  xlab("Year") + ylab("Monthly Crashes") + 
+  xlab("Date") + ylab("Crashes") + 
   scale_x_continuous(breaks = c(1,2,3,4,5,6,7), 
                      labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
                                 "Jan 2019", "Jan 2020", "Jan 2021")) + 
@@ -3657,7 +3666,7 @@ twenty_nineteen_monthly_forecast_values_HW
 
 autoplot(fcast.covid.monthly.2019) +
   ggtitle("Forecasts of Monthly Car Crashes Using HoltWinters") +
-  xlab("Year") + ylab("Crashes") + 
+  xlab("Date") + ylab("Crashes") + 
   scale_x_continuous(breaks = c(1,2,3,4,5,6,7), 
                      labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
                                 "Jan 2019", "Jan 2020", "Jan 2021")) + 
@@ -3681,7 +3690,7 @@ t <- crashes_mts4.2019 %>%
 t %>%
   autoplot() + 
   ggtitle("2015-2019 Seasonal and Trend Decomposition Using Loess Forecasting Model for Monthly Car Crashes") +
-  xlab("Year") + ylab("Daily Crashes") + 
+  xlab("Date") + ylab("Daily Crashes") + 
   scale_x_continuous(breaks = c(1,2,3,4,5,6,7), 
                      labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
                                 "Jan 2019", "Jan 2020", "Jan 2021")) + 
