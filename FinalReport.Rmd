@@ -5,6 +5,8 @@ author:
   - Cortlyn Morris, Kelly Wenzlof, Ayan Gulzar
   - Dr. Sayed Mostafa and Chinedu Jude Nzekwe 
 date: "7/14/2021"
+header-includes:
+    - \usepackage{setspace}\doublespacing
 output: 
   pdf_document
 ---

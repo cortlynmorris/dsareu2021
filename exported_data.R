@@ -3119,16 +3119,13 @@ crashes_pm2 = crashes %>%
 
 #Does NOT Include AlcoholResultType
 crashes_pm = crashes %>%
-  filter(Injury != "", Injury != "Unknown", VehicleType != "Unknown", 
-         VehicleType != "", ContributingCircumstance1 != "Unknown", 
-         ContributingCircumstance1 != "", Protection != "Unknown", 
-         Protection != "", WeatherCondition1 != "Unknown",
+  filter(Injury != "", Injury != "Unknown",  WeatherCondition1 != "Unknown",
          WeatherCondition1 != "", MostHarmfulEvent != "Unknown",
          MostHarmfulEvent != "", RoadFeature != "Unknown", RoadFeature != "",
          TrafficControlType != "Unknown", TrafficControlType != "",
          RoadClassification != "Unkown", RoadClassification != "",
-         PersonType != "", PersonType != "Unknown", VisionObstruction != "", 
-         VisionObstruction != "Unknown", VehicleType != "All terrain vehicle (ATV)",
+         PersonType != "", PersonType != "Unknown", 
+         VehicleType != "All terrain vehicle (ATV)",
          VehicleType != "Farm equipment", VehicleType != "Farm tractor",
          VehicleType != "Military", VehicleType != "Motor scooter or motor bike",
          VehicleType != "Motor home/recreational vehicle", 
@@ -3149,16 +3146,24 @@ crashes_pm = crashes %>%
   mutate(Injury = as.factor(Injury)) %>%
   mutate(Injury2 = if_else(Injury == "No injury", "No injury", "Injury"), 
          Injury2 = as.factor(Injury2)) %>%
-  mutate(VehicleType = as.factor(VehicleType)) %>%
-  mutate(ContributingCircumstance1 = as.factor(ContributingCircumstance1)) %>%
-  mutate(Protection = as.factor(Protection)) %>%
+  mutate(VehicleType = if_else(VehicleType %in% c("Unknown",""), 
+                               "Unknown/Blank", VehicleType),
+         VehicleType = as.factor(VehicleType)) %>%
+  mutate(ContributingCircumstance1 = if_else(ContributingCircumstance1 %in% c("Unknown",""), 
+                                             "Unknown/Blank", ContributingCircumstance1),
+         ContributingCircumstance1 = as.factor(ContributingCircumstance1)) %>%
+  mutate(Protection = if_else(Protection %in% c("Unable to determine",""), 
+                              "Unknown/Blank", Protection),
+         Protection = as.factor(Protection)) %>%
   mutate(WeatherCondition1 = as.factor(WeatherCondition1)) %>%
   mutate(MostHarmfulEvent = as.factor(MostHarmfulEvent)) %>%
   mutate(RoadFeature = as.factor(RoadFeature)) %>%
   mutate(TrafficControlType = as.factor(TrafficControlType)) %>%
   mutate(RoadClassification = as.factor(RoadClassification)) %>%
   mutate(PersonType = as.factor(PersonType)) %>%
-  mutate(VisionObstruction = as.factor(VisionObstruction))
+  mutate(VisionObstruction = if_else(VisionObstruction %in% c("Unknown",""), 
+                                     "Unknown/Blank", VisionObstruction),
+         VisionObstruction = as.factor(VisionObstruction))
 
 summary(crashes_pm$Injury)
 summary(crashes_pm$Injury2)
@@ -3350,7 +3355,7 @@ undersample_df1.test3 <- undersample_df1[!sample, ]
 undersample_df1.fit.train3 <- glm(Injury2~Age+VehicleType+ContributingCircumstance1+Protection+
                                     WeatherCondition1+MostHarmfulEvent+RoadFeature+
                                     TrafficControlType+RoadClassification+PersonType+
-                                    AlcoholResultType+VisionObstruction, 
+                                    VisionObstruction, 
                                   data=undersample_df1.train3, family="binomial") #fitting model on training set
 undersample_df1.pred.prob3 <- predict(undersample_df1.fit.train3, newdata=undersample_df1.test3, 
                                       type="response") #predicting prob. of default=1 for test set
@@ -3361,9 +3366,9 @@ undersample_df1.pred3 <- ifelse(undersample_df1.pred.prob3>0.5, "Injury", "No in
 #Combination of over and under sampling
 library(ROSE)
 overunder <- ROSE::ovun.sample(Injury2~Age+VehicleType+ContributingCircumstance1+Protection+
-                            WeatherCondition1+MostHarmfulEvent+RoadFeature+
-                            TrafficControlType+RoadClassification+PersonType+VisionObstruction, 
-                          data = crashes_pm.train, method = "both", N = 245633)$data
+                                 WeatherCondition1+MostHarmfulEvent+RoadFeature+
+                                 TrafficControlType+RoadClassification+PersonType+VisionObstruction, 
+                               data = crashes_pm.train, method = "both", N = 245633)$data
 
 ### Modeling Injury Outcome Using Over- and Under-sampled Data
 
@@ -3404,7 +3409,7 @@ overunder.train4 <- overunder[sample, ]
 overunder.test4 <- overunder[!sample, ]
 overunder.fit.train4 <- glm(Injury2~., data=overunder.train4, family="binomial") #fitting model on training set
 overunder.pred.prob4 <- predict(overunder.fit.train4, newdata=overunder.test4, 
-                                      type="response") #predicting prob. of default=1 for test set
+                                type="response") #predicting prob. of default=1 for test set
 overunder.pred4 <- ifelse(overunder.pred.prob4>0.5, "Injury", "No injury") #predicting `default` based on prob estimates
 (tab4 <- table(pred=overunder.pred4, actual=overunder.test4$Injury2)) #confusion matrix: cross-tab of predictions vs actual class
 (accuracy4=mean(overunder.pred4==overunder.test4$Injury2, na.rm=T)*100) #percent of correct predictions in test data
