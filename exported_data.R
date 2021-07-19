@@ -3285,8 +3285,8 @@ pR2(Injury2.select2)
 #Prediction accuracy on test data
 set.seed(101) #for reproducibility of results
 sample2 <- sample(c(TRUE, FALSE), nrow(oversample_df1), replace = T, prob = c(0.7,0.3)) #70/30% training/test sets
-oversample_df1.train2 <- oversample_df1[sample, ]
-oversample_df1.test2 <- oversample_df1[!sample, ]
+oversample_df1.train2 <- oversample_df1[sample2, ]
+oversample_df1.test2 <- oversample_df1[!sample2, ]
 oversample_df1.fit.train2 <- glm(Injury2~Age+VehicleType+ContributingCircumstance1+Protection+
                                    WeatherCondition1+MostHarmfulEvent+RoadFeature+
                                    TrafficControlType+RoadClassification+PersonType+
@@ -3323,7 +3323,7 @@ summary(Injury2.fit3)
 ci2 = cbind(coef(Injury2.fit3)-1.96*(summary(Injury2.fit3)$coefficients[,"Std. Error"]),
             coef(Injury2.fit3)+1.96*(summary(Injury2.fit3)$coefficients[,"Std. Error"]))
 
-round(ci, 3)
+round(ci2, 3)
 
 #Model coefficients
 coef(Injury2.fit3) #extract coefficients
@@ -3350,8 +3350,8 @@ pR2(Injury2.select3)
 #Prediction accuracy on test data
 set.seed(101) #for reproducibility of results
 sample3 <- sample(c(TRUE, FALSE), nrow(undersample_df1), replace = T, prob = c(0.7,0.3)) #70/30% training/test sets
-undersample_df1.train3 <- undersample_df1[sample, ]
-undersample_df1.test3 <- undersample_df1[!sample, ]
+undersample_df1.train3 <- undersample_df1[sample3, ]
+undersample_df1.test3 <- undersample_df1[!sample3, ]
 undersample_df1.fit.train3 <- glm(Injury2~Age+VehicleType+ContributingCircumstance1+Protection+
                                     WeatherCondition1+MostHarmfulEvent+RoadFeature+
                                     TrafficControlType+RoadClassification+PersonType+
@@ -3370,6 +3370,11 @@ overunder <- ROSE::ovun.sample(Injury2~Age+VehicleType+ContributingCircumstance1
                                  TrafficControlType+RoadClassification+PersonType+VisionObstruction, 
                                data = crashes_pm.train, method = "both", N = 245633)$data
 
+overunder2 <- ROSE::ovun.sample(Injury2~Age+VehicleType+ContributingCircumstance1+Protection+
+                                 WeatherCondition1+MostHarmfulEvent+RoadFeature+
+                                 TrafficControlType+RoadClassification+PersonType+VisionObstruction, 
+                               data = crashes_pm.train, method = "both", N = 100000)$data
+
 ### Modeling Injury Outcome Using Over- and Under-sampled Data
 
 Injury2.fit4 <- glm(Injury2~., data=overunder, family = "binomial")
@@ -3380,10 +3385,22 @@ ci3 = cbind(coef(Injury2.fit4)-1.96*(summary(Injury2.fit4)$coefficients[,"Std. E
 
 round(ci3, 3)
 
+Injury2.fit5 <- glm(Injury2~., data=overunder2, family = "binomial")
+summary(Injury2.fit5)
+
+ci4 = cbind(coef(Injury2.fit5)-1.96*(summary(Injury2.fit5)$coefficients[,"Std. Error"]),
+            coef(Injury2.fit5)+1.96*(summary(Injury2.fit5)$coefficients[,"Std. Error"]))
+
+round(ci4, 3)
+
 #Model coefficients
 coef(Injury2.fit4) #extract coefficients
 round(coef(Injury2.fit4), digits = 4) #get rounded coefficients
 round(confint(Injury2.fit4), digits = 4) #TAKES REALLY LONG get confidence intervals (CI) for coefs
+
+coef(Injury2.fit5) #extract coefficients
+round(coef(Injury2.fit5), digits = 4) #get rounded coefficients
+round(confint(Injury2.fit5), digits = 4) #TAKES REALLY LONG get confidence intervals (CI) for coefs
 
 #Odds ratios
 round(exp(coef(Injury2.fit4)), digits = 4) #OR=exp(coef)
@@ -3391,22 +3408,34 @@ round(exp(coef(Injury2.fit4)), digits = 4) #OR=exp(coef)
 round(exp(confint(Injury2.fit4)), digits = 4) #TAKES REALLY LONG confidence intervals for ORs
 round(data.frame(OR=exp(coef(Injury2.fit4)), exp(confint(Injury2.fit4))), digits = 4) #TAKES REALLY LONG ORs & their CIs
 
+round(exp(coef(Injury2.fit5)), digits = 4) #OR=exp(coef)
+(round(exp(coef(Injury2.fit5)), digits = 4)-1)*100 #percent change in odds
+round(exp(confint(Injury2.fit5)), digits = 4) #TAKES REALLY LONG confidence intervals for ORs
+round(data.frame(OR=exp(coef(Injury2.fit5)), exp(confint(Injury2.fit5))), digits = 4) #TAKES REALLY LONG ORs & their CIs
+
 #Model selection based on AIC
 #install.packages("MASS") #run once: installing package needed for the `stepAIC` function
 library(MASS) 
 Injury2.select4 <- stepAIC(Injury2.fit4)
 summary(Injury2.select4)
 
+library(MASS) 
+Injury2.select5 <- stepAIC(Injury2.fit5)
+summary(Injury2.select5)
+
 #Get a pseudo R^2 
 #install.packages("pscl") #package for computing the McFadden R^2
 library(pscl)
 pR2(Injury2.select4)
 
+library(pscl)
+pR2(Injury2.select5)
+
 #Prediction accuracy on test data
 set.seed(101) #for reproducibility of results
 sample4 <- sample(c(TRUE, FALSE), nrow(overunder), replace = T, prob = c(0.7,0.3)) #70/30% training/test sets
-overunder.train4 <- overunder[sample, ]
-overunder.test4 <- overunder[!sample, ]
+overunder.train4 <- overunder[sample4, ]
+overunder.test4 <- overunder[!sample4, ]
 overunder.fit.train4 <- glm(Injury2~., data=overunder.train4, family="binomial") #fitting model on training set
 overunder.pred.prob4 <- predict(overunder.fit.train4, newdata=overunder.test4, 
                                 type="response") #predicting prob. of default=1 for test set
@@ -3414,3 +3443,13 @@ overunder.pred4 <- ifelse(overunder.pred.prob4>0.5, "Injury", "No injury") #pred
 (tab4 <- table(pred=overunder.pred4, actual=overunder.test4$Injury2)) #confusion matrix: cross-tab of predictions vs actual class
 (accuracy4=mean(overunder.pred4==overunder.test4$Injury2, na.rm=T)*100) #percent of correct predictions in test
 
+set.seed(101) #for reproducibility of results
+sample5 <- sample(c(TRUE, FALSE), nrow(overunder2), replace = T, prob = c(0.7,0.3)) #70/30% training/test sets
+overunder.train5 <- overunder[sample5, ]
+overunder.test5 <- overunder[!sample5, ]
+overunder.fit.train5 <- glm(Injury2~., data=overunder.train5, family="binomial") #fitting model on training set
+overunder.pred.prob5 <- predict(overunder.fit.train5, newdata=overunder.test5, 
+                                type="response") #predicting prob. of default=1 for test set
+overunder.pred5 <- ifelse(overunder.pred.prob5>0.5, "Injury", "No injury") #predicting `default` based on prob estimates
+(tab5 <- table(pred=overunder.pred5, actual=overunder.test5$Injury2)) #confusion matrix: cross-tab of predictions vs actual class
+(accuracy5=mean(overunder.pred5==overunder.test5$Injury2, na.rm=T)*100) #percent of correct predictions in test
