@@ -9,6 +9,7 @@ header-includes:
     - \usepackage{setspace}\doublespacing
 output: 
   pdf_document
+always_allow_html: true
 ---
 
 ```{r setup, include=FALSE}
@@ -44,15 +45,247 @@ When it comes to car crashes, people assume that the driver was either speeding 
 
 ## Data
 
+For this study, we utilized public data from the Wake County crashes dataset. We combined datasets from each year so that we could forecast car crashes in Wake County. This database gets updated every month and has all the specifications for the car accident. 
+
+```{r loading-libraries, message=FALSE, warning=FALSE, echo=FALSE, include=FALSE}
+library(reshape2)
+library(tidyverse)
+library(ggplot2)
+library(dplyr)
+library(dslabs)
+library(ggrepel)
+library(ggthemes)
+library(maps)
+library(scales)
+library(zoo)
+```
+
+```{r read-data, message=FALSE, echo=FALSE, include=FALSE}
+#Code for Cortlyns computer (Mac)
+ # setwd("/Users/cmorris/Desktop/dsreu2021/rstudiodirectory/ResearchProject")
+ # persons <- read.csv(file="Persons_Involved_in_Crashes.csv")
+ # glimpse(persons)
+ #    
+ # locations <- read.csv(file="Reported_Crash_Locations.csv")
+ # glimpse(locations)
+ #    
+ # crashes <- persons %>% left_join(locations, by="key_crash")
+
+#Code for Kelly's computer (Windows)
+#library(readr)
+persons <- read_csv("~/NCAT REU/Mostafa/Data/Persons_Involved_in_Crashes.csv")
+
+locations <- read_csv("~/NCAT REU/Mostafa/Data/Reported_Crash_Locations.csv")
+
+crashes <- persons %>% left_join(locations, by="key_crash")
+
+# Code for Ayan's computer (Window)
+#library(readr)
+# persons <- read_csv("C:/Users/ayang/Desktop/Project FIles REU A&T/REU Research Project1/Persons_Involved_in_Crashes.csv")
+# 
+# locations <- read_csv("C:/Users/ayang/Desktop/Project FIles REU A&T/REU Research Project1/Reported_Crash_Locations.csv")
+# 
+# crashes <- persons %>% left_join(locations, by="key_crash")
+```
+
 ## Method 
 
 ### Exploratory Data Analysis 
 
-#### Bivariate Explorations 
+Exploratory data analysis was the first step in the process of understanding and finding patterns within the crash data set. We conducted univariate and bivariate explorations. 
 
 #### Univariate Explorations 
 
+Below are the most important univariate visualizations that we discovered. 
+
+```{r driver-passenger-age, echo=FALSE}
+crashes %>% 
+  filter(PersonType == "Driver" | PersonType == "Passenger", Age != "", Age != "NA") %>% 
+  ggplot() +
+  geom_histogram(aes(x=Age), binwidth = 5, col="red", fill="darkgrey") +
+  labs(x="Age", y="Frequency", title="Drivers' vs. Passengers' Age") +
+  theme(legend.position = "top") +
+  facet_wrap(~PersonType, dir = "v")
+```
+
+For the graph above we created a histogram to compare the drivers' and passengers' age. This helped us understand what age is common for drivers to get injured in a car accident. The range of drivers' ages is from about 16 to 100. The range of passengers' ages is from about 0 to 100. The range of drivers' ages is slightly larger due to the age restrictions for getting a license.
+
+```{r crash-year, echo=FALSE}
+crashes %>% 
+  filter(Crash_Date_Year != "Unknown", Crash_Date_Year != "2011") %>%
+  ggplot(aes(Crash_Date_Year, fill=as.factor(Crash_Date_Year))) +
+  geom_bar(show.legend = FALSE) +
+  geom_text(stat="count", aes(x=Crash_Date_Year, label=..count..), vjust=-0.25) + 
+  geom_abline(intercept = 387995/(77/12), slope = 0, lty="dashed") +
+  scale_x_continuous(breaks=2015:2021) +
+  labs(title = "Frequency of Crashes by Year", 
+       x = "Year", 
+       y = "Count")
+```
+
+For this bar plot, we had data for the years 2015 to March 2021. In the visual above you can see that there was a high rate of car accidents from the beginning of 2015 to the end of 2019.We included a horizontal dashed line to indicate where the yearly average lies and we can see that only the years 2020 and 2021 fall below this yearly average. The year with the most crashes in 2019 but not by many. The full year with the fewest crashes in 2020 which was to be expected due to the lockdowns that took place to try and mitigate the spread of Covid-19. 2021 also looks to be on track to be another low crash year but we do not have a perfect explanation for that seeing as things are beginning to open and "return to normal" again.
+
+```{r weather-condition, echo=FALSE}
+crashes %>% 
+  filter(WeatherCondition1 != "NA") %>%
+  count(WeatherCondition1) %>% 
+  mutate(logtrans = round(log10(n), digits = 2),
+         WeatherCondition1 = reorder(WeatherCondition1,logtrans)) %>% 
+  ggplot(aes(x=WeatherCondition1, y=logtrans, fill=WeatherCondition1)) +
+  geom_bar(stat = "identity", show.legend = FALSE) +
+  coord_flip() + 
+  geom_text(aes(label=logtrans),nudge_y=0.5) +
+  labs(title = "Frequency of Crashes by Weather Condition",
+       x = "Weather Condition",
+       y = "Count (log10 Scale)")
+```
+
+For this visual, we also created a bar plot to determine which weather condition tends to be the most common for car crashes. After constructing the bar plot you can recognize that most crashes tend to happen when the weather is clear. This is not very surprising because in North Carolina, the majority of the time the weather is clear. An interesting note is that snow still has a relatively high frequency despite it snowing minimally in North Carolina. 
+
+```{r vehicle-type, echo=FALSE}
+crashes %>% 
+  filter(VehicleType != "Unknown", VehicleType != "") %>%
+  count(VehicleType) %>% 
+  mutate(logtrans = round(log10(n), digits = 2), 
+         VehicleType = reorder(VehicleType,logtrans)) %>% 
+  ggplot(aes(x=VehicleType, y=logtrans, fill=VehicleType)) +
+  geom_bar(stat = "identity", show.legend = FALSE) +
+  coord_flip() + 
+  geom_text(aes(label=logtrans),nudge_y=0.5) + 
+  labs(title = "Frequency of Crashes by Vehicle Type", 
+       x = "Vehicle Type", 
+       y = "Count (log10 Scale)")
+```
+
+For the type of vehicle in a crash we had data for the years 2015 to March 2021. This bar plot helps us understand the most common vehicles and the least common vehicles in an accident in Wake County. The highest frequency of crashes occur in a passenger car. However, this is not very surprising because passenger cars are relatively common. An interesting note is that sport utility vehicles have the second highest frequency of crashes, however, sport utility vehicles are not nearly as common of a car.
+
+#### Bivariate Explorations
+
+...
+
+Below are some of the most important bivariate explorations. 
+
+...
+
 ### Identifying Hot Spots of Crashes
+
+This section is dedicatied to identifying hot spots of crashes in Wake County, North Carolina. 
+
+#### Word Clouds 
+
+Below are two word clouds created to visualize the frequency of crashes on streets in Wake County, North Carolina. 
+
+```{r tool, message=FALSE, echo=FALSE}
+devtools::install_github("gaospecial/wordcloud2")
+```
+
+```{r load-library-word-cloud, message=FALSE, echo=FALSE}
+#install.packages('wordcloud2')
+library(wordcloud2)
+```
+
+```{r location-on-word-cloud, echo=FALSE}
+location_road_name_on_freq <- crashes %>%
+  count(LocationRoadNameOn)
+
+set.seed(101)
+location_road_name_on_freq %>%
+  wordcloud2(shape = 'circle', backgroundColor = "black", minSize = 5) 
+```
+
+From the word cloud, we can see many crashes occur on 440, 40, and Capital Blvd. This makes sense because 440 and 40 are major interstates that connect to several major junctions and Capital Blvd is a main road in North Carolina as well. 
+
+```{r location-at-word-cloud, echo=FALSE}
+location_road_name_at_freq <- crashes %>%
+  count(LocationRoadNameAt)
+
+set.seed(102)
+location_road_name_at_freq %>%
+  wordcloud2(shape = 'circle', backgroundColor = "black", minSize = 5)
+```
+
+From the word cloud, we can see that 440, Capital Blvd, 40, and Blue Ridge Rd frequently have crashes that are near by. This would make sense because most of these streets are highly trafficked and populated.
+
+#### Interactive Heat Maps 
+
+Below are two interactive heat maps dedicated to organizing the data in a spatial manner. 
+
+```{r load-library-interactive-map, message=FALSE, echo=FALSE}
+library(ggplot2)
+#install.packages("ggmap")
+library(ggmap)
+library(RColorBrewer)
+library(plotly)
+```
+
+```{r nc-interactive-map, message=FALSE, warning=FALSE, echo=FALSE}
+map_bounds <- c(-78.98, 35.51, -78.24, 36.06)
+
+crashes_filter <- crashes %>%
+  filter(LocationLatitude != "0", LocationLongitude != "0",
+         LocationLatitude != "NA", LocationLatitude != "",
+         LocationLongitude != "NA", LocationLongitude != "",
+         LocationLatitude > 35.4, LocationLatitude < 36.2,
+         LocationLongitude < -78, LocationLongitude > -79)
+
+coords.map.nc <- get_stamenmap(map_bounds, zoom = 10, maptype = "toner-lite")
+
+coords.map.nc <- ggmap(coords.map.nc, extent="panel", legend="none")
+coords.map.nc <- coords.map.nc + stat_density2d(data=crashes_filter,  
+                                          aes(x=LocationLongitude, 
+                                              y=LocationLatitude, 
+                                              fill=..level..),
+                                          alpha = 0.3, 
+                                          geom="polygon")
+coords.map.nc <- coords.map.nc +   scale_fill_gradientn(colours=rev(brewer.pal(7, "RdBu")))
+
+coords.map.nc <- coords.map.nc + theme_bw() + 
+  ggtitle("Interactive Heat Map of Crashes in North Carolina (Zoomed-Out)") + 
+  xlab("Longitude") + ylab("Latitude")
+
+ggplotly(coords.map.nc) %>%
+  highlight(
+    "plotly_hover",
+    selected = attrs_selected(line = list(color = "black"))
+  )
+```
+
+In the visual above we created a heat map of common places where road accidents occur in North Carolina. 
+
+```{r wake-interactive-map, message=FALSE, warning=FALSE, echo=FALSE}
+crashes_filter <- crashes %>%
+  filter(LocationLatitude != "0", LocationLongitude != "0",
+         LocationLatitude != "NA", LocationLatitude != "",
+         LocationLongitude != "NA", LocationLongitude != "",
+         LocationLatitude > 35.4, LocationLatitude < 36.2,
+         LocationLongitude < -78, LocationLongitude > -79)
+
+map_bounds <- c(-78.8, 35.72, -78.5, 35.9) #coordinates of wake county
+
+coords.map.wake <- get_stamenmap(map_bounds, zoom = 13, maptype = "toner-lite")
+
+coords.map.wake <- ggmap(coords.map.wake, extent="panel")
+coords.map.wake <- coords.map.wake + stat_density2d(data=crashes_filter,  
+                                          aes(x=LocationLongitude, 
+                                              y=LocationLatitude, 
+                                              fill=..level..),
+                                          alpha=0.3, 
+                                          geom="polygon")
+
+coords.map.wake <- coords.map.wake + scale_fill_gradientn(colours=rev(brewer.pal(7, "RdYlGn")))
+
+coords.map.wake <- coords.map.wake + theme_bw() + 
+  ggtitle("Heat Map of Crash Locations") + 
+  xlab("Latitude") + ylab("Longitude")
+
+ggplotly(coords.map.wake) %>%
+  highlight(
+    "plotly_hover",
+    selected = attrs_selected(line = list(color = "black"))
+  )
+```
+
+Above we created an interactive heat map for Wake County. This heat map shows popular streets where it is common to have an accident. From the Wake County heat map, we can see that crashes are much more likely to occur in the center of the city. We see that as more streets populate an area, more crashes occur. 
 
 ### Time Series Visualization 
 
