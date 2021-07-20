@@ -1952,7 +1952,7 @@ autoplot(fc_tbats_covid2) +
   xlab("Date") + ylab("Crashes")
 ```
 
-```{r}
+```{r tbats-stationary, echo=FALSE, message=FALSE}
 #Stationary
 # crashests2
 # dif_crashests2<-diff(crashests2)
@@ -1978,7 +1978,7 @@ Yhat <- cumsum(c(crashests2[1],dYhat))
 Yhat <- ts(Yhat)
 ```
 
-```{r}
+```{r tbats-stationary-plot, echo=FALSE, message=FALSE}
 #Stationary
 autoplot(Yhat) + 
   ggtitle("TBATS Forecasting Model for Daily Car Crashes (With Pandemic Data)") +
@@ -2091,7 +2091,7 @@ rownames(daily_forecast_values_noncovid_STLF) <- seq(as.Date("2020/03/01"),
                                                    as.Date("2021/12/31"), "day")
 ```
 
-```{r noncovid-STLF-fcast-filter, echo=FALSE}
+```{r noncovid-STLF-fcast-filter-stationary, echo=FALSE}
 #stationary
 head(daily_forecast_values_noncovid_STLF)
 ```
