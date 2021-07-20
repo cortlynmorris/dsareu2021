@@ -3302,7 +3302,8 @@ crashes_pm.pred.prob <- predict(crashes_pm.fit.train, newdata=crashes_pm.test,
 crashes_pm.pred <- ifelse(crashes_pm.pred.prob>0.5, "Injury", "No injury") #predicting `default` based on prob estimates
 (tab <- table(pred=crashes_pm.pred, actual=crashes_pm.test$Injury2)) #confusion matrix: cross-tab of predictions vs actual class
 (accuracy=mean(crashes_pm.pred==crashes_pm.test$Injury2, na.rm=T)*100) #percent of correct predictions in test data
-
+(stats = calc_stats(tab, prevalence = NULL, positive = "Injury"))
+  
 #Balancing data
 df_crashes_pm_Injury_ind <- which(crashes_pm$Injury2 == "Injury")
 df_crashes_pm_NoInjury_ind <- which(crashes_pm$Injury2 == "No injury")
@@ -3391,7 +3392,7 @@ oversample_df1.pred.prob2 <- predict(oversample_df1.fit.train2, newdata=oversamp
 oversample_df1.pred2 <- ifelse(oversample_df1.pred.prob2>0.5, "Injury", "No injury") #predicting `default` based on prob estimates
 (tab2 <- table(pred=oversample_df1.pred2, actual=oversample_df1.test2$Injury2)) #confusion matrix: cross-tab of predictions vs actual class
 (accuracy2=mean(oversample_df1.pred2==oversample_df1.test2$Injury2, na.rm=T)*100) #percent of correct predictions in test data
-
+(stats2 = calc_stats(tab2, prevalence = NULL, positive = "Injury"))
 
 #Undersampling model
 crashes_pm_no_injury = crashes_pm %>%
@@ -3410,7 +3411,7 @@ undersample_df1 = crashes_pm_injury %>%
 Injury2.fit3 <- glm(Injury2~Age+VehicleType+ContributingCircumstance1+Protection+
                       WeatherCondition1+MostHarmfulEvent+RoadFeature+
                       TrafficControlType+RoadClassification+PersonType+
-                      AlcoholResultType+VisionObstruction,
+                      VisionObstruction,
                     data=undersample_df1, family = "binomial")
 summary(Injury2.fit3)
 
@@ -3455,7 +3456,8 @@ undersample_df1.pred.prob3 <- predict(undersample_df1.fit.train3, newdata=unders
                                       type="response") #predicting prob. of default=1 for test set
 undersample_df1.pred3 <- ifelse(undersample_df1.pred.prob3>0.5, "Injury", "No injury") #predicting `default` based on prob estimates
 (tab3 <- table(pred=undersample_df1.pred3, actual=undersample_df1.test3$Injury2)) #confusion matrix: cross-tab of predictions vs actual class
-(accuracy3=mean(undersample_df1.pred3==undersample_df1.test3$Injury2, na.rm=T)*100) #percent of correct predictions in test data
+(accuracy3=mean(undersample_df1.pred3==undersample_df1.test3$Injury2, na.rm=T)*100) #percent of correct predictions in test
+(stats3 = calc_stats(tab3, prevalence = NULL, positive = "Injury"))
 
 #Combination of over and under sampling
 library(ROSE)
@@ -3526,6 +3528,7 @@ library(pscl)
 pR2(Injury2.select5)
 
 #Prediction accuracy on test data
+library(confusionMatrix)
 set.seed(101) #for reproducibility of results
 sample4 <- sample(c(TRUE, FALSE), nrow(overunder), replace = T, prob = c(0.7,0.3)) #70/30% training/test sets
 overunder.train4 <- overunder[sample4, ]
@@ -3534,8 +3537,12 @@ overunder.fit.train4 <- glm(Injury2~., data=overunder.train4, family="binomial")
 overunder.pred.prob4 <- predict(overunder.fit.train4, newdata=overunder.test4, 
                                 type="response") #predicting prob. of default=1 for test set
 overunder.pred4 <- ifelse(overunder.pred.prob4>0.5, "Injury", "No injury") #predicting `default` based on prob estimates
+overunder.pred4.2 <- factor(overunder.pred4, levels = c("No injury", "Injury")) #predicting `default` based on prob estimates
 (tab4 <- table(pred=overunder.pred4, actual=overunder.test4$Injury2)) #confusion matrix: cross-tab of predictions vs actual class
+(tab4 <- table(pred=overunder.pred4.2, actual=overunder.test4$Injury2))
 (accuracy4=mean(overunder.pred4==overunder.test4$Injury2, na.rm=T)*100) #percent of correct predictions in test
+(stats4 = calc_stats(tab4, prevalence = NULL, positive = "Injury"))
+
 
 set.seed(101) #for reproducibility of results
 sample5 <- sample(c(TRUE, FALSE), nrow(overunder2), replace = T, prob = c(0.7,0.3)) #70/30% training/test sets
@@ -3545,5 +3552,48 @@ overunder.fit.train5 <- glm(Injury2~., data=overunder.train5, family="binomial")
 overunder.pred.prob5 <- predict(overunder.fit.train5, newdata=overunder.test5, 
                                 type="response") #predicting prob. of default=1 for test set
 overunder.pred5 <- ifelse(overunder.pred.prob5>0.5, "Injury", "No injury") #predicting `default` based on prob estimates
+overunder.pred5.2 <- factor(overunder.pred5, levels = c("No injury", "Injury")) #predicting `default` based on prob estimates
 (tab5 <- table(pred=overunder.pred5, actual=overunder.test5$Injury2)) #confusion matrix: cross-tab of predictions vs actual class
+(tab5 <- table(pred=overunder.pred5.2, actual=overunder.test5$Injury2))
 (accuracy5=mean(overunder.pred5==overunder.test5$Injury2, na.rm=T)*100) #percent of correct predictions in test
+(stats5 = calc_stats(tab5, prevalence = NULL, positive = "Injury"))
+
+StatisticsComparison = cbind(SampleType = c("Unbalanced", "Oversample", "Undersample", "Combination Full Sample", 
+        "Combination Sub-Sample"),rbind(stats, stats2, stats3, stats4, stats5))
+
+#Random Forest Model
+install.packages("ranger")
+library(ranger)
+
+crashes_pm.clean = crashes_pm %>%
+  dplyr::select(Injury2,Age,VehicleType,ContributingCircumstance1,Protection,
+           WeatherCondition1,MostHarmfulEvent,RoadFeature,
+           TrafficControlType,RoadClassification,PersonType,
+           VisionObstruction) %>%
+  na.omit()
+
+## Unbalanced
+rf.fit1 = ranger(Injury2~Age+VehicleType+ContributingCircumstance1+Protection+
+             WeatherCondition1+MostHarmfulEvent+RoadFeature+
+             TrafficControlType+RoadClassification+PersonType+
+             VisionObstruction, data=crashes_pm.clean, 
+       num.trees = 500, mtry = round(11/2), importance = "impurity", classification = T)
+
+## Oversample
+
+
+## Undersample
+
+
+## Combination
+
+
+
+
+
+
+
+
+
+
+
