@@ -1954,10 +1954,10 @@ autoplot(fc_tbats_covid2) +
 
 ```{r}
 #Stationary
-crashests2
-dif_crashests2<-diff(crashests2)
-z0<-cumsum(c(crashests2[1], dif_fc_tbats_covid2$fitted))
-all(crashests2==z0) #TRUE
+# crashests2
+# dif_crashests2<-diff(crashests2)
+# z0<-cumsum(c(crashests2[1], dif_fc_tbats_covid2))
+# all(crashests2==z0) #TRUE
 
 dif_y <- msts(dif_crashests2, seasonal.periods=c(7,365.25))
 
@@ -1965,31 +1965,22 @@ dif_fit_tbats_covid2 <- tbats(dif_y)
 
 dif_fc_tbats_covid2 <- forecast::forecast(dif_fit_tbats_covid2, h=214)
 
-str(dif_fc_tbats_covid2)
+dYhat <- dif_fc_tbats_covid2$mean #point forecast values 
 
-lapply(dif_fc_tbats_covid2, function(x) as.numeric(x$mean, na.rm = TRUE))
+crashests2
+dif_crashests2<-diff(crashests2)
+z0<-cumsum(c(crashests2[1], dif_crashests2))
+all(crashests2==z0) #TRUE
 
-library(tidyverse)
-dif_fc_tbats_covid2 %>% 
-      map_df(~ .x$mean %>% 
-              as.numeric)
-
-#dif_crashests2 <- diff(crashests2)
-dYhat <- crashests2[length(crashests2)]
-Yhat <- cumsum(c(Y[1],dYhat))
-
+#dif_crashests2 <- diff(crashests2) #already ran earlier
+#dYhat <- dif_fc_tbats_covid2$mean #already ran earlier 
+Yhat <- cumsum(c(crashests2[1],dYhat))
+Yhat <- ts(Yhat)
 ```
 
 ```{r}
 #Stationary
-rownames(dif_daily_forecast_values_covid_TBATS2) <- seq(as.Date("2021/06/01"), as.Date("2021/12/31"), "day")
-
-head(dif_daily_forecast_values_covid_TBATS2)
-```
-
-```{r}
-#Stationary
-autoplot(dif_fc_tbats_covid2) + 
+autoplot(Yhat) + 
   ggtitle("TBATS Forecasting Model for Daily Car Crashes (With Pandemic Data)") +
   xlab("Date") + ylab("Crashes")
 ```
