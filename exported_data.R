@@ -3410,7 +3410,7 @@ undersample_df1 = crashes_pm_injury %>%
 Injury2.fit3 <- glm(Injury2~Age+VehicleType+ContributingCircumstance1+Protection+
                       WeatherCondition1+MostHarmfulEvent+RoadFeature+
                       TrafficControlType+RoadClassification+PersonType+
-                      AlcoholResultType+VisionObstruction,
+                      VisionObstruction,
                     data=undersample_df1, family = "binomial")
 summary(Injury2.fit3)
 
