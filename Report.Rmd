@@ -1834,8 +1834,6 @@ cbind("Crashes" = crashests.noncovid,
   ggtitle("Stationarity Transformation of Daily NonPandemic Data")
 ```
 
-### Basic Forecasting
-
 ```{r HW-fcast-box-decomp, echo=FALSE, eval=FALSE}
 #DONT USE
 covid <- HoltWinters(crashests2)
@@ -2955,7 +2953,6 @@ Yhat.HW.noncovid <- ts(Yhat.HW.noncovid, start = c(6, 2), frequency=12)
 
 ```{r noncovid-monthly-fcast-filter-forecast-ts-stationary, echo=FALSE, message=FALSE}
 #Stationary 
-
 autoplot(crashes_mts4.noncovid) +
   autolayer(Yhat.HW.noncovid) + 
   ggtitle("Forecasts of Monthly Car Crashes Using HoltWinters (Stationary Without Pandemic Data)") +
@@ -3132,7 +3129,7 @@ autoplot(training_HW_monthly, series="Training data") +
   theme(axis.text.x = element_text(angle = 90), legend.position = "bottom")
 ```
 
-```{r ms-HW-monthly-forecast-ts-stationary , echo=FALSE,message=FALSE}
+```{r ms-HW-monthly-forecast-ts-stationary, echo=FALSE, message=FALSE}
 #Stationary  
 dif_training_HW_monthly <- subset(dif_crashes_mts4, end=length(dif_crashes_mts4)-5)
 
@@ -3165,6 +3162,7 @@ autoplot(training_HW_monthly) +
 ``` 
 
 ```{r ms-STLF-monthly-forecast-ts, echo=FALSE, message=FALSE}
+#Nonstationary 
 training_STLF_monthly <- subset(crashes_mts4, end=length(crashes_mts4)-5)
 
 test_STLF_monthly <- subset(crashes_mts4, start=length(crashes_mts4)-4)
@@ -3183,6 +3181,7 @@ crashes.train_STLF_monthly %>%
 ```
 
 ```{r rename-ms-STLF-monthly-fcast, echo=FALSE, include=FALSE}
+#Nonstationary 
 fcast.ms.STLF.monthly.covid <- summary(crashes.train_STLF_monthly)
 
 rownames(fcast.ms.STLF.monthly.covid) <- seq(as.Date("2021/01/01"),
@@ -3190,6 +3189,7 @@ rownames(fcast.ms.STLF.monthly.covid) <- seq(as.Date("2021/01/01"),
 ```
 
 ```{r ms-STLF-monthly-fcast-filter-decomp-sum, echo=FALSE, message=FALSE}
+#Nonstationary 
 fcast.ms.STLF.monthly.covid
 
 autoplot(training_STLF_monthly, series="Training data") +
@@ -3205,6 +3205,7 @@ autoplot(training_STLF_monthly, series="Training data") +
 ```
 
 ```{r noncovid-ms-HW-monthly-forecast-ts, echo=FALSE, message=FALSE}
+#Nonstationary 
 training_HW_noncovid_monthly <- subset(crashes_mts4.noncovid, 
                                        end=length(crashes_mts4.noncovid)-14)
 
@@ -3225,6 +3226,7 @@ crashes.train_HW_noncovid_monthly %>%
 ```
 
 ```{r rename-noncovid-ms-HW-monthly-fcast, echo=FALSE, include=FALSE}
+#NOnstationary 
 fcast.ms.HW.monthly.noncovid <- 
   summary(forecast::forecast(crashes.train_HW_noncovid_monthly, h=14, 
                              level=c(80,95)))
@@ -3234,6 +3236,7 @@ rownames(fcast.ms.HW.monthly.noncovid) <- seq(as.Date("2019/01/01"),
 ```
 
 ```{r noncovid-ms-HW-monthly-fcast-filter-decomp-sum, echo=FALSE, message=FALSE}
+#NOnstationary 
 head(fcast.ms.HW.monthly.noncovid)
 
 autoplot(training_HW_noncovid_monthly, series="Training data") +
@@ -3248,7 +3251,45 @@ autoplot(training_HW_noncovid_monthly, series="Training data") +
   theme(axis.text.x = element_text(angle = 90), legend.position = "bottom")
 ```
 
+```{r noncovid-ms-HW-monthly-forecast-ts-stationary, echo=FALSE, message=FALSE}
+#Stationary 
+dif_training_HW_noncovid_monthly <- subset(season_dif_crashes_mts4.noncovid, 
+                                       end=length(season_dif_crashes_mts4.noncovid)-14)
+
+dif_test_HW_noncovid_monthly <- subset(season_dif_crashes_mts4.noncovid, 
+                                   start=length(season_dif_crashes_mts4.noncovid)-13)
+
+dif_crashes.train_HW_noncovid_monthly <- HoltWinters(dif_training_HW_noncovid_monthly)
+
+dif_fc_HW_noncovid <- forecast::forecast(dif_crashes.train_HW_noncovid_monthly, h = 14)
+
+dYhat_ms_HW_noncovid <- dif_fc_HW_noncovid$mean 
+
+Yhat_ms_HW_noncovid <- cumsum(c(crashes_mts4.noncovid[length(crashes_mts4.noncovid)], 
+                                dYhat_ms_HW_noncovid))
+
+Yhat_ms_HW_noncovid <- ts(Yhat_ms_HW_noncovid, start = c(5, 1), frequency = 12)
+
+training_HW_noncovid_monthly <- subset(crashes_mts4.noncovid, 
+                                       end=length(crashes_mts4.noncovid)-14)
+
+test_HW_noncovid_monthly <- subset(crashes_mts4.noncovid, 
+                                   start=length(crashes_mts4.noncovid)-13)
+
+autoplot(training_HW_noncovid_monthly) + 
+  autolayer(Yhat_ms_HW_noncovid) + 
+  autolayer(test_HW_noncovid_monthly) + 
+  ggtitle("Multi-Step HW Monthly Forecasts of Crashes (Stationary Without Pandemic Data)") + 
+  xlab("Date") + ylab("Crashes") + 
+  scale_x_continuous(breaks = c(1,2,3,4,5,6,7), 
+                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
+                                "Jan 2019", "Jan 2020", "Jan 2021")) + 
+  theme(axis.text.x = element_text(angle = 90), legend.position = "bottom", 
+        title = element_text(size = 9))
+```
+
 ```{r noncovid-ms-STLF-forecast-ts, echo=FALSE, message=FALSE}
+#Nonstationary 
 training_STLF_noncovid_monthly <- subset(crashes_mts4.noncovid, end=length(crashes_mts4.noncovid)-14)
 
 test_STLF_noncovid_monthly <- subset(crashes_mts4.noncovid, start=length(crashes_mts4.noncovid)-13)
@@ -3267,6 +3308,7 @@ crashes.train_STLF_noncovid_monthly %>%
 ```
 
 ```{r rename-noncovid-ms-STLF-fcast, echo=FALSE, include=FALSE}
+#Nonstationary 
 fcast.ms.STLF.monthly.noncovid <- summary(crashes.train_STLF_noncovid_monthly)
 
 rownames(fcast.ms.STLF.monthly.noncovid) <- seq(as.Date("2019/01/01"),
@@ -3274,6 +3316,7 @@ rownames(fcast.ms.STLF.monthly.noncovid) <- seq(as.Date("2019/01/01"),
 ```
 
 ```{r noncovid-ms-STLF-fcast-filter-decomp-sum, echo=FALSE, message=FALSE}
+#Nonstationary 
 head(fcast.ms.STLF.monthly.noncovid)
 
 autoplot(training_STLF_noncovid_monthly, series="Training data") +
@@ -3288,6 +3331,7 @@ autoplot(training_STLF_noncovid_monthly, series="Training data") +
 ```
 
 ```{r ets-MAM-covid, echo=FALSE, message=FALSE}
+#Nonstationary 
 ##Working with ets() monthly covid MAM model 
 fit.ets.monthly.covid <- ets(y=crashes_mts4, model="MAM")
 
@@ -3323,7 +3367,47 @@ fit.ets.monthly.covid %>% forecast(h=8) %>%
   xlab("Date") + ylab("Crashes")
 ```
 
+```{r ets-MAM-covid-stationary, echo=FALSE, message=FALSE, eval=FALSE}
+#Stationary (Does not work)
+##Working with ets() monthly covid MAM model 
+dif.fit.ets.monthly.covid <- ets(y=dif_crashes_mts4, model="MAM")
+#ERORR: Error in ets(y = dif_crashes_mts4, model = "MAM") : 
+  #Inappropriate model for data with negative or zero values
+
+summary(fit.ets.monthly.covid)
+
+autoplot(fit.ets.monthly.covid) + 
+  ggtitle("Components of ETS Multiplicative HoltWinters Method with Multiplicative Errors (With Pandemic Data)") + 
+  theme(title = element_text(size = 7)) + 
+  scale_x_continuous(breaks = c(1,2,3,4,5,6,7,8), 
+                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
+                                "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022")) +
+  theme(axis.text.x = element_text(angle=90)) + 
+  xlab("Date") + ylab("Crashes")
+
+cbind('Residuals' = residuals(fit.ets.monthly.covid),
+      'Forecast errors' = residuals(fit.ets.monthly.covid,type='response')) %>%
+  autoplot(facet=TRUE) + xlab("Date") + ylab("") + 
+  ggtitle("Residuals of ETS Multiplicative HoltWinters Method with Multiplicative Errors (With Pandemic Data)") + 
+  theme(title = element_text(size=8)) + 
+  scale_x_continuous(breaks = c(1,2,3,4,5,6,7,8), 
+                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
+                                "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022")) + 
+  theme(axis.text.x = element_text(angle=90))
+
+fit.ets.monthly.covid %>% forecast(h=8) %>%
+  autoplot() + 
+  ggtitle("Forecasts from ETS Multiplicative HoltWinters Method with Multiplicative Errors (With Pandemic Data)") + 
+  theme(title = element_text(size=8)) + 
+  scale_x_continuous(breaks = c(1,2,3,4,5,6,7,8), 
+                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
+                                "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022")) + 
+  theme(axis.text.x = element_text(angle=90)) + 
+  xlab("Date") + ylab("Crashes")
+```
+
 ```{r ets-MNM-covid, echo=FALSE, message=FALSE}
+#Nonstationary 
 ##Working with ets() monthly MNM covid model 
 
 fit.ets.monthly.covid.MNM <-ets(y=crashes_mts4, model="ZZM")
@@ -3363,6 +3447,7 @@ fit.ets.monthly.covid.MNM %>% forecast(h=8) %>%
 ```
 
 ```{r ets-MMM-covid, echo=FALSE, message=FALSE}
+#Nonstationary
 ##Working with ets() monthly MMM covid model 
 
 fit.ets.monthly.covid.MMM <-ets(y=crashes_mts4, model="MMM")
@@ -3400,6 +3485,7 @@ fit.ets.monthly.covid.MMM %>% forecast(h=8) %>%
 ```
 
 ```{r ets-MNA-covid, echo=FALSE, message=FALSE}
+#Nonstationary
 ##Working with ets() monthly MNA covid model 
 
 fit.ets.monthly.covid.MNA <-ets(y=crashes_mts4, model="MNA")
@@ -3436,6 +3522,7 @@ fit.ets.monthly.covid.MNA %>% forecast(h=8) %>%
 ```
 
 ```{r ets-MAM-noncovid, echo=FALSE, message=FALSE}
+#Nonstationary 
 ##Working with ets() monthly noncovid MAM model 
 fit.ets.monthly.noncovid <- ets(y=crashes_mts4.noncovid, model="MAM")
 
@@ -3472,6 +3559,7 @@ fit.ets.monthly.noncovid %>% forecast(h=23) %>%
 ```
 
 ```{r ets-MNM-noncovid, echo=FALSE, message=FALSE}
+#Nonstationary 
 ##Working with ets() monthly MNM noncovid model 
 
 fit.ets.monthly.noncovid.MNM <-ets(y=crashes_mts4.noncovid, model="MNM")
@@ -3509,6 +3597,7 @@ fit.ets.monthly.noncovid.MNM %>% forecast(h=23) %>%
 ```
 
 ```{r ets-MMM-noncovid, echo=FALSE, message=FALSE}
+#Nonstationary
 ##Working with ets() monthly MMM noncovid model 
 
 fit.ets.monthly.noncovid.MMM <-ets(y=crashes_mts4.noncovid, model="MMM")
@@ -3546,6 +3635,7 @@ fit.ets.monthly.noncovid.MMM %>% forecast(h=23) %>%
 ```
 
 ```{r ets-MNA-noncovid, echo=FALSE, message=FALSE}
+#Nonstationary
 ##Working with ets() monthly MNA noncovid model 
 
 fit.ets.monthly.noncovid.MNA <-ets(y=crashes_mts4.noncovid, model="MNA")
