@@ -3006,7 +3006,6 @@ autoplot(crashes_mts4) +
 ```
 
 ```{r noncovid-monthly-STLF-forecast-ts-decomp, echo=FALSE, message=FALSE}
-#Nonstationary 
 crashes_mts4.noncovid %>% mstl() %>%
   autoplot() + 
   ggtitle("Time Series Decomposition") + 
@@ -3148,7 +3147,6 @@ autoplot(training_HW_monthly) +
 ``` 
 
 ```{r ms-STLF-monthly-forecast-ts, echo=FALSE, message=FALSE}
-#Nonstationary 
 training_STLF_monthly <- subset(crashes_mts4, end=length(crashes_mts4)-5)
 
 test_STLF_monthly <- subset(crashes_mts4, start=length(crashes_mts4)-4)
@@ -3275,7 +3273,6 @@ autoplot(training_HW_noncovid_monthly) +
 ```
 
 ```{r noncovid-ms-STLF-forecast-ts, echo=FALSE, message=FALSE}
-#Nonstationary 
 training_STLF_noncovid_monthly <- subset(crashes_mts4.noncovid, end=length(crashes_mts4.noncovid)-14)
 
 test_STLF_noncovid_monthly <- subset(crashes_mts4.noncovid, start=length(crashes_mts4.noncovid)-13)
