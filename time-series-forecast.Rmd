@@ -1,0 +1,683 @@
+---
+title: "Time Series Forecast"
+author: "Kelly Wentzlof"
+date: "7/21/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r loading-libraries, message=FALSE, warning=FALSE, echo=FALSE, include=FALSE}
+library(reshape2)
+library(tidyverse)
+library(ggplot2)
+library(dplyr)
+library(dslabs)
+library(ggrepel)
+library(ggthemes)
+library(maps)
+library(scales)
+library(zoo)
+library(forecast)
+library(urca)
+library(sf)
+library(TTR)
+library(fpp2)
+```
+
+```{r read-data, message=FALSE, echo=FALSE, include=FALSE}
+#Code for Cortlyns computer (Mac)
+ # setwd("/Users/cmorris/Desktop/dsreu2021/rstudiodirectory/ResearchProject")
+ # persons <- read.csv(file="Persons_Involved_in_Crashes.csv")
+ # glimpse(persons)
+ #    
+ # locations <- read.csv(file="Reported_Crash_Locations.csv")
+ # glimpse(locations)
+ #    
+ # crashes <- persons %>% left_join(locations, by="key_crash")
+
+#Code for Kelly's computer (Windows)
+#library(readr)
+persons <- read_csv("~/NCAT REU/Mostafa/Data/Persons_Involved_in_Crashes.csv")
+
+locations <- read_csv("~/NCAT REU/Mostafa/Data/Reported_Crash_Locations.csv")
+
+crashes <- persons %>% left_join(locations, by="key_crash")
+
+# Code for Ayan's computer (Window)
+#library(readr)
+# persons <- read_csv("C:/Users/ayang/Desktop/Project FIles REU A&T/REU Research Project1/Persons_Involved_in_Crashes.csv")
+# 
+# locations <- read_csv("C:/Users/ayang/Desktop/Project FIles REU A&T/REU Research Project1/Reported_Crash_Locations.csv")
+# 
+# crashes <- persons %>% left_join(locations, by="key_crash")
+```
+
+```{r data-frame, echo=FALSE, message=FALSE}
+#daily with pandemic 
+crashes_ts = crashes %>%
+  filter(as.Date(crash_date) >= "2015/01/01" & as.Date(crash_date) <= "2021/05/31") %>%
+  separate(crash_date, 
+           into = c("Date", "Hour"), sep = 11) %>%
+  group_by(Date) %>%
+  summarize(count = length(unique(key_crash)))
+
+crashests2 <- ts(crashes_ts$count, start = c(2015,1), end = c(2021,153),
+                frequency = 365)
+
+#daily without pandemic 
+crashes_ts.noncovid = crashes %>%
+  filter(as.Date(crash_date) >= "2015/01/01" & as.Date(crash_date) <= "2020/03/01") %>%
+  separate(crash_date, 
+           into = c("Date", "Hour"), sep = 11) %>%
+  group_by(Date) %>%
+  summarize(count = length(unique(key_crash)))
+
+crashests.noncovid <- ts(crashes_ts.noncovid$count, start = c(2015,1), 
+                         end = c(2020,59), frequency = 365)
+
+#monthly with pandemic 
+crashes_mts = crashes %>%
+  filter(as.Date(crash_date) >= "2015/01/01" & as.Date(crash_date) <= "2021/05/31") %>%
+  separate(crash_date, 
+           into = c("Date", "Hour"), sep = 11) %>%
+  group_by(Date) %>%
+  summarize(count = length(unique(key_crash))) %>%
+  separate(Date, into = c("Year", "Month", "Day"), sep = "/") %>%
+  group_by(Year, Month) %>%
+  summarise(mcount = sum(count)) %>%
+  tidyr::spread(key=Month, value=mcount)
+
+crashes_mts = as.data.frame(crashes_mts)
+
+rownames(crashes_mts) = seq(2015, 2021)
+
+crashes_mts3 = crashes_mts %>%
+  select(02:13)
+
+crashes_mts2 <- ts(c(t(crashes_mts3)), frequency=12)
+
+crashes_mts4 <- window(crashes_mts2, start=c(1,01), end=c(7,05), frequency=12)
+
+#monthly without pandemic 
+crashes_mts.noncovid = crashes %>%
+  filter(as.Date(crash_date) >= "2015/01/01" & as.Date(crash_date) <= "2020/02/29") %>%
+  separate(crash_date, 
+           into = c("Date", "Hour"), sep = 11) %>%
+  group_by(Date) %>%
+  summarize(count = length(unique(key_crash))) %>%
+  separate(Date, into = c("Year", "Month", "Day"), sep = "/") %>%
+  group_by(Year, Month) %>%
+  summarise(mcount = sum(count)) %>%
+  tidyr::spread(key=Month, value=mcount)
+
+crashes_mts.noncovid = as.data.frame(crashes_mts.noncovid)
+
+rownames(crashes_mts.noncovid) = seq(2015, 2020)
+
+crashes_mts3.noncovid = crashes_mts.noncovid %>%
+  select(02:13)
+
+crashes_mts2.noncovid <- ts(c(t(crashes_mts3.noncovid)), frequency=12)
+
+crashes_mts4.noncovid <- window(crashes_mts2.noncovid, start=c(1,01), 
+                                end=c(6,02), frequency=12)
+```
+
+## Time Series Forecasting 
+
+### Daily with Pandemic Data 
+
+#### Stationarity Check 
+
+```{r stationarity-trans-daily-covid}
+##Looking at stationarity of crashests2 daily time series 
+library(urca)
+acf(crashests2)
+summary(ur.kpss(crashests2))
+
+ndiffs(crashests2) #1
+nsdiffs(crashests2) #0
+
+#Attempt at differencing 
+dif_crashests2 <- diff(crashests2)
+
+#Looking at stationarity of first difference 
+acf(dif_crashests2)
+summary(ur.kpss(dif_crashests2))
+
+ndiffs(dif_crashests2) #0
+nsdiffs(dif_crashests2) #0
+```
+
+```{r stat-trans-daily-covid-plot}
+cbind("Crashes" = crashests2,
+      "First differenced" = diff(crashests2)) %>%
+  autoplot(facets=TRUE) +
+  xlab("Date") + ylab("") +
+  ggtitle("Stationarity Transformations of Daily Pandemic Data")
+```
+
+#### TBATS Model 
+
+```{r tbats-stationary, echo=FALSE, message=FALSE, include=FALSE}
+#Stationary
+
+#reload libraries 
+crashes_ts = crashes %>%
+  filter(as.Date(crash_date) >= "2015/01/01" & as.Date(crash_date) <= "2021/05/31") %>%
+  separate(crash_date, 
+           into = c("Date", "Hour"), sep = 11) %>%
+  group_by(Date) %>%
+  summarize(count = length(unique(key_crash)))
+
+crashests2 <- ts(crashes_ts$count, start = c(2015,1), end = c(2021,153),
+                frequency = 365)
+
+dif_crashests2 <- diff(crashests2)
+
+dif_y <- msts(dif_crashests2, seasonal.periods=c(7,365.25))
+
+dif_fit_tbats_covid2 <- tbats(dif_y)
+
+dif_fc_tbats_covid2 <- forecast::forecast(dif_fit_tbats_covid2, h=214)
+
+dYhat <- dif_fc_tbats_covid2$mean #point forecast values 
+
+#crashests2
+#dif_crashests2<-diff(crashests2)
+#z0<-cumsum(c(crashests2[1], dif_crashests2))
+#all(crashests2==z0) #TRUE
+
+#dif_crashests2 <- diff(crashests2) #already ran earlier
+#dYhat <- dif_fc_tbats_covid2$mean #already ran earlier 
+Yhat <- cumsum(c(crashests2[length(crashests2)],dYhat))
+Yhat <- ts(Yhat, start = c(2021, 152), frequency=365)
+```
+
+```{r tbats-stationary-plot, echo=FALSE, message=FALSE}
+#Stationary
+autoplot(crashests2) + 
+  autolayer(Yhat, series="Point Forecasts") + 
+  ggtitle("TBATS Forecasting Model for Daily Car Crashes (With Stationary Pandemic Data)") +
+  xlab("Date") + ylab("Crashes") + 
+  theme(title = element_text(size = 9), legend.position = "bottom")
+```
+
+#### Multi-Step TBATS 
+
+```{r tbats-ms-stationary, echo=FALSE, message=FALSE, include=FALSE}
+#Stationary
+dif_y2 <- msts(dif_crashests2, seasonal.periods=c(7,365.25))
+
+dif_training_TBATS2 <- subset(dif_y2, end=length(dif_y2)-151)
+
+dif_test_TBATS2 <- subset(dif_y2, start=length(dif_y2)-150)
+
+dif_crashes.train_TBATS2 <- tbats(dif_training_TBATS2)
+
+dif_fc_train_TBATS2 <- forecast(dif_crashes.train_TBATS2, h=151)
+
+dYhat_ms_TBATS <- dif_fc_train_TBATS2$mean
+
+y2 <- msts(crashests2, seasonal.periods=c(7,365.25))
+
+training_TBATS2 <- subset(y2, end=length(y2)-151)
+
+test_TBATS2 <- subset(y2, start=length(y2)-150)
+  
+#Yhat_ms_TBATS <- cumsum(c(crashests2[length(crashests2)], dYhat_ms_TBATS))
+Yhat_ms_TBATS <- cumsum(c(training_TBATS2[length(training_TBATS2)], dYhat_ms_TBATS))
+
+Yhat_ms_TBATS <- ts(Yhat_ms_TBATS, start = c(2021, 1), frequency = 365)
+```
+
+```{r tbats-ms-stationary-plot, echo=FALSE}
+#Stationary 
+autoplot(training_TBATS2) + 
+  autolayer(Yhat_ms_TBATS, series="Point Forecasts") + 
+  autolayer(test_TBATS2, series="Test Set", alpha = 0.7) + 
+  ggtitle("Multi-Step TBATS Daily Forecasts of Crashes (With Stationary Pandemic Data)") + 
+  xlab("Date") + ylab("Crashes") + 
+  theme(legend.position = "bottom")
+
+dif_crashes.test_TBATS2 <- tbats(dif_test_TBATS2)
+
+accuracy(dif_crashes.test_TBATS2)
+```
+
+#### ARIMA Model 
+
+
+
+
+#### Multi-Step ARIMA 
+
+
+#### Combination 
+
+
+### Daily without Pandemic Data 
+
+#### Stationarity Check 
+
+```{r stationarity-trans-daily-noncovid}
+##Looking at stationarity of crashests.noncovid daily time series 
+library(urca)
+acf(crashests.noncovid)
+summary(ur.kpss(crashests.noncovid))
+
+ndiffs(crashests.noncovid) #1
+nsdiffs(crashests.noncovid) #0
+
+#Attempt at differencing (noncovid)
+dif_crashests.noncovid <- diff(crashests.noncovid)
+
+#Looking at stationarity of first difference (noncovid)
+acf(dif_crashests.noncovid)
+summary(ur.kpss(dif_crashests.noncovid))
+
+ndiffs(dif_crashests.noncovid) #0
+nsdiffs(dif_crashests.noncovid) #0
+```
+
+```{r stat-trans-daily-noncovid-plot}
+cbind("Crashes" = crashests.noncovid,
+      "First differenced" = diff(crashests.noncovid)) %>%
+  autoplot(facets=TRUE) +
+  xlab("Date") + ylab("") +
+  ggtitle("Stationarity Transformation of Daily NonPandemic Data")
+```
+
+#### TBATS Model 
+
+```{r tbats-noncovid-stationary, echo=FALSE, message=FALSE, include=FALSE}
+#Stationary
+
+crashes_ts.noncovid = crashes %>%
+  filter(as.Date(crash_date) >= "2015/01/01" & as.Date(crash_date) <= "2020/03/01") %>%
+  separate(crash_date, 
+           into = c("Date", "Hour"), sep = 11) %>%
+  group_by(Date) %>%
+  summarize(count = length(unique(key_crash)))
+
+crashests.noncovid <- ts(crashes_ts.noncovid$count, start = c(2015,1), 
+                         end = c(2020,59), frequency = 365)
+
+dif_crashests.noncovid <- diff(crashests.noncovid)
+
+dif_y_noncovid <- msts(dif_crashests.noncovid, seasonal.periods=c(7,365.25))
+
+dif_fit_tbats_noncovid <- tbats(dif_y_noncovid)
+
+dif_fc_tbats_noncovid <- forecast::forecast(dif_fit_tbats_noncovid, h=671)
+
+dYhat_noncovid <- dif_fc_tbats_noncovid$mean #point forecast values 
+
+#crashests.noncovid
+#dif_crashests.noncovid<-diff(crashests.noncovid)
+#z0<-cumsum(c(crashests.noncovid[1], dif_crashests.noncovid))
+#all(crashests.noncovid==z0) #TRUE
+
+#dif_crashests2 <- diff(crashests2) #already ran earlier
+#dYhat <- dif_fc_tbats_covid2$mean #already ran earlier 
+Yhat_noncovid <- cumsum(c(crashests.noncovid[length(crashests.noncovid)],dYhat_noncovid))
+Yhat_noncovid <- ts(Yhat, start = c(2020, 60), frequency=365)
+```
+
+```{r tbats-noncovid-stationary-plot, echo=FALSE, message=FALSE}
+#Stationary
+
+true_noncovid_crashes <- crashes_ts %>%
+  filter(Date >= as.Date("2020/03/01") & Date <= as.Date("2021/05/31"))
+
+true_noncovid_crashes <- ts(true_noncovid_crashes$count, 
+                            start = c(2020,60), end = c(2021,153), 
+                            frequency = 365)
+
+autoplot(crashests.noncovid) + 
+  autolayer(true_noncovid_crashes, alpha=0.7, series="True Count") +
+  autolayer(Yhat_noncovid, alpha=0.6, series="Point Forecasts") + 
+  ggtitle("TBATS Forecasting Model for Daily Car Crashes (Stationary Without Pandemic Data)") +
+  xlab("Date") + ylab("Crashes") + 
+  theme(title = element_text(size = 9), legend.position = "bottom")
+```
+
+#### Multi-Step TBATS (fix)
+
+```{r tbats-ms-stationary-noncovid, echo=FALSE, message=FALSE, include=FALSE}
+#Stationary
+dif_y2.noncovid <- msts(dif_crashests.noncovid, seasonal.periods=c(7,365.25))
+
+dif_training_TBATS2.noncovid <- subset(dif_y2.noncovid, end=length(dif_y2.noncovid)-426)
+
+dif_test_TBATS2.noncovid <- subset(dif_y2.noncovid, start=length(dif_y2.noncovid)-425)
+
+dif_crashes.train_TBATS2.noncovid <- tbats(dif_training_TBATS2.noncovid)
+
+dif_fc_train_TBATS2.noncovid <- forecast::forecast(dif_crashes.train_TBATS2.noncovid, h=426)
+
+dYhat_ms_TBATS_noncovid <- dif_fc_train_TBATS2.noncovid$mean
+
+y2.noncovid <- msts(crashests.noncovid, seasonal.periods=c(7,365.25))
+
+training_TBATS2.noncovid <- subset(y2.noncovid, end=length(y2.noncovid)-426)
+
+test_TBATS2.noncovid <- subset(y2.noncovid, start=length(y2.noncovid)-425)
+
+Yhat_ms_TBATS_noncovid <- cumsum(c(crashests.noncovid[length(crashests.noncovid)], dYhat_ms_TBATS_noncovid))
+
+Yhat_ms_TBATS_noncovid <- cumsum(c(training_TBATS2.noncovid[length(training_TBATS2.noncovid)], dYhat_ms_TBATS_noncovid)) 
+
+Yhat_ms_TBATS_noncovid <- ts(Yhat_ms_TBATS_noncovid, start = c(2019,1), frequency=365)
+```
+
+```{r tbats-ms-stationary-noncovid-plots, echo=FALSE, message=FALSE, warning=FALSE}
+#Stationary
+autoplot(training_TBATS2.noncovid) + 
+  autolayer(Yhat_ms_TBATS_noncovid) + 
+  autolayer(test_TBATS2.noncovid) + 
+  ggtitle("Multi-Step TBATS Daily Forecasts of Crashes (Stationary Without Pandemic Data)") + 
+  xlab("Date") + ylab("Crashes") + 
+  theme(legend.position = "bottom")
+
+dif_crashes.test_TBATS2_noncovid <- tbats(dif_test_TBATS2.noncovid)
+
+accuracy(dif_crashes.test_TBATS2_noncovid)
+
+```
+
+#### ARIMA Model 
+
+#### Multi-Step ARIMA 
+
+#### Combination 
+
+### Monthly with Pandemic Data 
+
+#### Stationarity Check 
+
+```{r stationarity-trans-monthly-covid}
+##Looking at stationarity of crashes_mts4 monthly time series 
+library(urca)
+acf(crashes_mts4)
+summary(ur.kpss(crashes_mts4))
+
+ndiffs(crashes_mts4) #1
+nsdiffs(crashes_mts4) #0
+
+#Attempt at differencing 
+dif_crashes_mts4 <- diff(crashes_mts4)
+
+#Looking at stationarity of first difference 
+acf(dif_crashes_mts4)
+summary(ur.kpss(dif_crashes_mts4))
+
+ndiffs(dif_crashes_mts4) #0
+nsdiffs(dif_crashes_mts4) #0
+```
+
+```{r stat-trans-monthly-covid-plot}
+cbind("Crashes" = crashes_mts4,
+      "First differenced" = diff(crashes_mts4)) %>%
+  autoplot(facets=TRUE) +
+  xlab("Date") + ylab("") +
+  ggtitle("Stationarity Transformation of Monthly Pandemic Data")
+```
+
+#### TBATS Model 
+
+```{r tbats-stationary-monthly, echo=FALSE, message=FALSE, include=FALSE}
+#Stationary
+
+#reload libraries 
+crashes_mts = crashes %>%
+  filter(as.Date(crash_date) >= "2015/01/01" & as.Date(crash_date) <= "2021/05/31") %>%
+  separate(crash_date, 
+           into = c("Date", "Hour"), sep = 11) %>%
+  group_by(Date) %>%
+  summarize(count = length(unique(key_crash))) %>%
+  separate(Date, into = c("Year", "Month", "Day"), sep = "/") %>%
+  group_by(Year, Month) %>%
+  summarise(mcount = sum(count)) %>%
+  tidyr::spread(key=Month, value=mcount)
+
+crashes_mts = as.data.frame(crashes_mts)
+
+rownames(crashes_mts) = seq(2015, 2021)
+
+crashes_mts3 = crashes_mts %>%
+  select(02:13)
+
+crashes_mts2 <- ts(c(t(crashes_mts3)), frequency=12)
+
+crashes_mts4 <- window(crashes_mts2, start=c(1,01), end=c(7,05), frequency=12)
+
+dif_crashes_mts4 <- diff(crashes_mts4)
+
+dif_y_monthly <- msts(dif_crashes_mts4, seasonal.periods=12)
+
+dif_fit_tbats_covid2_monthly <- tbats(dif_y_monthly)
+
+dif_fc_tbats_covid2_monthly <- forecast::forecast(dif_fit_tbats_covid2, h=8)
+
+dYhat_monthly <- dif_fc_tbats_covid2_monthly$mean #point forecast values 
+
+#crashests2
+#dif_crashests2<-diff(crashests2)
+#z0<-cumsum(c(crashests2[1], dif_crashests2))
+#all(crashests2==z0) #TRUE
+
+#dif_crashests2 <- diff(crashests2) #already ran earlier
+#dYhat <- dif_fc_tbats_covid2$mean #already ran earlier 
+Yhat_monthly <- cumsum(c(crashes_mts4[length(crashes_mts4)],dYhat_monthly))
+Yhat_monthly <- ts(Yhat_monthly, start = c(7,6), frequency=12)
+```
+
+```{r tbats-stationary-plot-monthly, echo=FALSE, message=FALSE}
+#Stationary
+autoplot(crashes_mts4) + 
+  autolayer(Yhat_monthly, series="Point Forecasts") + 
+  ggtitle("TBATS Forecasting Model for Monthly Car Crashes (With Stationary Pandemic Data)") +
+  xlab("Date") + ylab("Crashes") + 
+  scale_x_continuous(breaks = c(1,2,3,4,5,6,7, 8), 
+                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
+                                "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022")) + 
+  theme(axis.text.x = element_text(angle = 90), title = element_text(size=9), 
+        legend.position = "bottom") 
+```
+
+#### Multi-Step TBATS
+
+```{r tbats-ms-stationary-monthly, echo=FALSE, message=FALSE, include=FALSE}
+#Stationary
+dif_y2_monthly <- msts(dif_crashes_mts4, seasonal.periods=12)
+
+dif_training_TBATS2_monthly <- subset(dif_y2_monthly, end=length(dif_y2_monthly)-5)
+
+dif_test_TBATS2_monthly <- subset(dif_y2_monthly, start=length(dif_y2_monthly)-4)
+
+dif_crashes.train_TBATS2_monthly <- tbats(dif_training_TBATS2_monthly)
+
+dif_fc_train_TBATS2_monthly <- forecast(dif_crashes.train_TBATS2_monthly, h=5)
+
+dYhat_ms_TBATS_monthly <- dif_fc_train_TBATS2_monthly$mean
+
+y2 <- msts(crashes_mts4, seasonal.periods=12)
+
+training_TBATS2 <- subset(y2, end=length(y2)-5)
+
+test_TBATS2 <- subset(y2, start=length(y2)-4)
+  
+#Yhat_ms_TBATS <- cumsum(c(crashests2[length(crashests2)], dYhat_ms_TBATS))
+Yhat_ms_TBATS_monthly <- cumsum(c(training_TBATS2[length(training_TBATS2)], dYhat_ms_TBATS_monthly))
+
+Yhat_ms_TBATS_monthly <- ts(Yhat_ms_TBATS_monthly, start = c(6,12), frequency=12)
+```
+
+```{r tbats-ms-stationary-plot, echo=FALSE}
+#Stationary 
+autoplot(training_TBATS2) + 
+  autolayer(Yhat_ms_TBATS_monthly, series="Point Forecasts") + 
+  autolayer(test_TBATS2, series="Test Set", alpha = 0.7) + 
+  ggtitle("Multi-Step TBATS Monthly Forecasts of Crashes (With Stationary Pandemic Data)") + 
+  xlab("Date") + ylab("Crashes") + 
+  theme(legend.position = "bottom", title=element_text(size=10))
+
+dif_crashes.test_TBATS2_monthly <- tbats(dif_test_TBATS2_monthly)
+
+accuracy(dif_crashes.test_TBATS2_monthly)
+```
+
+#### ARIMA Model 
+
+#### Multi-Step ARIMA 
+
+#### HoltWinters Model 
+
+```{r monthly-HW-fcast-decomp-stationary, echo=FALSE}
+#Stationary
+dif.covid.monthly <- HoltWinters(dif_crashes_mts4)
+
+#summary(dif.covid.monthly)
+
+#plot(fitted(dif.covid.monthly), main = "Box Jenkins Decomposition of Monthly Crashes (With Stationary Pandemic Data)", cex.main=1)
+
+dif.fcast.covid.monthly <- forecast::forecast(dif.covid.monthly, h=8, level=c(80,95))
+
+dYhat.HW <- dif.fcast.covid.monthly$mean
+
+#crashes_mts4
+#dif_crashes_mts4<-diff(crashes_mts4)
+#z0<-cumsum(c(crashes_mts4[1], dif_crashes_mts4))
+#all(crashes_mts4==z0) #TRUE
+
+Yhat.HW <- cumsum(c(crashes_mts4[length(crashes_mts4)],dYhat.HW))
+Yhat.HW <- ts(Yhat.HW, start = c(7, 5), frequency=12)
+```
+
+```{r monthly-HW-fcast-filter-forecast-ts-stationary, echo=FALSE, message=FALSE}
+#Stationary 
+
+autoplot(crashes_mts4) +
+  autolayer(Yhat.HW) +
+  ggtitle("Forecasts of Monthly Car Crashes Using HoltWinters (With Stationary Pandemic Data)") +
+  xlab("Date") + ylab("Crashes") +
+  scale_x_continuous(breaks = c(1,2,3,4,5,6,7, 8), 
+                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
+                                "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022")) + 
+  theme(axis.text.x = element_text(angle = 90), title = element_text(size=9), 
+        legend.position = "bottom")
+```
+
+#### Multi-Step HoltWinters 
+
+```{r ms-HW-monthly-forecast-ts-stationary, echo=FALSE, message=FALSE}
+#Stationary  
+dif_training_HW_monthly <- subset(dif_crashes_mts4, end=length(dif_crashes_mts4)-5)
+
+dif_test_HW_monthly <- subset(dif_crashes_mts4, start=length(dif_crashes_mts4)-4)
+
+dif_crashes.train_HW_monthly <- HoltWinters(dif_training_HW_monthly)
+
+dif_fc_HW <- forecast::forecast(dif_crashes.train_HW_monthly, h=5)
+
+dYhat_ms_HW <- dif_fc_HW$mean
+
+Yhat_ms_HW <- cumsum(c(crashes_mts4[length(crashes_mts4)],dYhat_ms_HW))
+
+Yhat_ms_HW <- ts(Yhat_ms_HW, start = c(7,1), frequency=12)
+
+training_HW_monthly <- subset(crashes_mts4, end=length(crashes_mts4)-5)
+
+test_HW_monthly <- subset(crashes_mts4, start=length(crashes_mts4)-4)
+
+autoplot(training_HW_monthly) + 
+  autolayer(Yhat_ms_HW) + 
+  autolayer(test_HW_monthly) + 
+  ggtitle("Multi-Step HoltWinters Monthly Forecasts of Crashes (With Stationary Pandemic Data)") + 
+  xlab("Date") + ylab("Crashes") + 
+  scale_x_continuous(breaks = c(1,2,3,4,5,6,7), 
+                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
+                                "Jan 2019", "Jan 2020", "Jan 2021")) + 
+  theme(axis.text.x = element_text(angle = 90), legend.position = "bottom", 
+        title = element_text(size = 9))
+``` 
+
+#### Combination 
+
+### Monthly without Pandemic Data 
+
+#### Stationarity Check 
+
+```{r stationarity-trans-monthly-noncovid, echo=FALSE, include=FALSE}
+##Looking at stationarity of crashes_mts4.noncovid monthly time series 
+library(urca)
+acf(crashes_mts4.noncovid)
+summary(ur.kpss(crashes_mts4.noncovid))
+
+ndiffs(crashes_mts4.noncovid) #1
+nsdiffs(crashes_mts4.noncovid) #1
+
+#Attempt at seasonal differencing (noncovid)
+season_dif_crashes_mts4.noncovid <- diff(crashes_mts4.noncovid,12)
+
+#Looking at stationarity of seasonal difference (noncovid)
+acf(season_dif_crashes_mts4.noncovid)
+summary(ur.kpss(season_dif_crashes_mts4.noncovid))
+
+ndiffs(season_dif_crashes_mts4.noncovid) #0
+nsdiffs(season_dif_crashes_mts4.noncovid) #0
+```
+
+```{r stat-trans-monthly-noncovid-plot, echo=FALSE}
+cbind("Crashes" = crashes_mts4.noncovid,
+      "Seasonally\n differenced" = diff(crashes_mts4.noncovid, 12)) %>%
+  autoplot(facets=TRUE) +
+  xlab("Date") + ylab("") +
+  ggtitle("Stationarity Transformation of Monthly NonPandemic Data")
+```
+
+#### SARIMA Model 
+
+#### Multi-Step SARIMA 
+
+#### STLF Model 
+
+```{r stlf, echo=FALSE, message=FALSE}
+q <- crashes_mts4.noncovid %>%
+  stlf(lambda = 0, h = 23, level=c(80,95)) 
+
+q %>%
+  autoplot() + 
+  ggtitle("STLF Model for Monthly Car Crashes (Without Pandemic Data)") +
+  xlab("Date") + ylab("Crashes") + 
+  scale_x_continuous(breaks = c(1,2,3,4,5,6,7,8), 
+                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
+                                "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022")) + 
+  theme(axis.text.x = element_text(angle = 90))
+```
+
+#### Multi-Step STLF 
+
+```{r noncovid-ms-STLF-forecast-ts, echo=FALSE, message=FALSE}
+training_STLF_noncovid_monthly <- subset(crashes_mts4.noncovid, end=length(crashes_mts4.noncovid)-14)
+
+test_STLF_noncovid_monthly <- subset(crashes_mts4.noncovid, start=length(crashes_mts4.noncovid)-13)
+
+crashes.train_STLF_noncovid_monthly <- stlf(training_STLF_noncovid_monthly, lambda = 0, h = 14, level=c(80,95))
+
+crashes.train_STLF_noncovid_monthly %>%
+  forecast::forecast(h=14) %>%
+  autoplot() + autolayer(test_STLF_noncovid_monthly) + 
+  ggtitle("Multi-Step STLF Monthly Forecasts of Crashes (Without Pandemic Data)") + 
+  xlab("Date") + ylab("Crashes") + 
+  scale_x_continuous(breaks = c(1,2,3,4,5,6,7), 
+                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
+                                "Jan 2019", "Jan 2020", "Jan 2021")) + 
+  theme(axis.text.x = element_text(angle = 90), legend.position = "bottom")
+```
+
+#### Combination 
