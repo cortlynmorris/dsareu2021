@@ -3501,7 +3501,7 @@ round(coef(Injury2.fit5), digits = 4) #get rounded coefficients
 round(confint(Injury2.fit5), digits = 4) #TAKES REALLY LONG get confidence intervals (CI) for coefs
 
 #Odds ratios
-round(exp(coef(Injury2.fit4)), digits = 4) #OR=exp(coef)
+round(exp(coef(Injury2.fit4)), digits = 4) #OR=exp(coef)  ## add to model summary table
 (round(exp(coef(Injury2.fit4)), digits = 4)-1)*100 #percent change in odds
 round(exp(confint(Injury2.fit4)), digits = 4) #TAKES REALLY LONG confidence intervals for ORs
 round(data.frame(OR=exp(coef(Injury2.fit4)), exp(confint(Injury2.fit4))), digits = 4) #TAKES REALLY LONG ORs & their CIs
@@ -3516,6 +3516,12 @@ round(data.frame(OR=exp(coef(Injury2.fit5)), exp(confint(Injury2.fit5))), digits
 library(MASS) 
 Injury2.select4 <- stepAIC(Injury2.fit4)
 summary(Injury2.select4)
+
+require(broom)
+require(knitr)
+out <- tidy(Injury2.select4)
+kable(out)
+
 
 library(MASS) 
 Injury2.select5 <- stepAIC(Injury2.fit5)
@@ -3560,10 +3566,16 @@ overunder.pred2 <- factor(overunder.pred2, levels = c("No injury", "Injury")) #p
 
 StatisticsComparison = cbind(SampleType = c("Unbalanced", "Oversample", "Undersample", "Combination Full Sample", 
         "Combination Sub-Sample"),rbind(stats, stats2, stats3, stats4, stats5))
+require(knitr)
+kable(StatisticsComparison)
 
 #Random Forest Model
 install.packages("ranger")
 library(ranger)
+install.packages("randomForest")
+library(randomForest)
+install.packages("Rcpp")
+library(Rcpp)
 
 crashes_pm.clean = crashes_pm %>%
   dplyr::select(Injury2,Age,VehicleType,ContributingCircumstance1,Protection,
@@ -3578,6 +3590,12 @@ rf.fit1 = ranger(Injury2~Age+VehicleType+ContributingCircumstance1+Protection+
              TrafficControlType+RoadClassification+PersonType+
              VisionObstruction, data=crashes_pm.clean, 
        num.trees = 500, mtry = round(11/2), importance = "impurity", classification = T)
+
+rf.fit1 = randomForest(Injury2~Age+VehicleType+ContributingCircumstance1+Protection+
+                   WeatherCondition1+MostHarmfulEvent+RoadFeature+
+                   TrafficControlType+RoadClassification+PersonType+
+                   VisionObstruction, data=crashes_pm.clean, 
+                 importance = T)
 
 ## Oversample
 
