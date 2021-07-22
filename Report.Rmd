@@ -1905,19 +1905,6 @@ dif_m %>%
   xlab("Date") + ylab("Crashes") 
 ```
 
-```{r rename-STLF-fcast-stationary, echo=FALSE, eval=FALSE}
-#Stationary
-dif_daily_forecast_values_covid_STLF <- summary(dif_m)
-
-rownames(dif_daily_forecast_values_covid_STLF) <- seq(as.Date("2021/06/01"), 
-                                                as.Date("2021/12/31"), "day")
-```
-
-```{r STLF-fcast-filter-stationary, echo=FALSE, eval=FALSE}
-#Stationary
-head(dif_daily_forecast_values_covid_STLF)
-```
-
 ```{r tbats, echo-FALSE, message=FALSE, include=FALSE}
 #Nonstationary 
 #y <- msts(crashes_ts$count, seasonal.periods=c(7,365.25))
@@ -2074,12 +2061,12 @@ head(daily_forecast_values_noncovid_STLF)
 ```
 
 ```{r noncovid-STLF-decomp-forecast-ts-stationary, echo=FALSE, eval=FALSE}
-#Stationary
+#Stationary (does not work)
 dif_crashests.noncovid %>% mstl() %>%
   autoplot() + 
   ggtitle("Time Series Decomposition (Without Pandemic Data)")
 
-p <- dif_crashests.noncovid %>%
+dif_p <- dif_crashests.noncovid %>%
   stlf(lambda = 0, h = 671, level = c(80, 95)) 
 
 true_crashes <- crashes_ts %>%
@@ -2095,19 +2082,6 @@ p %>%
   ggtitle("STLF Model for Daily Car Crashes (Without Pandemic Data)") +
   xlab("Date") + ylab("Daily Crashes") + 
   theme(legend.position = "bottom")
-```
-
-```{r rename-noncovid-STLF-fcast-stationary, echo=FALSE, eval=FALSE}
-#Stationary
-daily_forecast_values_noncovid_STLF <- summary(p)
-
-rownames(daily_forecast_values_noncovid_STLF) <- seq(as.Date("2020/03/01"), 
-                                                   as.Date("2021/12/31"), "day")
-```
-
-```{r noncovid-STLF-fcast-filter-stationary, echo=FALSE, eval=FALSE}
-#stationary
-head(daily_forecast_values_noncovid_STLF)
 ```
 
 ```{r tbats-noncovid, echo=FALSE, message=FALSE, include=FALSE}
@@ -3001,8 +2975,8 @@ rownames(monthly_forecast_values_covid_STLF) <- seq(as.Date("2021/06/01"),
 monthly_forecast_values_covid_STLF
 ```
 
-```{r monthly-STLF-forecast-ts-decomp-stationary, echo=FALSE, message=FALSE, eval=FALSE}
-#Stationary (does not work)
+```{r monthly-STLF-forecast-ts-decomp-stationary, echo=FALSE, message=FALSE}
+#Stationary
 dif_crashes_mts4 %>% mstl() %>%
   autoplot() + 
   ggtitle("Time Series Decomposition") + 
@@ -3012,11 +2986,17 @@ dif_crashes_mts4 %>% mstl() %>%
                                 "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022")) + 
   theme(axis.text.x = element_text(angle = 90))
 
-t <- dif_crashes_mts4 %>% #(ERROR: NaNs produced)
+dif_t <- dif_crashes_mts4 %>% #warning: NaNs produced
   stlf(lambda = 0, h = 8, level=c(80,95)) 
 
-t %>%
-  autoplot() + 
+dYhat_stlf_monthly <- dif_t$mean
+
+Yhat_stlf_monthly <- cumsum(c(crashes_mts4[length(crashes_mts4)], dYhat_stlf_monthly))
+
+Yhat_stlf_monthly <- ts(Yhat_stlf_monthly, start=c(7, 6), frequency=12)
+
+autoplot(crashes_mts4) +
+  autolayer(Yhat_stlf_monthly) + 
   ggtitle("SLTF Model for Monthly Car Crashes (With Stationary Pandemic Data)") +
   xlab("Date") + ylab("Crashes") + 
   scale_x_continuous(breaks = c(1,2,3,4,5,6,7,8), 
@@ -3063,7 +3043,7 @@ head(monthly_forecast_values_noncovid_STLF)
 ```
 
 ```{r noncovid-monthly-STLF-forecast-ts-decomp-stationary, echo=FALSE, message=FALSE}
-#Stationary (does not work)
+#Stationary 
 season_dif_crashes_mts4.noncovid %>% mstl() %>%
   autoplot() + 
   ggtitle("Time Series Decomposition") + 
@@ -3073,11 +3053,17 @@ season_dif_crashes_mts4.noncovid %>% mstl() %>%
                                 "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022")) + 
   theme(axis.text.x = element_text(angle = 90))
 
-q <- season_dif_crashes_mts4.noncovid %>% #ERROR: NaNs produce
+dif_q <- season_dif_crashes_mts4.noncovid %>% #warning: NaNs produce
   stlf(lambda = 0, h = 23, level=c(80,95)) 
 
-q %>%
-  autoplot() + 
+dYhat_stlf_monthly_noncovid <- dif_q$mean
+
+Yhat_stlf_monthly_noncovid <- cumsum(c(crashes_mts4.noncovid[length(crashes_mts4.noncovid)],dYhat_stlf_monthly_noncovid))
+
+Yhat_stlf_monthly_noncovid <- ts(Yhat_stlf_monthly_noncovid, start = c(6, 2), frequency=12)
+
+autoplot(crashes_mts4.noncovid) + 
+  autolayer(Yhat_stlf_monthly_noncovid) + 
   ggtitle("STLF Model for Monthly Car Crashes (Stationary Without Pandemic Data)") +
   xlab("Date") + ylab("Crashes") + 
   scale_x_continuous(breaks = c(1,2,3,4,5,6,7,8), 
