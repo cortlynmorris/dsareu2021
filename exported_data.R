@@ -3608,10 +3608,8 @@ crashes_pm.clean.fit.train <- ranger(Injury2~Age+VehicleType+ContributingCircums
                                  TrafficControlType+RoadClassification+PersonType+
                                  VisionObstruction, data=crashes_pm.clean, 
                                num.trees = 500, mtry = round(11/2), importance = "impurity", classification = T) #fitting model on training set
-crashes_pm.clean.pred.prob <- predict(crashes_pm.clean.fit.train, newdata=crashes_pm.clean.test, 
-                                type="response") #predicting prob. of default=1 for test set
-crashes_pm.clean.pred <- ifelse(crashes_pm.pred.prob>0.5, "Injury", "No injury") #predicting `default` based on prob estimates
-(tab.rf <- table(pred=crashes_pm.clean.pred, actual=crashes_pm.clean.test$Injury2)) #confusion matrix: cross-tab of predictions vs actual class(accuracy.rf=mean(crashes_pm.clean.pred==crashes_pm.clean.test$Injury2, na.rm=T)*100) #percent of correct predictions in test data
+crashes_pm.clean.pred <- predict(crashes_pm.clean.fit.train, data=crashes_pm.clean.test, type="response")
+(tab.rf <- table(pred=crashes_pm.clean.pred$predictions, actual=crashes_pm.clean.test$Injury2)) #confusion matrix: cross-tab of predictions vs actual class(accuracy.rf=mean(crashes_pm.clean.pred==crashes_pm.clean.test$Injury2, na.rm=T)*100) #percent of correct predictions in test data
 (stats.rf = calc_stats(tab.rf, prevalence = NULL, positive = "Injury"))
 
 ## Oversample
@@ -3643,11 +3641,9 @@ oversample_df2.fit.train <- ranger(Injury2~Age+VehicleType+ContributingCircumsta
                                      TrafficControlType+RoadClassification+PersonType+
                                      VisionObstruction, data=oversample_df2.train, 
                                    num.trees = 500, mtry = round(11/2), importance = "impurity", classification = T) #fitting model on training set
-oversample_df2.pred.prob <- predict(oversample_df2.fit.train, newdata=oversample_df2.test, 
-                                    type="response") #predicting prob. of default=1 for test set
-oversample_df2.pred <- ifelse(oversample_df2.pred.prob>0.5, "Injury", "No injury") #predicting `default` based on prob estimates
-(tab.rf2 <- table(pred=oversample_df2.pred, actual=oversample_df2.test$Injury2)) #confusion matrix: cross-tab of predictions vs actual class
-(accuracy.rf2=mean(oversample_df2.pred==oversample_df2.test$Injury2, na.rm=T)*100) #percent of correct predictions in test data
+oversample_df2.pred <-predict(oversample_df2.fit.train, data=oversample_df2.test, type="response")
+(tab.rf2 <- table(pred=oversample_df2.pred$predictions, actual=oversample_df2.test$Injury2)) #confusion matrix: cross-tab of predictions vs actual class
+(accuracy.rf2=mean(oversample_df2.pred$predictions==oversample_df2.test$Injury2, na.rm=T)*100) #percent of correct predictions in test data
 (stats.rf2 = calc_stats(tab.rf2, prevalence = NULL, positive = "Injury"))
 
 ## Undersample
@@ -3680,11 +3676,9 @@ undersample_df2.fit.train <- ranger(Injury2~Age+VehicleType+ContributingCircumst
                                      TrafficControlType+RoadClassification+PersonType+
                                      VisionObstruction, data=undersample_df2.train, 
                                    num.trees = 500, mtry = round(11/2), importance = "impurity", classification = T) #fitting model on training set
-undersample_df2.pred.prob <- predict(undersample_df2.fit.train, newdata=undersample_df2.test, 
-                                    type="response") #predicting prob. of default=1 for test set
-undersample_df2.pred <- ifelse(undersample_df2.pred.prob>0.5, "Injury", "No injury") #predicting `default` based on prob estimates
-(tab.rf3 <- table(pred=undersample_df2.pred, actual=undersample_df2.test$Injury2)) #confusion matrix: cross-tab of predictions vs actual class
-(accuracy.rf3=mean(undersample_df2.pred==undersample_df2.test$Injury2, na.rm=T)*100) #percent of correct predictions in test data
+undersample_df2.pred <-predict(undersample_df2.fit.train, data=undersample_df2.test, type="response")
+(tab.rf3 <- table(pred=undersample_df2.pred$predictions, actual=undersample_df2.test$Injury2)) #confusion matrix: cross-tab of predictions vs actual class
+(accuracy.rf3=mean(undersample_df2.pred$predictions==undersample_df2.test$Injury2, na.rm=T)*100) #percent of correct predictions in test data
 (stats.rf3 = calc_stats(tab.rf3, prevalence = NULL, positive = "Injury"))
 
 ## Combination
@@ -3712,11 +3706,9 @@ overunder.rf.fit.train <- ranger(Injury2~Age+VehicleType+ContributingCircumstanc
                                       TrafficControlType+RoadClassification+PersonType+
                                       VisionObstruction, data=overunder.rf.train, 
                                     num.trees = 500, mtry = round(11/2), importance = "impurity", classification = T) #fitting model on training set
-overunder.rf.pred.prob <- predict(overunder.rf.fit.train, newdata=overunder.rf.test, 
-                                     type="response") #predicting prob. of default=1 for test set
-overunder.rf.pred <- ifelse(overunder.rf.pred.prob>0.5, "Injury", "No injury") #predicting `default` based on prob estimates
-(tab.rf4 <- table(pred=overunder.rf.pred, actual=overunder.rf.test$Injury2)) #confusion matrix: cross-tab of predictions vs actual class
-(accuracy.rf4=mean(overunder.rf.pred==overunder.rf.test$Injury2, na.rm=T)*100) #percent of correct predictions in test data
+overunder.rf.pred <-predict(overunder.rf.fit.train, data=overunder.rf.test, type="response")
+(tab.rf4 <- table(pred=overunder.rf.pred$predictions, actual=overunder.rf.test$Injury2)) #confusion matrix: cross-tab of predictions vs actual class
+(accuracy.rf4=mean(overunder.rf.pred$predictions==overunder.rf.test$Injury2, na.rm=T)*100) #percent of correct predictions in test data
 (stats.rf4 = calc_stats(tab.rf4, prevalence = NULL, positive = "Injury"))
 
 
@@ -3743,11 +3735,10 @@ overunder2.rf.fit.train <- ranger(Injury2~Age+VehicleType+ContributingCircumstan
                                    TrafficControlType+RoadClassification+PersonType+
                                    VisionObstruction, data=overunder2.rf.train, 
                                  num.trees = 500, mtry = round(11/2), importance = "impurity", classification = T) #fitting model on training set
-overunder2.rf.pred.prob <- predict(overunder2.rf.fit.train, newdata=overunder2.rf.test, 
-                                  type="response") #predicting prob. of default=1 for test set
-overunder2.rf.pred <- ifelse(overunder2.rf.pred.prob>0.5, "Injury", "No injury") #predicting `default` based on prob estimates
-(tab.rf5 <- table(pred=overunder2.rf.pred, actual=overunder2.rf.test$Injury2)) #confusion matrix: cross-tab of predictions vs actual class
-(accuracy.rf5=mean(overunder2.rf.pred==overunder2.rf.test$Injury2, na.rm=T)*100) #percent of correct predictions in test data
+overunder2.rf.pred <-predict(overunder2.rf.fit.train, data=overunder2.rf.test, type="response")
+#overunder2.rf.pred <- ifelse(overunder2.rf.pred.prob>0.5, "Injury", "No injury") #predicting `default` based on prob estimates
+(tab.rf5 <- table(pred=overunder2.rf.pred$predictions, actual=overunder2.rf.test$Injury2)) #confusion matrix: cross-tab of predictions vs actual class
+(accuracy.rf5=mean(overunder2.rf.pred$predictions==overunder2.rf.test$Injury2, na.rm=T)*100) #percent of correct predictions in test data
 (stats.rf5 = calc_stats(tab.rf5, prevalence = NULL, positive = "Injury"))
 
 
