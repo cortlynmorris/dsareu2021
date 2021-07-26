@@ -1299,7 +1299,7 @@ crashes %>%
   ggplot(aes(fill=Injury, x=VisionObstruction)) + 
   geom_bar(position="fill", stat="count") + 
   coord_flip() + 
-  labs(title = "Injury Frequncy by Vision Obstruction",
+  labs(title = "Injury Frequency by Vision Obstruction",
        x = "Vision Obstruction",
        y = "Percentage")
 ```
