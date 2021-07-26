@@ -23,7 +23,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Abstract
 
-Studies have shown that road traffic crashes are one of the leading causes of non-natural death for U.S citizens. There are many different ways that road crashes occur, and several various factors lead to it. It is essential to analyze the most common elements of road crashes. In this report, we will model and forecast crashes in Wake County, North Carolina. To accomplish this goal, we will use the North Carolina Wake County crashes dataset from 2015 to March 2021. We were able to observe which factors have a higher cause of crashes in Wake County. We will address the above research question by using histograms of common factors leading to crashes and Time Series Forecasting crashes in Wake County.
+Studies have shown that road traffic crashes are one of the leading causes of non-natural death for U.S citizens. There are many different ways that road crashes occur, and several various factors lead to it. It is essential to analyze the most common elements of road crashes. In this report, our goal is to model and forecast crashes in Wake County, North Carolina. To accomplish this goal, a public dataset  called  North Carolina Wake County crashes was available to use. The crash dataset used in this research was from 2015 to March 2021. Using the dataset to our advantage our intent is to  observe which factors have a higher cause of crashes in Wake County. The objective of this research is to address the above research question by using bar plots of common factors leading to crashes and Time Series Forecasting crashes in Wake County.
 
 \newpage
 
@@ -35,11 +35,23 @@ When it comes to identifying car crashes, different states in the U.S experience
 
 From the beginning of 2015, information on car crashes has been listed in the Wake County car accident database. This data includes the driver's age, gender, vehicle type, and many more critical car accident factors. Our database is based on what police officers have recorded at the scene of the accident. Most of the data found in this database are true, but there is a small percentage of error with some of the data. Our goal is to sort out essential factors from the database to help forecast crashes in Wake County.
 
-In this report, we will be visualizing, modeling and forecasting car crashes in Wake County. Our research questions are 1) What are the main factors that contribute to a crash? 2) Did the law change to obtaining a driver’s license due to the COVID pandemic impact crash frequency? 3) What are the conditions that lead to worse outcomes in terms of crash injuries?4) Can we forecast the daily number of crashes in Wake County? 5) Can we predict traffic hotspots in Wake County?.We assembled a dataset from the Wake County crashes database from 2015 to March 2021. Although some of the input in the database is missing, this data will help provide some information about crashes in Wake County. This will also help us forecast car crashes after 2021. 
+In this report, we will be visualizing, modeling and forecasting car crashes in Wake County. Our research questions are 1) What are the main factors that contribute to a crash? 2) Did the law change to obtaining a driver’s license due to the COVID pandemic impact crash frequency? 3) What are the conditions that lead to worse outcomes in terms of crash injuries?4) Can we forecast the daily number of crashes in Wake County? 5) Can we predict traffic hotspots in Wake County? We assembled a dataset from the Wake County crashes database from 2015 to March 2021. Although some of the input in the database is missing, this data will help provide some information about crashes in Wake County. This will also help us forecast car crashes after 2021. 
 
 # Background 
 
 When it comes to car crashes, people assume that the driver was either speeding or not paying attention. It is essential to understand that there are other factors to consider when a car accident occurs. Since everything has slowly started to open after the COVID-19 pandemic, there has been an increase in car crashes. Studying the different factors of impacts can help decrease the number of accidents.
+
+## Hotspots
+
+When looking at car crashes it is essential to study hotspots and notice roads where crashes are common. Some roads might not be known for accidents and others might be known for having the most accidents or even most life-threatening crashes. There has not been a lot of research done on the types of roads that crashes occur on. This is something to consider when looking at road crashes because it gives us a better understanding of roads where crashes are more common than others.  
+
+## Weather Condition
+
+Weather conditions are a prominent factor in car crashes. When studying car crashes it is crucial to study how the weather affects a crash. Sometimes crashes tend to increase when there is bad weather. Researchers have found that rain was one of the top contributors to weather-related auto crashes.
+
+## Outro 
+
+With all these factors of crashes done in previous research, some have not studied in-depth about this topic. Our goal is to expand this topic as we found there is no research on the main factors that cause car accidents. The condition that leads to the worst outcome to injuries. Lastly, the most common road that crashes happen. We will forecast  Crashes in Wake County, North Carolina from 2015 to March 2021. 
 
 # Data, Method, and Analysis 
 
@@ -161,15 +173,337 @@ For the type of vehicle in a crash we had data for the years 2015 to March 2021.
 
 #### Bivariate Explorations
 
-...
+This section is dedicated to visualizing factors that may lead to worse outcomes of crashes in terms of injury. Using percent stacked bar charts, we are able to determine which variables lead to a more or less serious injuries which we can later use to help predict the seriousness of injury through predictive modeling. 
 
 Below are some of the most important bivariate explorations. 
 
-...
+```{r contrib-circum-injury, echo=FALSE}
+crashes %>%
+  filter(Injury != "NA", Injury != "Unknown", ContributingCircumstance1 != "NA", 
+         ContributingCircumstance1 != "NaN", 
+         ContributingCircumstance1 != "Unable to determine", 
+         ContributingCircumstance1 != "Unknown", 
+         ContributingCircumstance1 !="") %>%
+  group_by(Injury) %>%
+  ggplot(aes(fill=Injury, x=ContributingCircumstance1)) + 
+  geom_bar(position="fill", stat="count") + 
+  coord_flip() + 
+  labs(title = "Injury Frequency by Contributing Circumstance",
+       x = "Contributing Circumstance",
+       y = "Percentage") + 
+  scale_x_discrete(labels = c("Alcohol use", 
+                              "Going wrong way",
+                              "Disregarded other traffic signs",
+                              "Disregarded road markings",
+                              "Disregarded stop sign",
+                              "Disregarded traffic signals",
+                              "Disregarded yield sign", 
+                              "Driver distracted",
+                              "Driver distracted by communication device",
+                              "Driver distracted by external distraction", 
+                              "Driver distracted by electronic",
+                              "Driver distracted by passenger", 
+                              "Drug use", 
+                              "Exceeded speed limit",
+                              "Exceeded safe speed", 
+                              "Failed to yield", 
+                              "Failure to reduce speed",
+                              "Followed too closely",
+                              "Improper backing",
+                              "Improper lane change", 
+                              "Improper or no signal",
+                              "Improper parking",
+                              "Improper turn",
+                              "Inattention",
+                              "No contributing circumstance",
+                              "Operated defective equipment", 
+                              "Erratic, reckless, negligent", 
+                              "Other improper passing", 
+                              "Other*",
+                              "Overcorrected/oversteered",
+                              "Passed on curve",  
+                              "Passed on hill",
+                              "Passed stopped school bus", 
+                              "Right turn on red",
+                              "Swerved or avoided",  
+                              "Use of improper lane",
+                              "Visibility obstructed"))
+```
+
+From the percent stacked bar chart above, it is important to note that exceeding the speed limi leads to very serious injuries, has the lowest rate of no injury, and has the highest rate of people being killed. 
+
+```{r driver-age-injury, echo=FALSE}
+# Comparing Injury to Driver Age
+crashes %>%
+  filter(Injury != "NA", Injury != "Unknown", Injury != "", PersonType == "Driver", Age != "NA",
+         Age != "", Age != "Unknown", Age >= 5) %>%
+  group_by(Injury) %>%
+  mutate(shift = case_when(
+    Age >= 5 & Age < 15 ~ "5-14",
+    Age >= 15 & Age < 25 ~ "15-24",
+    Age >= 25 & Age < 35 ~ "25-34",
+    Age >= 35 & Age < 45 ~ "35-44",
+    Age >= 45 & Age < 55 ~ "45-54",
+    Age >= 55 & Age < 65 ~ "55-64",
+    Age >= 65 & Age < 75 ~ "65-74",
+    Age >= 75 & Age < 85 ~ "75-84",
+    Age >= 85 & Age < 95 ~ "85-94",
+    Age >= 95 & Age < 105 ~ "95-104",
+    Age >= 105 & Age < 115 ~ "105-114",
+    TRUE ~ "115-124")) %>%
+  ggplot(aes(fill=Injury, x=shift)) + 
+  geom_bar(position="fill", stat="count") + 
+  coord_flip() + 
+  labs(title = "Injury Frequency by Driver Age",
+       x = "Age",
+       y = "Percentage")
+```
+
+```{r driver-age, echo=FALSE}
+crashes %>%
+  filter(PersonType == "Driver", Age != "NA",
+         Age != "", Age != "Unknown", Age >= 5) %>%
+  mutate(age = case_when(
+    Age >= 5 & Age < 15 ~ "5-14",
+    Age >= 15 & Age < 25 ~ "15-24",
+    Age >= 25 & Age < 35 ~ "25-34",
+    Age >= 35 & Age < 45 ~ "35-44",
+    Age >= 45 & Age < 55 ~ "45-54",
+    Age >= 55 & Age < 65 ~ "55-64",
+    Age >= 65 & Age < 75 ~ "65-74",
+    Age >= 75 & Age < 85 ~ "75-84",
+    Age >= 85 & Age < 95 ~ "85-94",
+    Age >= 95 & Age < 105 ~ "95-104",
+    Age >= 105 & Age < 115 ~ "105-114",
+    TRUE ~ "115-124")) %>%
+  mutate(age = factor(age, levels = c("5-14", "15-24", "25-34", "35-44", "45-54",
+                                      "55-64", "65-74", "75-84", "85-94", 
+                                      "95-104", "105-114", "115-124"))) %>%
+  ggplot(aes(fill=age, x=age)) + 
+  geom_bar(show.legend = FALSE) + 
+  labs(title = "Frequency of Driver Age",
+       x = "Age",
+       y = "Count") + 
+  theme(axis.text.x = element_text(angle = 90))
+```
+
+From the percent stacked bar chart and the bar chart above... 
+
+```{r passenger-age-injury, echo=FALSE}
+crashes %>%
+  filter(Injury != "NA", Injury != "Unknown", Injury != "", PersonType == "Passenger", Age != "NA",
+         Age != "", Age != "Unknown") %>%
+  group_by(Injury) %>%
+  mutate(shift = case_when(
+    Age >= 0 & Age < 10 ~ "0-9",
+    Age >= 10 & Age < 20 ~ "10-19",
+    Age >= 20 & Age < 30 ~ "20-29",
+    Age >= 30 & Age < 40 ~ "30-39",
+    Age >= 40 & Age < 50 ~ "40-49",
+    Age >= 50 & Age < 60 ~ "50-59",
+    Age >= 60 & Age < 70 ~ "60-69",
+    Age >= 70 & Age < 80 ~ "70-79",
+    Age >= 80 & Age < 90 ~ "80-89",
+    Age >= 90 & Age < 100 ~ "90-99",
+    Age >= 100 & Age < 110 ~ "100-109",
+    Age >= 110 & Age < 120 ~ "110-119",
+    TRUE ~ "120-129")) %>%
+  ggplot(aes(fill=Injury, x=shift)) + 
+  geom_bar(position="fill", stat="count") + 
+  coord_flip() + 
+  labs(title = "Injury Frequency by Passenger Age",
+       x = "Age",
+       y = "Percentage")
+```
+
+```{r passenger-age, echo=FALSE}
+crashes %>%
+  filter(PersonType == "Passenger", Age != "NA",
+         Age != "", Age != "Unknown") %>%
+  mutate(age = case_when(
+    Age >= 0 & Age < 10 ~ "0-9",
+    Age >= 10 & Age < 20 ~ "10-19",
+    Age >= 20 & Age < 30 ~ "20-29",
+    Age >= 30 & Age < 40 ~ "30-39",
+    Age >= 40 & Age < 50 ~ "40-49",
+    Age >= 50 & Age < 60 ~ "50-59",
+    Age >= 60 & Age < 70 ~ "60-69",
+    Age >= 70 & Age < 80 ~ "70-79",
+    Age >= 80 & Age < 90 ~ "80-89",
+    Age >= 90 & Age < 100 ~ "90-99",
+    Age >= 100 & Age < 110 ~ "100-109",
+    Age >= 110 & Age < 120 ~ "110-119",
+    TRUE ~ "120-129")) %>%
+  mutate(age = factor(age, levels = c("0-9", "10-19", "20-29", "30-39", "40-49", 
+                                      "50-59", "60-69", "70-79", "80-89", 
+                                      "90-99", "100-109", "110-119",
+                                      "120-129"))) %>%
+  ggplot(aes(fill=age, x=age)) + 
+  geom_bar(show.legend = FALSE) + 
+  labs(title = "Frequency of Passenger Age",
+       x = "Age",
+       y = "Percentage") + 
+  theme(axis.text.x = element_text(angle = 90))
+```
+
+From the percent stacked bar chart and the bar chart above... 
+
+```{r vehicle-injury, echo=FALSE}
+crashes %>%
+  filter(Injury != "NA", Injury != "Unknown", VehicleType != "NA", 
+         VehicleType != "NaN", VehicleType != "Unknown", VehicleType != "") %>%
+  group_by(Injury) %>%
+  ggplot(aes(fill=Injury, x=VehicleType)) + 
+  geom_bar(position="fill", stat="count") + 
+  coord_flip() + 
+  labs(title = "Injury Frequency by Vehicle Type",
+       x = "Vehicle Type",
+       y = "Percentage")
+```
+
+Pedestrian were the most killed, followed by motorcycles and motor scooters. This makes sense because these people are more exposed to conditions as well as generally having less protection than people in enclosed vehicles. Large vehicles like buses, trucks, and military vehicles, had the leaast amount of injuries most likely due to their large size.
+
+```{r protection-injury, echo=FALSE}
+crashes %>%
+  filter(Injury != "NA", Injury != "Unknown", Protection != "NA", 
+         Protection != "NaN", Protection != "Unable to determine", 
+         Protection != "") %>%
+  group_by(Injury) %>%
+  ggplot(aes(fill=Injury, x=Protection)) + 
+  geom_bar(position="fill", stat="count") + 
+  coord_flip() + 
+  labs(title = "Injury Frequency by Protection",
+       x = "Protection",
+       y = "Percentage")
+```
+
+The most injuries occurred when people were using reflective clothing, lighting, and a helmet as protection. This makes sense because people using this would most likely be pedestrians or bikers, both of which are more exposed to danger and to having more significant injuries. Shoulder belts, lap belts, and the combination between the two appear to help decrease the amount of injuries that occur.
+
+```{r weather-injury, echo=FALSE}
+crashes %>%
+  filter(Injury != "NA", Injury != "Unknown", WeatherCondition1 != "NA", 
+         WeatherCondition1 != "NaN", WeatherCondition1 != "") %>%
+  group_by(Injury) %>%
+  ggplot(aes(fill=Injury, x=WeatherCondition1)) + 
+  geom_bar(position="fill", stat="count") + 
+  coord_flip() + 
+  labs(title = "Injury Frequency by Weather Condition",
+       x = "Weather Condition",
+       y = "Percentage")
+```
+
+Rain and sleet, hail, freezing rain/drizzle leads to the most disabling type injuries. 
+
+```{r most-harm-injury, echo=FALSE}
+crashes %>%
+  filter(Injury != "NA", Injury != "Unknown", MostHarmfulEvent != "NA", 
+         MostHarmfulEvent != "NaN", MostHarmfulEvent != "Unknown") %>%
+  group_by(Injury) %>%
+  ggplot(aes(fill=Injury, x=MostHarmfulEvent)) + 
+  geom_bar(position="fill", stat="count") + 
+  coord_flip() + 
+  labs(title = "Injury Frequency by Most Harmful Event",
+       x = "Most Harmful Event",
+       y = "Percentage")
+```
+
+The most harmful event that led to most people killed and disabling injuries was with pedestrians. This would make sense because pedestrians often do not have protection from cars. Overturn/rollover harmful events also had a significant amount of injuries. Backing up had the least amount of injuries which would make sense because when backing a car up, people tend to be going a slower speed than if they were accelerating forward. 
+
+```{r road-feat-injury, echo=FALSE}
+crashes %>%
+  filter(Injury != "NA", Injury != "Unknown", RoadFeature != "NA", 
+         RoadFeature != "NaN", RoadFeature != "") %>%
+  group_by(Injury) %>%
+  ggplot(aes(fill=Injury, x=RoadFeature)) + 
+  geom_bar(position="fill", stat="count") + 
+  coord_flip() + 
+  labs(title = "Injury Frequency by Road Feature",
+       x = "Road Feature",
+       y = "Percentage")
+```
+
+Driveways tend to lead to the least amount of injuries probably due to the slow speed that people are going when in driveways. 
+
+```{r traffic-injury, echo=FALSE}
+crashes %>%
+  filter(Injury != "NA", Injury != "Unknown", TrafficControlType != "NA", 
+         TrafficControlType != "NaN", TrafficControlType != "") %>%
+  group_by(Injury) %>%
+  ggplot(aes(fill=Injury, x=TrafficControlType)) + 
+  geom_bar(position="fill", stat="count") + 
+  coord_flip() +
+  labs(title = "Injury Frequency by Traffic Control Type",
+       x = "Traffic Control Type",
+       y = "Percentage")
+```
+
+Places where warning signs are post led to the post injuries including people killed. This may be because the signs are not taken as seriously and are less common to see, therefore, more people may disregard the warnings. Not many injuries occur near Railroad crossings. 
+
+```{r road-class-injury, echo=FALSE}
+crashes %>%
+  filter(Injury != "NA", Injury != "Unknown", RoadClassification != "NA", 
+         RoadClassification != "NaN", RoadClassification != "") %>%
+  group_by(Injury) %>%
+  ggplot(aes(fill=Injury, x=RoadClassification)) + 
+  geom_bar(position="fill", stat="count") + 
+  coord_flip() + 
+  labs(title = "Injury Frequency by Road Classification",
+       x = "Road Classification",
+       y = "Percentage")
+```
+
+Public vehicular areas and private roads/driveways lead to the least amount of injuries. This may be because these areas are minimally trafficked and are usually at slower speeds than other roads. 
+
+```{r person-injury, echo=FALSE}
+crashes %>%
+  filter(Injury != "NA", Injury != "Unknown", Injury != "", PersonType != "NA", 
+        PersonType != "NaN", PersonType != "Unknown", PersonType != "") %>%
+  group_by(Injury) %>%
+  ggplot(aes(fill=Injury, x=PersonType)) + 
+  geom_bar(position="fill", stat="count") + 
+  coord_flip() + 
+  labs(title = "Injury Frequency by Person Type",
+       x = "Person Type",
+       y = "Percentage")
+```
+
+Pedestrians are most likely to die, followed by pedalcyclists most likely due to lack of protection and high exposure to the environment. Driver's are slightly less likely to be injured than passengers. 
+
+```{r alcohol-filter-injury, echo=FALSE}
+crashes %>%
+  filter(Injury != "NA", Injury != "Unknown", AlcoholResultType != "NA", 
+         AlcoholResultType != "NaN", AlcoholResultType != "Unknown",
+         AlcoholResultType != "Contaminated sample/unusable", 
+         AlcoholResultType != "Pending", AlcoholResultType != "") %>%
+  group_by(Injury) %>%
+  ggplot(aes(fill=Injury, x=AlcoholResultType)) + 
+  geom_bar(position="fill", stat="count") + 
+  coord_flip() + 
+  labs(title = "Injury Frequency by Alcohol Result Type",
+       x = "Alcohol Result Type",
+       y = "Percentage")
+```
+
+The most people are killed when there are no alcohol or other drugs. This is slightly surprising, however, it may be because when people are driving with drugs or alcohol in their system, they may attempt to be more cautious so that they do not get pulled over by police. 
+
+```{r vision-obstruct-injury, echo=FALSE}
+crashes %>%
+  filter(Injury != "NA", Injury != "Unknown", VisionObstruction != "NA", 
+         VisionObstruction != "NaN", VisionObstruction != "") %>%
+  group_by(Injury) %>%
+  ggplot(aes(fill=Injury, x=VisionObstruction)) + 
+  geom_bar(position="fill", stat="count") + 
+  coord_flip() + 
+  labs(title = "Injury Frequency by Vision Obstruction",
+       x = "Vision Obstruction",
+       y = "Percentage")
+```
+
+Signs and embankment led to the most people being killed. This may be because these are both stationary opaque objects that will continuously block people's views of the road and conditions. Also being blinded by other lights led to the most disabling injuries. 
 
 ### Identifying Hot Spots of Crashes
 
-This section is dedicatied to identifying hot spots of crashes in Wake County, North Carolina. 
+This section is dedicated to identifying hot spots of crashes in Wake County, North Carolina. 
 
 #### Word Clouds 
 
