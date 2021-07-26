@@ -623,6 +623,54 @@ Above we created an interactive heat map for Wake County. This heat map shows po
 
 ### Time Series Visualization 
 
+This section is dedicated to visualizing the entire data set of car crashes in Wake County, North Carolina from January 1, 2015 to May 31, 2021. 
+
+```{r load-library-ts, echo=FALSE, message=FALSE}
+library(zoo)
+```
+
+```{r crashes-ts, echo=FALSE}
+crashes_ts = crashes %>%
+  separate(crash_date, 
+           into = c("Date", "Hour"), sep = 11) %>%
+  group_by(Date) %>%
+  summarize(count = length(unique(key_crash)))
+```
+
+```{r 7-day-ma-ts, echo=FALSE, warning=FALSE}
+crashes_ts %>%
+  filter(as.Date(Date) >= "2015/01/01") %>%
+  ggplot(aes(x = as.Date(Date), y = count)) + 
+  geom_line() +
+  geom_line(aes(y=rollmean(count, 7, na.pad = TRUE)), color = "red") +
+  scale_x_date(date_labels = "%m-%Y", date_breaks = "6 month") + 
+  theme(axis.text.x = element_text(angle = 90), title = element_text(size=8)) + 
+  ggtitle("Time Series Plot for Frequency of Daily Crashes With 7 Day Moving Average (With Pandemic Data)")
+```
+
+Above we have a time series plot of a seven day moving average of the number of crashes. We see that there are major spikes around March 2015, late October 2015, and December 2016. The two latter spikes may be related to the popular holidays, Halloween and Christmas. 
+
+Additionally, from the time series plot, we can see that there is a significant drop in car crashes in March 2020. This can be explained by the stay-at-home-orders due to the COVID-19 pandemic. After the stay at home orders, the frequency of crashes seems to be slightly lower throughout May 2021. There will likely be an increase in the next few month due to stay-at-home-orders and COVID-19 regulations being lifted now that the vaccination is available. 
+
+```{r annual-ts, echo=FALSE}
+crashes_annual = crashes_ts %>%
+  separate(Date, 
+           into = c("Year", "Month"), sep = 4, remove = FALSE) %>%
+  select(-Month)
+
+crashes_annual %>%
+  filter(as.Date(Date) >= "2015/01/01") %>%
+  ggplot(aes(x = as.Date(Date), y = count)) + 
+  ggtitle("Time Series Plots for Frequency of Daily Crashes Organized by Year") + 
+  geom_line() + 
+  scale_x_date(date_labels = "%m-%Y", date_breaks = "1 month") + 
+  xlab("Date") + ylab("Count") + 
+  theme(axis.text.x = element_text(angle = 90)) +
+  facet_wrap(~Year, scales = "free_x")
+```
+
+Above, we can see the daily time series plot broken into annual plots. This helps better visualize the spikes and dips throughout the specific years. 
+
 ### Time Series Forecasting 
 
 #### Stationary Transformation 
