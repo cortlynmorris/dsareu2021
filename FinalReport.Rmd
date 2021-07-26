@@ -110,7 +110,7 @@ Exploratory data analysis was the first step in the process of understanding and
 
 Below are the most important univariate visualizations that we discovered. 
 
-```{r driver-passenger-age, echo=FALSE}
+```{r driver-passenger-age, echo=FALSE, fig.width = 10}
 crashes %>% 
   filter(PersonType == "Driver" | PersonType == "Passenger", Age != "", Age != "NA") %>% 
   ggplot() +
@@ -122,7 +122,7 @@ crashes %>%
 
 For the graph above we created a histogram to compare the drivers' and passengers' age. This helped us understand what age is common for drivers to get injured in a car accident. The range of drivers' ages is from about 16 to 100. The range of passengers' ages is from about 0 to 100. The range of drivers' ages is slightly larger due to the age restrictions for getting a license.
 
-```{r crash-year, echo=FALSE}
+```{r crash-year, echo=FALSE, fig.width = 10}
 crashes %>% 
   filter(Crash_Date_Year != "Unknown", Crash_Date_Year != "2011") %>%
   ggplot(aes(Crash_Date_Year, fill=as.factor(Crash_Date_Year))) +
@@ -137,7 +137,7 @@ crashes %>%
 
 For this bar plot, we had data for the years 2015 to March 2021. In the visual above you can see that there was a high rate of car accidents from the beginning of 2015 to the end of 2019.We included a horizontal dashed line to indicate where the yearly average lies and we can see that only the years 2020 and 2021 fall below this yearly average. The year with the most crashes in 2019 but not by many. The full year with the fewest crashes in 2020 which was to be expected due to the lockdowns that took place to try and mitigate the spread of Covid-19. 2021 also looks to be on track to be another low crash year but we do not have a perfect explanation for that seeing as things are beginning to open and "return to normal" again.
 
-```{r weather-condition, echo=FALSE}
+```{r weather-condition, echo=FALSE, fig.width = 10}
 crashes %>% 
   filter(WeatherCondition1 != "NA") %>%
   count(WeatherCondition1) %>% 
@@ -154,7 +154,7 @@ crashes %>%
 
 For this visual, we also created a bar plot to determine which weather condition tends to be the most common for car crashes. After constructing the bar plot you can recognize that most crashes tend to happen when the weather is clear. This is not very surprising because in North Carolina, the majority of the time the weather is clear. An interesting note is that snow still has a relatively high frequency despite it snowing minimally in North Carolina. 
 
-```{r vehicle-type, echo=FALSE}
+```{r vehicle-type, echo=FALSE, fig.width = 10}
 crashes %>% 
   filter(VehicleType != "Unknown", VehicleType != "") %>%
   count(VehicleType) %>% 
@@ -177,7 +177,7 @@ This section is dedicated to visualizing factors that may lead to worse outcomes
 
 Below are some of the most important bivariate explorations. 
 
-```{r contrib-circum-injury, echo=FALSE}
+```{r contrib-circum-injury, echo=FALSE, fig.width = 10}
 crashes %>%
   filter(Injury != "NA", Injury != "Unknown", ContributingCircumstance1 != "NA", 
          ContributingCircumstance1 != "NaN", 
@@ -232,7 +232,7 @@ crashes %>%
 
 From the percent stacked bar chart above, it is important to note that exceeding the speed limi leads to very serious injuries, has the lowest rate of no injury, and has the highest rate of people being killed. 
 
-```{r driver-age-injury, echo=FALSE}
+```{r driver-age-injury, echo=FALSE, fig.width = 10}
 # Comparing Injury to Driver Age
 crashes %>%
   filter(Injury != "NA", Injury != "Unknown", Injury != "", PersonType == "Driver", Age != "NA",
@@ -259,7 +259,7 @@ crashes %>%
        y = "Percentage")
 ```
 
-```{r driver-age, echo=FALSE}
+```{r driver-age, echo=FALSE, fig.width = 10}
 crashes %>%
   filter(PersonType == "Driver", Age != "NA",
          Age != "", Age != "Unknown", Age >= 5) %>%
@@ -289,7 +289,7 @@ crashes %>%
 
 From the percent stacked bar chart and the bar chart above... 
 
-```{r passenger-age-injury, echo=FALSE}
+```{r passenger-age-injury, echo=FALSE, fig.width = 10}
 crashes %>%
   filter(Injury != "NA", Injury != "Unknown", Injury != "", PersonType == "Passenger", Age != "NA",
          Age != "", Age != "Unknown") %>%
@@ -316,7 +316,7 @@ crashes %>%
        y = "Percentage")
 ```
 
-```{r passenger-age, echo=FALSE}
+```{r passenger-age, echo=FALSE, fig.width = 10}
 crashes %>%
   filter(PersonType == "Passenger", Age != "NA",
          Age != "", Age != "Unknown") %>%
@@ -348,7 +348,7 @@ crashes %>%
 
 From the percent stacked bar chart and the bar chart above... 
 
-```{r vehicle-injury, echo=FALSE}
+```{r vehicle-injury, echo=FALSE, fig.width = 10}
 crashes %>%
   filter(Injury != "NA", Injury != "Unknown", VehicleType != "NA", 
          VehicleType != "NaN", VehicleType != "Unknown", VehicleType != "") %>%
@@ -363,7 +363,7 @@ crashes %>%
 
 Pedestrian were the most killed, followed by motorcycles and motor scooters. This makes sense because these people are more exposed to conditions as well as generally having less protection than people in enclosed vehicles. Large vehicles like buses, trucks, and military vehicles, had the leaast amount of injuries most likely due to their large size.
 
-```{r protection-injury, echo=FALSE}
+```{r protection-injury, echo=FALSE, fig.width = 10}
 crashes %>%
   filter(Injury != "NA", Injury != "Unknown", Protection != "NA", 
          Protection != "NaN", Protection != "Unable to determine", 
@@ -379,7 +379,7 @@ crashes %>%
 
 The most injuries occurred when people were using reflective clothing, lighting, and a helmet as protection. This makes sense because people using this would most likely be pedestrians or bikers, both of which are more exposed to danger and to having more significant injuries. Shoulder belts, lap belts, and the combination between the two appear to help decrease the amount of injuries that occur.
 
-```{r weather-injury, echo=FALSE}
+```{r weather-injury, echo=FALSE, fig.width = 10}
 crashes %>%
   filter(Injury != "NA", Injury != "Unknown", WeatherCondition1 != "NA", 
          WeatherCondition1 != "NaN", WeatherCondition1 != "") %>%
@@ -394,7 +394,7 @@ crashes %>%
 
 Rain and sleet, hail, freezing rain/drizzle leads to the most disabling type injuries. 
 
-```{r most-harm-injury, echo=FALSE}
+```{r most-harm-injury, echo=FALSE, fig.width = 10}
 crashes %>%
   filter(Injury != "NA", Injury != "Unknown", MostHarmfulEvent != "NA", 
          MostHarmfulEvent != "NaN", MostHarmfulEvent != "Unknown") %>%
@@ -409,7 +409,7 @@ crashes %>%
 
 The most harmful event that led to most people killed and disabling injuries was with pedestrians. This would make sense because pedestrians often do not have protection from cars. Overturn/rollover harmful events also had a significant amount of injuries. Backing up had the least amount of injuries which would make sense because when backing a car up, people tend to be going a slower speed than if they were accelerating forward. 
 
-```{r road-feat-injury, echo=FALSE}
+```{r road-feat-injury, echo=FALSE, fig.width = 10}
 crashes %>%
   filter(Injury != "NA", Injury != "Unknown", RoadFeature != "NA", 
          RoadFeature != "NaN", RoadFeature != "") %>%
@@ -424,7 +424,7 @@ crashes %>%
 
 Driveways tend to lead to the least amount of injuries probably due to the slow speed that people are going when in driveways. 
 
-```{r traffic-injury, echo=FALSE}
+```{r traffic-injury, echo=FALSE, fig.width = 10}
 crashes %>%
   filter(Injury != "NA", Injury != "Unknown", TrafficControlType != "NA", 
          TrafficControlType != "NaN", TrafficControlType != "") %>%
@@ -439,7 +439,7 @@ crashes %>%
 
 Places where warning signs are post led to the post injuries including people killed. This may be because the signs are not taken as seriously and are less common to see, therefore, more people may disregard the warnings. Not many injuries occur near Railroad crossings. 
 
-```{r road-class-injury, echo=FALSE}
+```{r road-class-injury, echo=FALSE, fig.width = 10}
 crashes %>%
   filter(Injury != "NA", Injury != "Unknown", RoadClassification != "NA", 
          RoadClassification != "NaN", RoadClassification != "") %>%
@@ -454,7 +454,7 @@ crashes %>%
 
 Public vehicular areas and private roads/driveways lead to the least amount of injuries. This may be because these areas are minimally trafficked and are usually at slower speeds than other roads. 
 
-```{r person-injury, echo=FALSE}
+```{r person-injury, echo=FALSE, fig.width = 10}
 crashes %>%
   filter(Injury != "NA", Injury != "Unknown", Injury != "", PersonType != "NA", 
         PersonType != "NaN", PersonType != "Unknown", PersonType != "") %>%
@@ -469,7 +469,7 @@ crashes %>%
 
 Pedestrians are most likely to die, followed by pedalcyclists most likely due to lack of protection and high exposure to the environment. Driver's are slightly less likely to be injured than passengers. 
 
-```{r alcohol-filter-injury, echo=FALSE}
+```{r alcohol-filter-injury, echo=FALSE, fig.width = 10}
 crashes %>%
   filter(Injury != "NA", Injury != "Unknown", AlcoholResultType != "NA", 
          AlcoholResultType != "NaN", AlcoholResultType != "Unknown",
@@ -486,7 +486,7 @@ crashes %>%
 
 The most people are killed when there are no alcohol or other drugs. This is slightly surprising, however, it may be because when people are driving with drugs or alcohol in their system, they may attempt to be more cautious so that they do not get pulled over by police. 
 
-```{r vision-obstruct-injury, echo=FALSE}
+```{r vision-obstruct-injury, echo=FALSE, fig.width = 10}
 crashes %>%
   filter(Injury != "NA", Injury != "Unknown", VisionObstruction != "NA", 
          VisionObstruction != "NaN", VisionObstruction != "") %>%
@@ -625,8 +625,77 @@ Above we created an interactive heat map for Wake County. This heat map shows po
 
 This section is dedicated to visualizing the entire data set of car crashes in Wake County, North Carolina from January 1, 2015 to May 31, 2021. 
 
+#### Daily Time Series 
+
 ```{r load-library-ts, echo=FALSE, message=FALSE}
 library(zoo)
+```
+
+```{r data-1, echo=FALSE, message=FALSE}
+crashes_ts = crashes %>%
+  filter(as.Date(crash_date) >= "2015/01/01" & as.Date(crash_date) <= "2021/05/31") %>%
+  separate(crash_date, 
+           into = c("Date", "Hour"), sep = 11) %>%
+  group_by(Date) %>%
+  summarize(count = length(unique(key_crash)))
+
+crashests2 <- ts(crashes_ts$count, start = c(2015,1), end = c(2021,153),
+                frequency = 365)
+
+crashes_ts.noncovid = crashes %>%
+  filter(as.Date(crash_date) >= "2015/01/01" & as.Date(crash_date) <= "2020/03/01") %>%
+  separate(crash_date, 
+           into = c("Date", "Hour"), sep = 11) %>%
+  group_by(Date) %>%
+  summarize(count = length(unique(key_crash)))
+
+crashests.noncovid <- ts(crashes_ts.noncovid$count, start = c(2015,1), 
+                         end = c(2020,59), frequency = 365)
+
+crashes_mts = crashes %>%
+  filter(as.Date(crash_date) >= "2015/01/01" & as.Date(crash_date) <= "2021/05/31") %>%
+  separate(crash_date, 
+           into = c("Date", "Hour"), sep = 11) %>%
+  group_by(Date) %>%
+  summarize(count = length(unique(key_crash))) %>%
+  separate(Date, into = c("Year", "Month", "Day"), sep = "/") %>%
+  group_by(Year, Month) %>%
+  summarise(mcount = sum(count)) %>%
+  tidyr::spread(key=Month, value=mcount)
+
+crashes_mts = as.data.frame(crashes_mts)
+
+rownames(crashes_mts) = seq(2015, 2021)
+
+crashes_mts3 = crashes_mts %>%
+  select(02:13)
+
+crashes_mts2 <- ts(c(t(crashes_mts3)), frequency=12)
+
+crashes_mts4 <- window(crashes_mts2, start=c(1,01), end=c(7,05), frequency=12)
+
+crashes_mts.noncovid = crashes %>%
+  filter(as.Date(crash_date) >= "2015/01/01" & as.Date(crash_date) <= "2020/02/29") %>%
+  separate(crash_date, 
+           into = c("Date", "Hour"), sep = 11) %>%
+  group_by(Date) %>%
+  summarize(count = length(unique(key_crash))) %>%
+  separate(Date, into = c("Year", "Month", "Day"), sep = "/") %>%
+  group_by(Year, Month) %>%
+  summarise(mcount = sum(count)) %>%
+  tidyr::spread(key=Month, value=mcount)
+
+crashes_mts.noncovid = as.data.frame(crashes_mts.noncovid)
+
+rownames(crashes_mts.noncovid) = seq(2015, 2020)
+
+crashes_mts3.noncovid = crashes_mts.noncovid %>%
+  select(02:13)
+
+crashes_mts2.noncovid <- ts(c(t(crashes_mts3.noncovid)), frequency=12)
+
+crashes_mts4.noncovid <- window(crashes_mts2.noncovid, start=c(1,01), 
+                                end=c(6,02), frequency=12)
 ```
 
 ```{r crashes-ts, echo=FALSE}
@@ -637,7 +706,7 @@ crashes_ts = crashes %>%
   summarize(count = length(unique(key_crash)))
 ```
 
-```{r 7-day-ma-ts, echo=FALSE, warning=FALSE}
+```{r 7-day-ma-ts, echo=FALSE, warning=FALSE, fig.width = 10}
 crashes_ts %>%
   filter(as.Date(Date) >= "2015/01/01") %>%
   ggplot(aes(x = as.Date(Date), y = count)) + 
@@ -645,14 +714,31 @@ crashes_ts %>%
   geom_line(aes(y=rollmean(count, 7, na.pad = TRUE)), color = "red") +
   scale_x_date(date_labels = "%m-%Y", date_breaks = "6 month") + 
   theme(axis.text.x = element_text(angle = 90), title = element_text(size=8)) + 
-  ggtitle("Time Series Plot for Frequency of Daily Crashes With 7 Day Moving Average (With Pandemic Data)")
+  ggtitle("Time Series Plot for Frequency of Daily Crashes (With Pandemic Data)")
+```
+
+```{r noncovid-daily-ts, echo=FALSE, message=FALSE, fig.width = 10}
+crashes_ts.noncovid = crashes %>%
+  filter(as.Date(crash_date) >= "2015/01/01" & as.Date(crash_date) <= "2020/03/01") %>%
+  separate(crash_date, 
+           into = c("Date", "Hour"), sep = 11) %>%
+  group_by(Date) %>%
+  summarize(count = length(unique(key_crash)))
+
+crashes_ts.noncovid %>%
+  filter(as.Date(Date) >= "2015/01/01") %>%
+  ggplot(aes(x = as.Date(Date), y = count)) + 
+  ggtitle("Time Series Plot for Frequency of Daily Crashes (Without Pandemic Data)") + xlab("Date") + ylab("Count") + 
+  geom_line() + 
+  scale_x_date(date_labels = "%m-%Y", date_breaks = "6 month") + 
+  theme(axis.text.x = element_text(angle = 90), title = element_text(size = 10))
 ```
 
 Above we have a time series plot of a seven day moving average of the number of crashes. We see that there are major spikes around March 2015, late October 2015, and December 2016. The two latter spikes may be related to the popular holidays, Halloween and Christmas. 
 
 Additionally, from the time series plot, we can see that there is a significant drop in car crashes in March 2020. This can be explained by the stay-at-home-orders due to the COVID-19 pandemic. After the stay at home orders, the frequency of crashes seems to be slightly lower throughout May 2021. There will likely be an increase in the next few month due to stay-at-home-orders and COVID-19 regulations being lifted now that the vaccination is available. 
 
-```{r annual-ts, echo=FALSE}
+```{r annual-ts, echo=FALSE, fig.width = 10}
 crashes_annual = crashes_ts %>%
   separate(Date, 
            into = c("Year", "Month"), sep = 4, remove = FALSE) %>%
@@ -671,21 +757,33 @@ crashes_annual %>%
 
 Above, we can see the daily time series plot broken into annual plots. This helps better visualize the spikes and dips throughout the specific years. 
 
+#### Monthly Time Series 
+
+```{r monthly-ts, echo=FALSE, message=FALSE, fig.width=10}
+forecast::autoplot(crashes_mts4) +
+  ggtitle("Time Series Plot for Frequency of Daily Crashes (With Pandemic Data)") + xlab("Date") + ylab("Monthly Crashes") + 
+  scale_x_continuous(breaks = c(1,2,3,4,5,6,7,8), 
+                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", 
+                                "Jan 2018", "Jan 2019", "Jan 2020", 
+                                "Jan 2021", "Jan 2022")) + 
+  theme(axis.text.x = element_text(angle = 90), 
+        title = element_text(size=10))
+```
+
+```{r monthly-ts-noncovid, echo=FALSE, message=FALSE, fig.width = 10}
+forecast::autoplot(crashes_mts4.noncovid) +
+  ggtitle("Time Series Plot for Frequency of Daily Crashes (Without Pandemic Data)") + xlab("Date") + ylab("Monthly Crashes") + 
+  scale_x_continuous(breaks = c(1,2,3,4,5,6,7,8), 
+                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", 
+                                "Jan 2018", "Jan 2019", "Jan 2020", 
+                                "Jan 2021", "Jan 2022")) + 
+  theme(axis.text.x = element_text(angle = 90), 
+        title = element_text(size=10))
+```
+
 ### Time Series Forecasting 
 
-### Statistical Analyses 
-
-### Predictive Models 
-
-# Results 
-
-## Time Series Analysis Results 
-
-These forecasts and comparison of models help us determine which model best forecasts for daily pandemic data, daily nonpandemic data, monthly pandemic data, and monthly nonpandemic data. Additionally, we have determined that the pandemic data not only effected the crash counts in Wake County, NC, but they also affect the future accuracy of forecasting crashes. 
-
-### Time Series Forecasting 
-
-```{r loading-libraries, message=FALSE, warning=FALSE, echo=FALSE, include=FALSE}
+```{r loading-libraries-2, message=FALSE, warning=FALSE, echo=FALSE, include=FALSE}
 library(reshape2)
 library(tidyverse)
 library(ggplot2)
@@ -703,13 +801,80 @@ library(TTR)
 library(fpp2)
 ```
 
+```{r data, echo=FALSE, message=FALSE}
+crashes_ts = crashes %>%
+  filter(as.Date(crash_date) >= "2015/01/01" & as.Date(crash_date) <= "2021/05/31") %>%
+  separate(crash_date, 
+           into = c("Date", "Hour"), sep = 11) %>%
+  group_by(Date) %>%
+  summarize(count = length(unique(key_crash)))
+
+crashests2 <- ts(crashes_ts$count, start = c(2015,1), end = c(2021,153),
+                frequency = 365)
+
+crashes_ts.noncovid = crashes %>%
+  filter(as.Date(crash_date) >= "2015/01/01" & as.Date(crash_date) <= "2020/03/01") %>%
+  separate(crash_date, 
+           into = c("Date", "Hour"), sep = 11) %>%
+  group_by(Date) %>%
+  summarize(count = length(unique(key_crash)))
+
+crashests.noncovid <- ts(crashes_ts.noncovid$count, start = c(2015,1), 
+                         end = c(2020,59), frequency = 365)
+
+crashes_mts = crashes %>%
+  filter(as.Date(crash_date) >= "2015/01/01" & as.Date(crash_date) <= "2021/05/31") %>%
+  separate(crash_date, 
+           into = c("Date", "Hour"), sep = 11) %>%
+  group_by(Date) %>%
+  summarize(count = length(unique(key_crash))) %>%
+  separate(Date, into = c("Year", "Month", "Day"), sep = "/") %>%
+  group_by(Year, Month) %>%
+  summarise(mcount = sum(count)) %>%
+  tidyr::spread(key=Month, value=mcount)
+
+crashes_mts = as.data.frame(crashes_mts)
+
+rownames(crashes_mts) = seq(2015, 2021)
+
+crashes_mts3 = crashes_mts %>%
+  select(02:13)
+
+crashes_mts2 <- ts(c(t(crashes_mts3)), frequency=12)
+
+crashes_mts4 <- window(crashes_mts2, start=c(1,01), end=c(7,05), frequency=12)
+
+crashes_mts.noncovid = crashes %>%
+  filter(as.Date(crash_date) >= "2015/01/01" & as.Date(crash_date) <= "2020/02/29") %>%
+  separate(crash_date, 
+           into = c("Date", "Hour"), sep = 11) %>%
+  group_by(Date) %>%
+  summarize(count = length(unique(key_crash))) %>%
+  separate(Date, into = c("Year", "Month", "Day"), sep = "/") %>%
+  group_by(Year, Month) %>%
+  summarise(mcount = sum(count)) %>%
+  tidyr::spread(key=Month, value=mcount)
+
+crashes_mts.noncovid = as.data.frame(crashes_mts.noncovid)
+
+rownames(crashes_mts.noncovid) = seq(2015, 2020)
+
+crashes_mts3.noncovid = crashes_mts.noncovid %>%
+  select(02:13)
+
+crashes_mts2.noncovid <- ts(c(t(crashes_mts3.noncovid)), frequency=12)
+
+crashes_mts4.noncovid <- window(crashes_mts2.noncovid, start=c(1,01), 
+                                end=c(6,02), frequency=12)
+```
+
 #### Daily with Pandemic Data 
 
 First, we had to ensure that the data we working with was stationary. Stationarity is when there is no observed trend or seasonality within a dataset. Therefore, if you pick out a section of points at a specific time, you will not be able pick out a that same pattern within the data set again at a similar time. Stationarity is a large assumption that must be met for many models when forecasting. 
 
 The ndiffs() function checks if the data set needs any first difference calculations. The nsdiffs() function checks if the data set needs any seasonal difference calculations. 
 
-```{r stationarity-trans-daily-covid}
+```{r stationarity-trans-daily-covid, fig.width = 10}
 ##Looking at stationarity of crashests2 daily time series 
 library(urca)
 acf(crashests2)
@@ -731,7 +896,7 @@ nsdiffs(dif_crashests2) #0
 
 Here our daily pandemic data needs one first difference and we do this with the diff() function. Using the diff() function, we take the first difference and then we check the acf of the data to make sure that it does not take too many lags to hit 0 indicating that the first difference transformed our data to be stationary. 
 
-```{r stat-trans-daily-covid-plot}
+```{r stat-trans-daily-covid-plot, fig.width = 10}
 cbind("Crashes" = crashests2,
       "First differenced" = diff(crashests2)) %>%
   autoplot(facets=TRUE) +
@@ -785,72 +950,26 @@ Yhat_ci_lower <- cumsum(c(crashests2[length(crashests2)],dYhat_ci_lower))
 Yhat_ci_lower <- ts(Yhat_ci_lower, start = c(2021, 152), end = c(2022,1), frequency=365)
 ```
 
-```{r tbats-stationary-plot, echo=FALSE, message=FALSE}
+```{r tbats-stationary-plot, echo=FALSE, message=FALSE, fig.width = 10}
 #Stationary
 autoplot(crashests2) + 
   autolayer(Yhat, series="Point Forecasts") + 
   #autolayer(Yhat_ci_upper) + 
   #autolayer(Yhat_ci_lower) + 
-  ggtitle("TBATS Forecasting Model for Daily Car Crashes (With Stationary Pandemic Data)") +
+  ggtitle("TBATS Forecasting Model for Daily Car Crashes (With Pandemic Data)") +
   xlab("Date") + ylab("Crashes") + 
   theme(title = element_text(size = 10), legend.position = "bottom")
 ```
 
 The Exponential smoothing state space model with Box-Cox transformation, ARMA errors, Trend and Seasonal components (TBATS model) was chosen because it is known to perform well at forecasting with long daily time series. 
 
-```{r tbats-ms-stationary, echo=FALSE, message=FALSE, include=FALSE}
-#Stationary
-
-#getting differenced training and test sets 
-dif_y2 <- msts(dif_crashests2, seasonal.periods=c(7,365.25))
-
-dif_training_TBATS2 <- subset(dif_y2, end=length(dif_y2)-151)
-
-dif_test_TBATS2 <- subset(dif_y2, start=length(dif_y2)-150)
-
-dif_crashes.train_TBATS2 <- tbats(dif_training_TBATS2)
-
-dif_fc_train_TBATS2 <- forecast(dif_crashes.train_TBATS2, h=151)
-
-#getting point forecasts 
-dYhat_ms_TBATS <- dif_fc_train_TBATS2$mean
-
-#setting up normal ts training and test sets 
-y2 <- msts(crashests2, seasonal.periods=c(7,365.25))
-
-training_TBATS2 <- subset(y2, end=length(y2)-151)
-
-test_TBATS2 <- subset(y2, start=length(y2)-150)
-
-#reverting back to original points   
-Yhat_ms_TBATS <- cumsum(c(training_TBATS2[length(training_TBATS2)], dYhat_ms_TBATS))
-
-Yhat_ms_TBATS <- ts(Yhat_ms_TBATS, start = c(2021, 1), frequency = 365)
-```
-
-```{r tbats-ms-stationary-plot, echo=FALSE}
-#Stationary 
-autoplot(training_TBATS2) + 
-  autolayer(Yhat_ms_TBATS, series="Point Forecasts") + 
-  autolayer(test_TBATS2, series="Test Set", alpha = 0.7) + 
-  ggtitle("Multi-Step TBATS Daily Forecasts of Crashes (With Stationary Pandemic Data)") + 
-  xlab("Date") + ylab("Crashes") + 
-  theme(legend.position = "bottom")
-
-dif_crashes.test_TBATS2 <- tbats(dif_test_TBATS2)
-
-accuracy(dif_crashes.test_TBATS2)
-```
-
-From the plot above... 
-
-```{r arima, echo=FALSE}
+```{r arima, echo=FALSE, fig.width = 10}
 fit_arima <- auto.arima(crashests2)
 
 fc_arima <- forecast(fit_arima, h=214)
 
 autoplot(fc_arima) + 
-  ggtitle("ARIMA Forecasting Model for Daily Car Crashes (With Stationary Pandemic Data)") +
+  ggtitle("ARIMA Forecasting Model for Daily Car Crashes (With Pandemic Data)") +
   xlab("Date") + ylab("Crashes") + 
   theme(title = element_text(size = 10))
 ```
@@ -859,91 +978,11 @@ The autoregressive integrated moving average (ARIMA) model was chosen because it
 
 From the plot above...
 
-```{r ms-arima, echo=FALSE}
-#Stationary
-training_arima <- subset(crashests2, end=length(crashests2)-151)
-
-test_arima <- subset(crashests2, start=length(crashests2)-150)
-
-crashes.train_arima <- auto.arima(training_arima)
-
-fc_train_arima <- forecast(crashes.train_arima, h=151)
-
-autoplot(fc_train_arima) + 
-  autolayer(test_arima, series="Test Set", alpha = 0.7) + 
-  ggtitle("Multi-Step ARIMA Daily Forecasts of Crashes (With Stationary Pandemic Data)") + 
-  xlab("Date") + ylab("Crashes") + 
-  theme(legend.position = "bottom")
-
-crashes.test_arima <- arima(test_arima)
-
-accuracy(crashes.test_arima)
-```
-
-From the time series forecast above... 
-
-```{r combination, echo=FALSE, message=FALSE}
-crashes_ts = crashes %>%
-  filter(as.Date(crash_date) >= "2015/01/01" & as.Date(crash_date) <= "2021/05/31") %>%
-  separate(crash_date, 
-           into = c("Date", "Hour"), sep = 11) %>%
-  group_by(Date) %>%
-  summarize(count = length(unique(key_crash)))
-
-crashests2 <- ts(crashes_ts$count, start = c(2015,1), end = c(2021,153),
-                frequency = 365)
-
-train <- window(crashests2, end=c(2019,12))
-
-h <- length(crashests2) - length(train)
-
-#ARIMA model 
-ARIMA <- forecast::forecast(auto.arima(train, lambda=0, biasadj=TRUE), h=h)
-
-#TBATS model 
-train_tbats <- msts(dif_crashests2, end=c(2019,12), seasonal.periods = c(7,365.25))
-
-TBATS <- forecast::forecast(tbats(train_tbats, biasadj = TRUE), h=h)
-
-dYhat_combo <- TBATS$mean
-  
-Yhat_combo <- cumsum(c(train[length(train)], dYhat_combo))
-
-Yhat_combo <- ts(Yhat_combo, start = c(2019, 12), frequency = 365)
-
-Combination <- (ARIMA[["mean"]] + Yhat_combo)/2
-
-true_noncovid_crashes <- crashes_ts %>%
-  filter(Date >= as.Date("2019/01/01") & Date <= as.Date("2021/05/31"))
-
-true_noncovid_crashes <- ts(true_noncovid_crashes$count, 
-                            start = c(2019,1), end = c(2021,153), 
-                            frequency = 365)
-
-autoplot(train) +
-  autolayer(true_noncovid_crashes) +
-  autolayer(Combination, series="Combination", alpha=0.8) +
-  autolayer(ARIMA, series="ARIMA", PI=F) +
-  autolayer(Yhat_combo, series="TBATS", alpha=0.7) +
-  xlab("Date") + ylab("Crashes") +
-  ggtitle("Time Series Combination (With Stationary Pandemic Data)") + 
-  theme(legend.position = "bottom")
-
-c(ARIMA = accuracy(ARIMA, crashests2)["Test set", "RMSE"],
-  TBATS = accuracy(Yhat_combo, crashests2)["Test set", "RMSE"],
-  Combination =
-    accuracy(Combination, crashests2)["Test set", "RMSE"])
-```
-
-This model shows the TBATS model, the ARIMA model, as well as the combination model. The combination model takes the average of the TBATS and the ARIMA forecasts to create a combination forecast. 
-
-From the root mean square error, we can see that the TBATS model performs much better than the ARIMA and the Combination model. The model with the small root mean square error (smallest error in general), is said to perform better. 
-
-### Daily without Pandemic Data 
+#### Daily without Pandemic Data 
 
 First we check the daily nonpandemic data for stationarity as we did for the daily pandemic data. 
 
-```{r stationarity-trans-daily-noncovid}
+```{r stationarity-trans-daily-noncovid, fig.width = 10}
 ##Looking at stationarity of crashests.noncovid daily time series 
 library(urca)
 acf(crashests.noncovid)
@@ -965,7 +1004,7 @@ nsdiffs(dif_crashests.noncovid) #0
 
 Here our daily nonpandemic data needs one first difference and we do this with the diff() function. Using the diff() function, we take the first difference and then we check the acf of the data to make sure that it does not take too many lags to hit 0 indicating that the first difference transformed our data to be stationary.
 
-```{r stat-trans-daily-noncovid-plot}
+```{r stat-trans-daily-noncovid-plot, fig.width = 10}
 cbind("Crashes" = crashests.noncovid,
       "First differenced" = diff(crashests.noncovid)) %>%
   autoplot(facets=TRUE) +
@@ -1009,7 +1048,7 @@ Yhat_noncovid <- cumsum(c(crashests.noncovid[length(crashests.noncovid)],dYhat_n
 Yhat_noncovid <- ts(Yhat, start = c(2020, 60), frequency=365)
 ```
 
-```{r tbats-noncovid-stationary-plot, echo=FALSE, message=FALSE}
+```{r tbats-noncovid-stationary-plot, echo=FALSE, message=FALSE, fig.width = 10}
 #Stationary
 
 true_noncovid_crashes <- crashes_ts %>%
@@ -1022,111 +1061,31 @@ true_noncovid_crashes <- ts(true_noncovid_crashes$count,
 autoplot(crashests.noncovid) + 
   autolayer(true_noncovid_crashes, alpha=0.7, series="True Count") +
   autolayer(Yhat_noncovid, alpha=0.6, series="Point Forecasts") + 
-  ggtitle("TBATS Forecasting Model for Daily Car Crashes (Stationary Without Pandemic Data)") +
+  ggtitle("TBATS Forecasting Model for Daily Car Crashes (Without Pandemic Data)") +
   xlab("Date") + ylab("Crashes") + 
   theme(title = element_text(size = 10), legend.position = "bottom")
 ```
 
 From the plot above... 
 
-```{r arima-noncovid, echo=FALSE}
+```{r arima-noncovid, echo=FALSE, fig.width = 10}
 fit_arima.noncovid <- auto.arima(crashests.noncovid)
 
 fc_arima.noncovid <- forecast(fit_arima.noncovid, h=671)
 
 autoplot(fc_arima.noncovid) + 
-  ggtitle("ARIMA Forecasting Model for Daily Car Crashes (Stationary Without Pandemic Data)") +
+  ggtitle("ARIMA Forecasting Model for Daily Car Crashes (Without Pandemic Data)") +
   xlab("Date") + ylab("Crashes") + 
   theme(title = element_text(size = 10))
 ```
 
 From the plot above... 
 
-```{r ms-arima-noncovid, echo=FALSE}
-#Stationary
-training_arima_noncovid <- subset(crashests.noncovid, end=length(crashests.noncovid)-426)
-
-test_arima_noncovid <- subset(crashests.noncovid, start=length(crashests.noncovid)-425)
-
-crashes.train_arima_noncovid <- auto.arima(training_arima_noncovid)
-
-fc_train_arima_noncovid <- forecast(crashes.train_arima_noncovid, h=426)
-
-autoplot(fc_train_arima_noncovid) + 
-  autolayer(test_arima_noncovid, series="Test Set", alpha = 0.7) + 
-  ggtitle("Multi-Step ARIMA Daily Forecasts of Crashes (Stationary Without Pandemic Data)") + 
-  xlab("Date") + ylab("Crashes") + 
-  theme(legend.position = "bottom", title = element_text(size=9))
-
-crashes.test_arima_noncovid <- arima(test_arima_noncovid)
-
-accuracy(crashes.test_arima_noncovid)
-```
-
-From the plot above...
-
-```{r combination-noncovid, echo=FALSE, message=FALSE}
-crashes_ts.noncovid = crashes %>%
-  filter(as.Date(crash_date) >= "2015/01/01" & as.Date(crash_date) <= "2020/03/01") %>%
-  separate(crash_date, 
-           into = c("Date", "Hour"), sep = 11) %>%
-  group_by(Date) %>%
-  summarize(count = length(unique(key_crash)))
-
-crashests.noncovid <- ts(crashes_ts.noncovid$count, start = c(2015,1), 
-                         end = c(2020,59), frequency = 365)
-
-train.noncovid <- window(crashests2, end=c(2019,12))
-
-h.noncovid <- 426
-
-#ARIMA model 
-ARIMA.noncovid <- forecast::forecast(auto.arima(train.noncovid, lambda=0, biasadj=TRUE), h=h)
-
-#TBATS model 
-train_tbats.noncovid <- msts(dif_crashests.noncovid, end=c(2019,12), seasonal.periods = c(7,365.25))
-
-TBATS.noncovid <- forecast::forecast(tbats(train_tbats.noncovid, biasadj = TRUE), h=h)
-
-dYhat_combo.noncovid <- TBATS.noncovid$mean
-  
-Yhat_combo.noncovid <- cumsum(c(train.noncovid[length(train.noncovid)], dYhat_combo.noncovid))
-
-Yhat_combo.noncovid <- ts(Yhat_combo.noncovid, start = c(2019, 12), frequency = 365)
-
-Combination.noncovid <- (ARIMA.noncovid[["mean"]] + Yhat_combo.noncovid)/2
-
-true_noncovid_crashes <- crashes_ts %>%
-  filter(Date >= as.Date("2019/01/01") & Date <= as.Date("2021/05/31"))
-
-true_noncovid_crashes <- ts(true_noncovid_crashes$count, 
-                            start = c(2019,1), end = c(2021,153), 
-                            frequency = 365)
-
-autoplot(train.noncovid) +
-  autolayer(true_noncovid_crashes, series = "True Count") +
-  autolayer(Combination.noncovid, series="Combination", alpha=0.8) +
-  autolayer(ARIMA.noncovid, series="ARIMA", PI=F) +
-  autolayer(Yhat_combo.noncovid, series="TBATS", alpha=0.7) +
-  xlab("Date") + ylab("Crashes") +
-  ggtitle("Time Series Combination (Stationary Without Pandemic Data)") + 
-  theme(legend.position = "bottom")
-
-c(ARIMA = accuracy(ARIMA.noncovid, crashests2)["Test set", "RMSE"],
-  TBATS = accuracy(Yhat_combo.noncovid, crashests2)["Test set", "RMSE"],
-  Combination =
-    accuracy(Combination.noncovid, crashests2)["Test set", "RMSE"])
-```
-
-This model shows the TBATS model, the ARIMA model, as well as the combination model. The combination model takes the average of the TBATS and the ARIMA forecasts to create a combination forecast for daily nonpandemic data. 
-
-From the root mean square error, we can see that the three models perform similarly, however, the ARIMA model does slightly better than the other two models. 
-
-### Monthly with Pandemic Data 
+#### Monthly with pandemic Data 
 
 First we check the monthly pandemic data for stationarity as we did for the daily data. 
 
-```{r stationarity-trans-monthly-covid}
+```{r stationarity-trans-monthly-covid, fig.width = 10}
 ##Looking at stationarity of crashes_mts4 monthly time series 
 library(urca)
 acf(crashes_mts4)
@@ -1148,7 +1107,7 @@ nsdiffs(dif_crashes_mts4) #0
 
 Here our monthly pandemic data needs one first difference and we do this with the diff() function. Using the diff() function, we take the first difference and then we check the acf of the data to make sure that it does not take too many lags to hit 0 indicating that the first difference transformed our data to be stationary.
 
-```{r stat-trans-monthly-covid-plot}
+```{r stat-trans-monthly-covid-plot, fig.width = 10}
 cbind("Crashes" = crashes_mts4,
       "First differenced" = diff(crashes_mts4)) %>%
   autoplot(facets=TRUE) +
@@ -1205,11 +1164,11 @@ Yhat_monthly <- cumsum(c(crashes_mts4[length(crashes_mts4)],dYhat_monthly))
 Yhat_monthly <- ts(Yhat_monthly, start = c(7,6), frequency=12)
 ```
 
-```{r tbats-stationary-plot-monthly, echo=FALSE, message=FALSE}
+```{r tbats-stationary-plot-monthly, echo=FALSE, message=FALSE, fig.width = 10}
 #Stationary
 autoplot(crashes_mts4) + 
   autolayer(Yhat_monthly, series="Point Forecasts") + 
-  ggtitle("TBATS Forecasting Model for Monthly Car Crashes (With Stationary Pandemic Data)") +
+  ggtitle("TBATS Forecasting Model for Monthly Car Crashes (With Pandemic Data)") +
   xlab("Date") + ylab("Crashes") + 
   scale_x_continuous(breaks = c(1,2,3,4,5,6,7, 8), 
                      labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
@@ -1219,6 +1178,365 @@ autoplot(crashes_mts4) +
 ```
 
 From the time series plot above... 
+
+```{r arima-monthly, echo=FALSE, message=FALSE, fig.width = 10}
+fit_arima_monthly <- auto.arima(crashes_mts4)
+
+fc_arima_monthly <- forecast(fit_arima_monthly, h=8)
+
+autoplot(fc_arima_monthly) + 
+  ggtitle("ARIMA Forecasting Model for Monthly Car Crashes (With Pandemic Data)") +
+  xlab("Date") + ylab("Crashes") + 
+  scale_x_continuous(breaks = c(1,2,3,4,5,6,7, 8), 
+                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
+                                "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022")) + 
+  theme(axis.text.x = element_text(angle = 90), title = element_text(size=9))
+  
+```
+
+From the plot above... 
+
+```{r monthly-HW-fcast-decomp-stationary, echo=FALSE}
+#Stationary
+dif.covid.monthly <- HoltWinters(dif_crashes_mts4)
+
+#summary(dif.covid.monthly)
+
+#plot(fitted(dif.covid.monthly), main = "Box Jenkins Decomposition of Monthly Crashes (With Pandemic Data)", cex.main=1)
+
+dif.fcast.covid.monthly <- forecast::forecast(dif.covid.monthly, h=8, level=c(80,95))
+
+dYhat.HW <- dif.fcast.covid.monthly$mean
+
+#crashes_mts4
+#dif_crashes_mts4<-diff(crashes_mts4)
+#z0<-cumsum(c(crashes_mts4[1], dif_crashes_mts4))
+#all(crashes_mts4==z0) #TRUE
+
+Yhat.HW <- cumsum(c(crashes_mts4[length(crashes_mts4)],dYhat.HW))
+Yhat.HW <- ts(Yhat.HW, start = c(7, 5), frequency=12)
+```
+
+```{r monthly-HW-fcast-filter-forecast-ts-stationary, echo=FALSE, message=FALSE, fig.width = 10}
+#Stationary 
+
+autoplot(crashes_mts4) +
+  autolayer(Yhat.HW, series = "Point Forecasts") +
+  ggtitle("Forecasts of Monthly Car Crashes Using HoltWinters (With Pandemic Data)") +
+  xlab("Date") + ylab("Crashes") +
+  scale_x_continuous(breaks = c(1,2,3,4,5,6,7, 8), 
+                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
+                                "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022")) + 
+  theme(axis.text.x = element_text(angle = 90), title = element_text(size=9), 
+        legend.position = "bottom")
+```
+
+From the plot above... 
+
+#### Monthly without Pandemic Data 
+
+First we check the monthly pandemic data for stationarity as we did for the other data. 
+
+```{r stationarity-trans-monthly-noncovid, fig.width = 10}
+##Looking at stationarity of crashes_mts4.noncovid monthly time series 
+library(urca)
+acf(crashes_mts4.noncovid)
+summary(ur.kpss(crashes_mts4.noncovid))
+
+ndiffs(crashes_mts4.noncovid) #1
+nsdiffs(crashes_mts4.noncovid) #1
+
+#Attempt at seasonal differencing (noncovid)
+season_dif_crashes_mts4.noncovid <- diff(crashes_mts4.noncovid,12)
+
+#Looking at stationarity of seasonal difference (noncovid)
+acf(season_dif_crashes_mts4.noncovid)
+summary(ur.kpss(season_dif_crashes_mts4.noncovid))
+
+ndiffs(season_dif_crashes_mts4.noncovid) #0
+nsdiffs(season_dif_crashes_mts4.noncovid) #0
+```
+
+Here our monthly nonpandemic data needs one seasonal difference and we do this with the diff() function and adding the argument "lag=12" to indicate a seasonal difference. Using the diff() function, we take the seasonal difference and then we check the acf of the data to make sure that it does not take too many lags to hit 0 indicating that the first difference transformed our data to be stationary.
+
+```{r stat-trans-monthly-noncovid-plot, fig.width = 10}
+cbind("Crashes" = crashes_mts4.noncovid,
+      "Seasonally\n differenced" = diff(crashes_mts4.noncovid, 12)) %>%
+  autoplot(facets=TRUE) +
+  xlab("Date") + ylab("") +
+  ggtitle("Stationarity Transformation of Monthly NonPandemic Data")
+```
+
+The plot above, shows the data before the stationary transformation and after the first difference was taken (stationary data)
+
+```{r sarima-library, echo=FALSE, message=FALSE}
+#install.packages("astsa")
+library(astsa)
+```
+
+```{r sarima, echo=FALSE, message=FALSE, include=FALSE}
+fc_sarima <- sarima.for(crashes_mts4.noncovid, n.ahead=23, 1,0,0,0,1,1,12) 
+```
+
+```{r sarima-plot, echo=FALSE, message=FALSE, fig.width = 10}
+fc_sarima <- ts(fc_sarima$pred, start=c(6,3),frequency=12)
+
+autoplot(crashes_mts4.noncovid) + 
+  autolayer(fc_sarima, series="Point Forecasts") + 
+  ggtitle("SARIMA Forecasting Model for Monthly Car Crashes (Without Pandemic Data)") +
+  xlab("Date") + ylab("Crashes") + 
+  scale_x_continuous(breaks = c(1,2,3,4,5,6,7, 8), 
+                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
+                                "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022")) + 
+  theme(axis.text.x = element_text(angle = 90), title = element_text(size=9), 
+        legend.position = "bottom")
+```
+
+The Seasonal Autoregressive Integrated Moving Average (SARIMA) model was chosen because it is able to automatically handle our monthly nonpandemic data that needs to be seasonally differenced. It was also chosen because it has been shown to create accurate forecasts for seasonally adjusted data. 
+
+From the plot... 
+
+```{r stlf, echo=FALSE, message=FALSE, fig.width = 10}
+q <- crashes_mts4.noncovid %>%
+  stlf(lambda = 0, h = 23, level=c(80,95)) 
+
+q %>%
+  autoplot() + 
+  ggtitle("STLF Model for Monthly Car Crashes (Without Pandemic Data)") +
+  xlab("Date") + ylab("Crashes") + 
+  scale_x_continuous(breaks = c(1,2,3,4,5,6,7,8), 
+                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
+                                "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022")) + 
+  theme(axis.text.x = element_text(angle = 90))
+```
+
+The Seasonal and Trend Decomposition using Loess Forecasting Model (STLF) was chosen because it is able to automatically handle our monthly nonpandemic data that needs to be seasonally differenced. It was also chosen because it has been shown to create accurate forecasts for seasonally adjusted data. 
+
+
+
+### Statistical Analyses 
+
+### Predictive Models 
+
+# Results 
+
+## Time Series Analysis Results 
+
+These forecasts and comparison of models help us determine which model best forecasts for daily pandemic data, daily nonpandemic data, monthly pandemic data, and monthly nonpandemic data. Additionally, we have determined that the pandemic data not only effected the crash counts in Wake County, NC, but they also affect the future accuracy of forecasting crashes. 
+
+### Time Series Forecasting 
+
+#### Daily with Pandemic Data 
+
+```{r tbats-ms-stationary, echo=FALSE, message=FALSE, include=FALSE}
+#Stationary
+
+#getting differenced training and test sets 
+dif_y2 <- msts(dif_crashests2, seasonal.periods=c(7,365.25))
+
+dif_training_TBATS2 <- subset(dif_y2, end=length(dif_y2)-151)
+
+dif_test_TBATS2 <- subset(dif_y2, start=length(dif_y2)-150)
+
+dif_crashes.train_TBATS2 <- tbats(dif_training_TBATS2)
+
+dif_fc_train_TBATS2 <- forecast(dif_crashes.train_TBATS2, h=151)
+
+#getting point forecasts 
+dYhat_ms_TBATS <- dif_fc_train_TBATS2$mean
+
+#setting up normal ts training and test sets 
+y2 <- msts(crashests2, seasonal.periods=c(7,365.25))
+
+training_TBATS2 <- subset(y2, end=length(y2)-151)
+
+test_TBATS2 <- subset(y2, start=length(y2)-150)
+
+#reverting back to original points   
+Yhat_ms_TBATS <- cumsum(c(training_TBATS2[length(training_TBATS2)], dYhat_ms_TBATS))
+
+Yhat_ms_TBATS <- ts(Yhat_ms_TBATS, start = c(2021, 1), frequency = 365)
+```
+
+```{r tbats-ms-stationary-plot, echo=FALSE, fig.width = 10}
+#Stationary 
+autoplot(training_TBATS2) + 
+  autolayer(Yhat_ms_TBATS, series="Point Forecasts") + 
+  autolayer(test_TBATS2, series="Test Set", alpha = 0.7) + 
+  ggtitle("Multi-Step TBATS Daily Forecasts of Crashes (With Pandemic Data)") + 
+  xlab("Date") + ylab("Crashes") + 
+  theme(legend.position = "bottom")
+
+dif_crashes.test_TBATS2 <- tbats(dif_test_TBATS2)
+
+accuracy(dif_crashes.test_TBATS2)
+```
+
+From the plot above... 
+
+```{r ms-arima, echo=FALSE, fig.width = 10}
+#Stationary
+training_arima <- subset(crashests2, end=length(crashests2)-151)
+
+test_arima <- subset(crashests2, start=length(crashests2)-150)
+
+crashes.train_arima <- auto.arima(training_arima)
+
+fc_train_arima <- forecast(crashes.train_arima, h=151)
+
+autoplot(fc_train_arima) + 
+  autolayer(test_arima, series="Test Set", alpha = 0.7) + 
+  ggtitle("Multi-Step ARIMA Daily Forecasts of Crashes (With Pandemic Data)") + 
+  xlab("Date") + ylab("Crashes") + 
+  theme(legend.position = "bottom")
+
+crashes.test_arima <- arima(test_arima)
+
+accuracy(crashes.test_arima)
+```
+
+From the time series forecast above... 
+
+```{r combination, echo=FALSE, message=FALSE, fig.width = 10}
+crashes_ts = crashes %>%
+  filter(as.Date(crash_date) >= "2015/01/01" & as.Date(crash_date) <= "2021/05/31") %>%
+  separate(crash_date, 
+           into = c("Date", "Hour"), sep = 11) %>%
+  group_by(Date) %>%
+  summarize(count = length(unique(key_crash)))
+
+crashests2 <- ts(crashes_ts$count, start = c(2015,1), end = c(2021,153),
+                frequency = 365)
+
+train <- window(crashests2, end=c(2019,12))
+
+h <- length(crashests2) - length(train)
+
+#ARIMA model 
+ARIMA <- forecast::forecast(auto.arima(train, lambda=0, biasadj=TRUE), h=h)
+
+#TBATS model 
+train_tbats <- msts(dif_crashests2, end=c(2019,12), seasonal.periods = c(7,365.25))
+
+TBATS <- forecast::forecast(tbats(train_tbats, biasadj = TRUE), h=h)
+
+dYhat_combo <- TBATS$mean
+  
+Yhat_combo <- cumsum(c(train[length(train)], dYhat_combo))
+
+Yhat_combo <- ts(Yhat_combo, start = c(2019, 12), frequency = 365)
+
+Combination <- (ARIMA[["mean"]] + Yhat_combo)/2
+
+true_noncovid_crashes <- crashes_ts %>%
+  filter(Date >= as.Date("2019/01/01") & Date <= as.Date("2021/05/31"))
+
+true_noncovid_crashes <- ts(true_noncovid_crashes$count, 
+                            start = c(2019,1), end = c(2021,153), 
+                            frequency = 365)
+
+autoplot(train) +
+  autolayer(true_noncovid_crashes) +
+  autolayer(Combination, series="Combination", alpha=0.8) +
+  autolayer(ARIMA, series="ARIMA", PI=F) +
+  autolayer(Yhat_combo, series="TBATS", alpha=0.7) +
+  xlab("Date") + ylab("Crashes") +
+  ggtitle("Time Series Combination (With Pandemic Data)") + 
+  theme(legend.position = "bottom")
+
+c(ARIMA = accuracy(ARIMA, crashests2)["Test set", "RMSE"],
+  TBATS = accuracy(Yhat_combo, crashests2)["Test set", "RMSE"],
+  Combination =
+    accuracy(Combination, crashests2)["Test set", "RMSE"])
+```
+
+This model shows the TBATS model, the ARIMA model, as well as the combination model. The combination model takes the average of the TBATS and the ARIMA forecasts to create a combination forecast. 
+
+From the root mean square error, we can see that the TBATS model performs much better than the ARIMA and the Combination model. The model with the small root mean square error (smallest error in general), is said to perform better. 
+
+### Daily without Pandemic Data 
+
+```{r ms-arima-noncovid, echo=FALSE, fig.width = 10}
+#Stationary
+training_arima_noncovid <- subset(crashests.noncovid, end=length(crashests.noncovid)-426)
+
+test_arima_noncovid <- subset(crashests.noncovid, start=length(crashests.noncovid)-425)
+
+crashes.train_arima_noncovid <- auto.arima(training_arima_noncovid)
+
+fc_train_arima_noncovid <- forecast(crashes.train_arima_noncovid, h=426)
+
+autoplot(fc_train_arima_noncovid) + 
+  autolayer(test_arima_noncovid, series="Test Set", alpha = 0.7) + 
+  ggtitle("Multi-Step ARIMA Daily Forecasts of Crashes (Without Pandemic Data)") + 
+  xlab("Date") + ylab("Crashes") + 
+  theme(legend.position = "bottom", title = element_text(size=9))
+
+crashes.test_arima_noncovid <- arima(test_arima_noncovid)
+
+accuracy(crashes.test_arima_noncovid)
+```
+
+From the plot above...
+
+```{r combination-noncovid, echo=FALSE, message=FALSE, fig.width = 10}
+crashes_ts.noncovid = crashes %>%
+  filter(as.Date(crash_date) >= "2015/01/01" & as.Date(crash_date) <= "2020/03/01") %>%
+  separate(crash_date, 
+           into = c("Date", "Hour"), sep = 11) %>%
+  group_by(Date) %>%
+  summarize(count = length(unique(key_crash)))
+
+crashests.noncovid <- ts(crashes_ts.noncovid$count, start = c(2015,1), 
+                         end = c(2020,59), frequency = 365)
+
+train.noncovid <- window(crashests2, end=c(2019,12))
+
+h.noncovid <- 426
+
+#ARIMA model 
+ARIMA.noncovid <- forecast::forecast(auto.arima(train.noncovid, lambda=0, biasadj=TRUE), h=h)
+
+#TBATS model 
+train_tbats.noncovid <- msts(dif_crashests.noncovid, end=c(2019,12), seasonal.periods = c(7,365.25))
+
+TBATS.noncovid <- forecast::forecast(tbats(train_tbats.noncovid, biasadj = TRUE), h=h)
+
+dYhat_combo.noncovid <- TBATS.noncovid$mean
+  
+Yhat_combo.noncovid <- cumsum(c(train.noncovid[length(train.noncovid)], dYhat_combo.noncovid))
+
+Yhat_combo.noncovid <- ts(Yhat_combo.noncovid, start = c(2019, 12), frequency = 365)
+
+Combination.noncovid <- (ARIMA.noncovid[["mean"]] + Yhat_combo.noncovid)/2
+
+true_noncovid_crashes <- crashes_ts %>%
+  filter(Date >= as.Date("2019/01/01") & Date <= as.Date("2021/05/31"))
+
+true_noncovid_crashes <- ts(true_noncovid_crashes$count, 
+                            start = c(2019,1), end = c(2021,153), 
+                            frequency = 365)
+
+autoplot(train.noncovid) +
+  autolayer(true_noncovid_crashes, series = "True Count") +
+  autolayer(Combination.noncovid, series="Combination", alpha=0.8) +
+  autolayer(ARIMA.noncovid, series="ARIMA", PI=F) +
+  autolayer(Yhat_combo.noncovid, series="TBATS", alpha=0.7) +
+  xlab("Date") + ylab("Crashes") +
+  ggtitle("Time Series Combination (Without Pandemic Data)") + 
+  theme(legend.position = "bottom")
+
+c(ARIMA = accuracy(ARIMA.noncovid, crashests2)["Test set", "RMSE"],
+  TBATS = accuracy(Yhat_combo.noncovid, crashests2)["Test set", "RMSE"],
+  Combination =
+    accuracy(Combination.noncovid, crashests2)["Test set", "RMSE"])
+```
+
+This model shows the TBATS model, the ARIMA model, as well as the combination model. The combination model takes the average of the TBATS and the ARIMA forecasts to create a combination forecast for daily nonpandemic data. 
+
+From the root mean square error, we can see that the three models perform similarly, however, the ARIMA model does slightly better than the other two models. 
+
+### Monthly with Pandemic Data 
 
 ```{r tbats-ms-stationary-monthly, echo=FALSE, message=FALSE, include=FALSE}
 #Stationary
@@ -1246,12 +1564,12 @@ Yhat_ms_TBATS_monthly <- cumsum(c(training_TBATS2[length(training_TBATS2)], dYha
 Yhat_ms_TBATS_monthly <- ts(Yhat_ms_TBATS_monthly, start = c(6,12), frequency=12)
 ```
 
-```{r tbats-ms-stationary-plot-monthly, echo=FALSE}
+```{r tbats-ms-stationary-plot-monthly, echo=FALSE, fig.width = 10}
 #Stationary 
 autoplot(training_TBATS2) + 
   autolayer(Yhat_ms_TBATS_monthly, series="Point Forecasts") + 
   autolayer(test_TBATS2, series="Test Set", alpha = 0.7) + 
-  ggtitle("Multi-Step TBATS Monthly Forecasts of Crashes (With Stationary Pandemic Data)") + 
+  ggtitle("Multi-Step TBATS Monthly Forecasts of Crashes (With Pandemic Data)") + 
   xlab("Date") + ylab("Crashes") + 
   theme(legend.position = "bottom", title=element_text(size=10))
 
@@ -1262,24 +1580,7 @@ accuracy(dif_crashes.test_TBATS2_monthly)
 
 From the plot above...
 
-```{r arima-monthly, echo=FALSE, message=FALSE}
-fit_arima_monthly <- auto.arima(crashes_mts4)
-
-fc_arima_monthly <- forecast(fit_arima_monthly, h=8)
-
-autoplot(fc_arima_monthly) + 
-  ggtitle("ARIMA Forecasting Model for Monthly Car Crashes (With Stationary Pandemic Data)") +
-  xlab("Date") + ylab("Crashes") + 
-  scale_x_continuous(breaks = c(1,2,3,4,5,6,7, 8), 
-                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
-                                "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022")) + 
-  theme(axis.text.x = element_text(angle = 90), title = element_text(size=9))
-  
-```
-
-From the plot above... 
-
-```{r ms-arima-monthly, echo=FALSE, message=FALSE}
+```{r ms-arima-monthly, echo=FALSE, message=FALSE, fig.width = 10}
 #Stationary
 training_arima_monthly <- subset(crashes_mts4, end=length(crashes_mts4)-5)
 
@@ -1291,7 +1592,7 @@ fc_train_arima_monthly <- forecast(crashes.train_arima_monthly, h=5)
 
 autoplot(fc_train_arima_monthly) + 
   autolayer(test_arima_monthly, series="Test Set", alpha = 0.7) + 
-  ggtitle("Multi-Step ARIMA Monthly Forecasts of Crashes (With Stationary Pandemic Data)") + 
+  ggtitle("Multi-Step ARIMA Monthly Forecasts of Crashes (With Pandemic Data)") + 
   xlab("Date") + ylab("Crashes") + 
   theme(legend.position = "bottom") + 
   scale_x_continuous(breaks = c(1,2,3,4,5,6,7, 8), 
@@ -1307,44 +1608,7 @@ accuracy(crashes.test_arima_monthly)
 
 From the plot above... 
 
-```{r monthly-HW-fcast-decomp-stationary, echo=FALSE}
-#Stationary
-dif.covid.monthly <- HoltWinters(dif_crashes_mts4)
-
-#summary(dif.covid.monthly)
-
-#plot(fitted(dif.covid.monthly), main = "Box Jenkins Decomposition of Monthly Crashes (With Stationary Pandemic Data)", cex.main=1)
-
-dif.fcast.covid.monthly <- forecast::forecast(dif.covid.monthly, h=8, level=c(80,95))
-
-dYhat.HW <- dif.fcast.covid.monthly$mean
-
-#crashes_mts4
-#dif_crashes_mts4<-diff(crashes_mts4)
-#z0<-cumsum(c(crashes_mts4[1], dif_crashes_mts4))
-#all(crashes_mts4==z0) #TRUE
-
-Yhat.HW <- cumsum(c(crashes_mts4[length(crashes_mts4)],dYhat.HW))
-Yhat.HW <- ts(Yhat.HW, start = c(7, 5), frequency=12)
-```
-
-```{r monthly-HW-fcast-filter-forecast-ts-stationary, echo=FALSE, message=FALSE}
-#Stationary 
-
-autoplot(crashes_mts4) +
-  autolayer(Yhat.HW, series = "Point Forecasts") +
-  ggtitle("Forecasts of Monthly Car Crashes Using HoltWinters (With Stationary Pandemic Data)") +
-  xlab("Date") + ylab("Crashes") +
-  scale_x_continuous(breaks = c(1,2,3,4,5,6,7, 8), 
-                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
-                                "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022")) + 
-  theme(axis.text.x = element_text(angle = 90), title = element_text(size=9), 
-        legend.position = "bottom")
-```
-
-From the plot above... 
-
-```{r ms-HW-monthly-forecast-ts-stationary, echo=FALSE, message=FALSE}
+```{r ms-HW-monthly-forecast-ts-stationary, echo=FALSE, message=FALSE, fig.width = 10}
 #Stationary  
 dif_training_HW_monthly <- subset(dif_crashes_mts4, end=length(dif_crashes_mts4)-5)
 
@@ -1369,7 +1633,7 @@ true_count_monthly <- ts(crashes_mts4, start=c(7,1), end=c(7,5), frequency=12)
 autoplot(training_HW_monthly) + 
   autolayer(Yhat_ms_HW, series = "Point Forecasts") + 
   autolayer(test_HW_monthly, series = "Test Set") + 
-  ggtitle("Multi-Step HoltWinters Monthly Forecasts of Crashes (With Stationary Pandemic Data)") + 
+  ggtitle("Multi-Step HoltWinters Monthly Forecasts of Crashes (With Pandemic Data)") + 
   xlab("Date") + ylab("Crashes") + 
   scale_x_continuous(breaks = c(1,2,3,4,5,6,7), 
                      labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
@@ -1380,7 +1644,7 @@ autoplot(training_HW_monthly) +
 
 From the plot above... 
 
-```{r combination-monthly, echo=FALSE, message=FALSE}
+```{r combination-monthly, echo=FALSE, message=FALSE, fig.width = 10}
 train_monthly <- window(crashes_mts4, end=c(5,12))
 
 h_monthly <- length(crashes_mts4) - length(train_monthly)
@@ -1418,7 +1682,7 @@ autoplot(train_monthly) +
   autolayer(Yhat_combo_monthly, series="TBATS", alpha=0.7) +
   autolayer(Yhat_HW_monthly, series="HoltWinters", alpha=0.7) + 
   xlab("Date") + ylab("Crashes") +
-  ggtitle("Time Series Combination (With Stationary Pandemic Data)") + 
+  ggtitle("Time Series Combination (With Pandemic Data)") + 
   scale_x_continuous(breaks = c(1,2,3,4,5,6,7), 
                      labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
                                 "Jan 2019", "Jan 2020", "Jan 2021")) + 
@@ -1438,67 +1702,6 @@ From the root mean square error, we can see that all of the models did not perfo
 
 ### Monthly without Pandemic Data 
 
-First we check the monthly pandemic data for stationarity as we did for the other data. 
-
-```{r stationarity-trans-monthly-noncovid}
-##Looking at stationarity of crashes_mts4.noncovid monthly time series 
-library(urca)
-acf(crashes_mts4.noncovid)
-summary(ur.kpss(crashes_mts4.noncovid))
-
-ndiffs(crashes_mts4.noncovid) #1
-nsdiffs(crashes_mts4.noncovid) #1
-
-#Attempt at seasonal differencing (noncovid)
-season_dif_crashes_mts4.noncovid <- diff(crashes_mts4.noncovid,12)
-
-#Looking at stationarity of seasonal difference (noncovid)
-acf(season_dif_crashes_mts4.noncovid)
-summary(ur.kpss(season_dif_crashes_mts4.noncovid))
-
-ndiffs(season_dif_crashes_mts4.noncovid) #0
-nsdiffs(season_dif_crashes_mts4.noncovid) #0
-```
-
-Here our monthly nonpandemic data needs one seasonal difference and we do this with the diff() function and adding the argument "lag=12" to indicate a seasonal difference. Using the diff() function, we take the seasonal difference and then we check the acf of the data to make sure that it does not take too many lags to hit 0 indicating that the first difference transformed our data to be stationary.
-
-```{r stat-trans-monthly-noncovid-plot}
-cbind("Crashes" = crashes_mts4.noncovid,
-      "Seasonally\n differenced" = diff(crashes_mts4.noncovid, 12)) %>%
-  autoplot(facets=TRUE) +
-  xlab("Date") + ylab("") +
-  ggtitle("Stationarity Transformation of Monthly NonPandemic Data")
-```
-
-The plot above, shows the data before the stationary transformation and after the first difference was taken (stationary data)
-
-```{r sarima-library, echo=FALSE, message=FALSE}
-#install.packages("astsa")
-library(astsa)
-```
-
-```{r sarima, echo=FALSE, message=FALSE, include=FALSE}
-fc_sarima <- sarima.for(crashes_mts4.noncovid, n.ahead=23, 1,0,0,0,1,1,12) 
-```
-
-```{r sarima-plot, echo=FALSE, message=FALSE}
-fc_sarima <- ts(fc_sarima$pred, start=c(6,3),frequency=12)
-
-autoplot(crashes_mts4.noncovid) + 
-  autolayer(fc_sarima, series="Point Forecasts") + 
-  ggtitle("SARIMA Forecasting Model for Monthly Car Crashes (Stationary Without Pandemic Data)") +
-  xlab("Date") + ylab("Crashes") + 
-  scale_x_continuous(breaks = c(1,2,3,4,5,6,7, 8), 
-                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
-                                "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022")) + 
-  theme(axis.text.x = element_text(angle = 90), title = element_text(size=9), 
-        legend.position = "bottom")
-```
-
-The Seasonal Autoregressive Integrated Moving Average (SARIMA) model was chosen because it is able to automatically handle our monthly nonpandemic data that needs to be seasonally differenced. It was also chosen because it has been shown to create accurate forecasts for seasonally adjusted data. 
-
-From the plot... 
-
 ```{r ms-sarima, echo=FALSE, message=FALSE, include=FALSE}
 training_sarima <- subset(crashes_mts4.noncovid, end=length(crashes_mts4.noncovid)-14)
 
@@ -1509,11 +1712,11 @@ crashes.train_sarima <- sarima.for(training_sarima, n.ahead=14, 1,0,0,0,1,1,12)
 crashes.train_sarima <- ts(crashes.train_sarima$pred, start=c(5,1),frequency=12)
 ```
 
-```{r ms-sarima-plot, echo=FALSE, message=FALSE}
+```{r ms-sarima-plot, echo=FALSE, message=FALSE, fig.width = 10}
 autoplot(training_sarima) + 
   autolayer(crashes.train_sarima, series="Point Forecasts") + 
   autolayer(test_sarima, series = "Test Set") + 
-  ggtitle("Multi-Step SARIMA Monthly Forecasts of Crashes (Stationary Without Pandemic Data)") + 
+  ggtitle("Multi-Step SARIMA Monthly Forecasts of Crashes (Without Pandemic Data)") + 
   xlab("Date") + ylab("Crashes") + 
   scale_x_continuous(breaks = c(1,2,3,4,5,6,7), 
                      labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
@@ -1524,23 +1727,7 @@ autoplot(training_sarima) +
 
 From the plot... 
 
-```{r stlf, echo=FALSE, message=FALSE}
-q <- crashes_mts4.noncovid %>%
-  stlf(lambda = 0, h = 23, level=c(80,95)) 
-
-q %>%
-  autoplot() + 
-  ggtitle("STLF Model for Monthly Car Crashes (Stationary Without Pandemic Data)") +
-  xlab("Date") + ylab("Crashes") + 
-  scale_x_continuous(breaks = c(1,2,3,4,5,6,7,8), 
-                     labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
-                                "Jan 2019", "Jan 2020", "Jan 2021", "Jan 2022")) + 
-  theme(axis.text.x = element_text(angle = 90))
-```
-
-The Seasonal and Trend Decomposition using Loess Forecasting Model (STLF) was chosen because it is able to automatically handle our monthly nonpandemic data that needs to be seasonally differenced. It was also chosen because it has been shown to create accurate forecasts for seasonally adjusted data. 
-
-```{r noncovid-ms-STLF-forecast-ts, echo=FALSE, message=FALSE}
+```{r noncovid-ms-STLF-forecast-ts, echo=FALSE, message=FALSE, fig.width = 10}
 training_STLF_noncovid_monthly <- subset(crashes_mts4.noncovid, end=length(crashes_mts4.noncovid)-14)
 
 test_STLF_noncovid_monthly <- subset(crashes_mts4.noncovid, start=length(crashes_mts4.noncovid)-13)
@@ -1551,7 +1738,7 @@ crashes.train_STLF_noncovid_monthly %>%
   forecast::forecast(h=14) %>%
   autoplot() + 
   autolayer(test_STLF_noncovid_monthly, series="Test Set") + 
-  ggtitle("Multi-Step STLF Monthly Forecasts of Crashes (Stationary Without Pandemic Data)") + 
+  ggtitle("Multi-Step STLF Monthly Forecasts of Crashes (Without Pandemic Data)") + 
   xlab("Date") + ylab("Crashes") + 
   scale_x_continuous(breaks = c(1,2,3,4,5,6,7), 
                      labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
@@ -1573,7 +1760,7 @@ SARIMA <- sarima.for(train_monthly.noncovid, n.ahead=14, 1,0,0,0,1,1,12)
 SARIMA <- ts(SARIMA$pred, start=c(6,1),frequency=12)
 ```
 
-```{r combination-monthly-noncovid-plot, echo=FALSE, message=FALSE}
+```{r combination-monthly-noncovid-plot, echo=FALSE, message=FALSE, fig.width = 10}
 #STLF Model 
 STLF <- stlf(train_monthly.noncovid, lambda = 0, h = 14) 
 
@@ -1587,7 +1774,7 @@ autoplot(train_monthly.noncovid) +
   autolayer(STLF, series="STLF", PI=F) +
   autolayer(Combination_monthly.noncovid, series="Combination") +
   xlab("Date") + ylab("Crashes") +
-  ggtitle("Time Series Combination (Stationary Without Pandemic Data)") + 
+  ggtitle("Time Series Combination (Without Pandemic Data)") + 
   scale_x_continuous(breaks = c(1,2,3,4,5,6,7), 
                      labels = c("Jan 2015", "Jan 2016", "Jan 2017", "Jan 2018", 
                                 "Jan 2019", "Jan 2020", "Jan 2021")) + 
@@ -1727,7 +1914,7 @@ crashes %>%
 
 ### Bivariate Explorations 
 
-```{r contrib-circum-injury=code, eval=FALSE}
+```{r contrib-circum-injury-code, eval=FALSE}
 crashes %>%
   filter(Injury != "NA", Injury != "Unknown", ContributingCircumstance1 != "NA", 
          ContributingCircumstance1 != "NaN", 
