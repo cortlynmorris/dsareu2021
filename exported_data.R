@@ -3609,7 +3609,8 @@ crashes_pm.clean.fit.train <- ranger(Injury2~Age+VehicleType+ContributingCircums
                                  VisionObstruction, data=crashes_pm.clean, 
                                num.trees = 500, mtry = round(11/2), importance = "impurity", classification = T) #fitting model on training set
 crashes_pm.clean.pred <- predict(crashes_pm.clean.fit.train, data=crashes_pm.clean.test, type="response")
-(tab.rf <- table(pred=crashes_pm.clean.pred$predictions, actual=crashes_pm.clean.test$Injury2)) #confusion matrix: cross-tab of predictions vs actual class(accuracy.rf=mean(crashes_pm.clean.pred==crashes_pm.clean.test$Injury2, na.rm=T)*100) #percent of correct predictions in test data
+(tab.rf <- table(pred=crashes_pm.clean.pred$predictions, actual=crashes_pm.clean.test$Injury2)) #confusion matrix: cross-tab of predictions vs actual class
+(accuracy.rf=mean(crashes_pm.clean.pred$predictions==crashes_pm.clean.test$Injury2, na.rm=T)*100) #percent of correct predictions in test data
 (stats.rf = calc_stats(tab.rf, prevalence = NULL, positive = "Injury"))
 
 ## Oversample
@@ -3742,7 +3743,10 @@ overunder2.rf.pred <-predict(overunder2.rf.fit.train, data=overunder2.rf.test, t
 (stats.rf5 = calc_stats(tab.rf5, prevalence = NULL, positive = "Injury"))
 
 
-
+StatisticsComparison.rf = cbind(SampleType = c("Unbalanced", "Oversample", "Undersample", "Combination Full Sample", 
+                                            "Combination Sub-Sample"),rbind(stats.rf, stats.rf2, stats.rf3, stats.rf4, stats.rf5))
+require(knitr)
+kable(StatisticsComparison.rf)
 
 
 
