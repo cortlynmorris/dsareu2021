@@ -1745,7 +1745,7 @@ This section is dedicated to showing the results of the predictive modeling of t
 From the logistic regression and the random forest model, we can determine the main conditions that lead to worse outcomes in terms of injury. Hopefully resulting in these models helping policy makers to make the roads safer by adding necessary precautions and transportation development. 
 
 ### Logistic Regression 
-```{r unbalanced data pred acc, echo=FALSE, include=FALSE}
+```{r unbalanced-data-pred-acc, echo=FALSE, include=FALSE}
 set.seed(101) #for reproducibility of results
 sample <- sample(c(TRUE, FALSE), nrow(crashes_pm), replace = T, prob = c(0.7,0.3)) #70/30% training/test sets
 crashes_pm.train <- crashes_pm[sample, ]
@@ -1760,7 +1760,7 @@ crashes_pm.pred <- ifelse(crashes_pm.pred.prob>0.5, "Injury", "No injury") #pred
 (stats = calc_stats(tab, prevalence = NULL, positive = "Injury"))
 ```
 
-```{r oversampled dataset, echo=FALSE, include=FALSE}
+```{r oversampled-dataset, echo=FALSE, include=FALSE}
 df_crashes_pm_Injury_ind <- which(crashes_pm$Injury2 == "Injury")
 df_crashes_pm_NoInjury_ind <- which(crashes_pm$Injury2 == "No injury")
 
@@ -1768,7 +1768,7 @@ oversample_df1 <- crashes_pm[c(df_crashes_pm_NoInjury_ind,
                                rep(df_crashes_pm_Injury_ind, 5)), ]
 ```
 
-```{r oversample data pred acc, echo=FALSE, include=FALSE}
+```{r oversample-data-pred-acc, echo=FALSE, include=FALSE}
 set.seed(101) #for reproducibility of results
 sample2 <- sample(c(TRUE, FALSE), nrow(oversample_df1), replace = T, prob = c(0.7,0.3)) #70/30% training/test sets
 oversample_df1.train <- oversample_df1[sample2, ]
@@ -1786,7 +1786,7 @@ oversample_df1.pred <- ifelse(oversample_df1.pred.prob>0.5, "Injury", "No injury
 (stats2 = calc_stats(tab2, prevalence = NULL, positive = "Injury"))
 ```
 
-```{r undersampled dataset, echo=FALSE, include=FALSE}
+```{r undersampled-dataset, echo=FALSE, include=FALSE}
 crashes_pm_no_injury = crashes_pm %>%
   filter(Injury2 == "No injury")
 
@@ -1799,7 +1799,7 @@ undersample_df1 = crashes_pm_injury %>%
   bind_rows(crashes_pm_no_injury[s,])
 ```
 
-```{r undersample data pred acc, echo=FALSE, include=FALSE}
+```{r undersample-data-pred-acc, echo=FALSE, include=FALSE}
 set.seed(101) #for reproducibility of results
 sample3 <- sample(c(TRUE, FALSE), nrow(undersample_df1), replace = T, prob = c(0.7,0.3)) #70/30% training/test sets
 undersample_df1.train <- undersample_df1[sample3, ]
@@ -1817,7 +1817,7 @@ undersample_df1.pred <- ifelse(undersample_df1.pred.prob>0.5, "Injury", "No inju
 (stats3 = calc_stats(tab3, prevalence = NULL, positive = "Injury"))
 ```
 
-```{r combo datasets, echo=FALSE, include=FALSE}
+```{r combo-datasets, echo=FALSE, include=FALSE}
 overunder <- ROSE::ovun.sample(Injury2~Age+VehicleType+ContributingCircumstance1+Protection+
                                  WeatherCondition1+MostHarmfulEvent+RoadFeature+
                                  TrafficControlType+RoadClassification+PersonType+VisionObstruction, 
@@ -1829,7 +1829,7 @@ overunder2 <- ROSE::ovun.sample(Injury2~Age+VehicleType+ContributingCircumstance
                                data = crashes_pm.train, method = "both", N = 100000)$data
 ```
 
-```{r combo data pred acc, echo=FALSE, include=FALSE}
+```{r combo-data-pred-acc, echo=FALSE, include=FALSE}
 set.seed(101) #for reproducibility of results
 sample4 <- sample(c(TRUE, FALSE), nrow(overunder), replace = T, prob = c(0.7,0.3)) #70/30% training/test sets
 overunder.train <- overunder[sample4, ]
@@ -1857,22 +1857,33 @@ overunder.pred2 <- factor(overunder.pred2, levels = c("No injury", "Injury")) #p
 (stats5 = calc_stats(tab5, prevalence = NULL, positive = "Injury"))
 ```
 
-```{r StatisticsComparison Table}
+```{r StatisticsComparison-Table}
 (StatisticsComparison = cbind(SampleType = c("Unbalanced", "Oversample", "Undersample", "Combination Full Sample", 
         "Combination Sub-Sample"),round(rbind(stats, stats2, stats3, stats4, stats5), 4)))
 
 ```
 
-
 ### Random Forest
 
 # Conclusion 
 
-Although there have been a couple of research projects done on this topic. Most of the research has not been in-depth about car accidents. When looking at a car crash there are many different factors that come into play. There are also a lot of factors that take place when forecasting car crashes. There has not been a lot of research done on what conditions lead to the outcome of car crashes. Within our exploratory data analysis, we are able to visually see what common factors contribute to car crashes in Wake County. From this stage, we found out that it is essential to understand factors of car crashes so that we can learn how to forecast them in the future.
+Although there have been a couple of research projects done on this topic. Most of the research has not been in-depth about car accidents. When looking at a car crash there are many different factors that come into play. There are also a lot of factors that take place when forecasting car crashes. There has not been a lot of research done on what conditions lead to the outcome of car crashes. Within our exploratory data analysis, we are able to visually see what common factors contribute to car crashes in Wake County. From this stage, we found out that it is essential to understand factors of car crashes so that we can learn how to forecast them in the future. 
+
+The variables that significantly increase a car crash are the drivers age, vehicle type, and hotspots. Each of these variables play an important role when identifying a car crash. Comparing these models to each other we see that on average the drivers under 18 years old and drivers over 65 years old tend to get in the most accidents. This is because drivers under the age of 18 are considered as new drivers and have very little experience on the road. These drivers tend to get excited and not follow the rules. Drivers over the age of 65 tend to get in an accident because as they get older they have a slower reaction time. When they are on the road sometimes they are not able to comprehend what is going on.  
+
+After comparing these variables we realized that young drivers and older drivers both tend to drive sports cars. This is surprising because sports cars are unknown to be the most unsafe vehicle to drive. While performing our research we inferred that young drivers and older drivers would drive sedans, SUVs, and minivans since those vehicles are safer to drive. Today more drivers are getting their licenses without a road test due to the pandemic. As observed in the forecasting models above, crashes in Wake County will slowly increase with everything opening back up ever since the pandemic occurred. 
+
+We made use of multiple different methods to present factors that cause car crashes in Wake County. We were able to create a forecasting model for our time series data. Both TBATS and ARIMA models produced solid predictions which had high accuracy. Both of these time series models follow a similar pattern. It was clearly shown that from March of 2020 to December of 2020 there was a decrease in car accidents. This was because there was a pandemic and no one was on the road for a long period. After everything started to open up there was a rise in car accidents since more people were driving. Based on the research we performed various factors play a role in car crashes, with some factors having a greater effect than others. 
 
 # Discussion 
 
 This report highlights the many different factors of car crashes. In this report our goal was to analyze car crashes from 2015 to March 2021 and forecast crashes after 2021. Though our research was thorough to our best ability, data from the Wake County crashes data set had some human error. This was because the police report was filled out by officers and they did not fill in the document correctly. If it was possible to work with a dataset that was filled out correctly we would be able to give a better analysis on car crashes in Wake County. 
+
+We have taken advantage of the Wake County Crashes database. We have also contributed by making a Time Series Forecasting. Many researchers don't have access to a similar database as we did. Therefore, the database we accessed helped us get a better idea of car crashes in Wake County, NC from 2015 to March 2021. 
+
+Based on the research we have performed, we can make a few implications of what may cause the most accidents in Wake County. The word cloud shown in the section (Identifying Hot Spots of Crashes) we can see that most crashes occur on Capital Blvd. 440, and 40. This makes sense because these roads are some of the major interstate highways in North Carolina. Although more research is needed to compare the major interstates that connect to Wake County, it seems that the most liveliest roads tend to have the most road accidents. 
+
+Looking at an overview of crashes in Wake County North Carolina, one way to reduce car crashes is to not drive on the highway if possible. This is because when people drive on highways they tend to speed which causes them to lose control of their vehicle. People tend to use the highways because it gets them to their destination faster. Hence, the highway becomes busy which causes car accidents to occur. 
 
 # References
 
