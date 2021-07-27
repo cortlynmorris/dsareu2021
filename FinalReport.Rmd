@@ -36,7 +36,7 @@ When it comes to identifying car crashes, different states in the U.S experience
 
 From the beginning of 2015, information on car crashes has been listed in the Wake County car accident database. This data includes the driver's age, gender, vehicle type, and many more critical car accident factors. Our database is based on what police officers have recorded at the scene of the accident. Most of the data found in this database are true, but there is a small percentage of error with some of the data. Our goal is to sort out essential factors from the database to help forecast crashes in Wake County.
 
-In this report, we will be visualizing, modeling and forecasting car crashes in Wake County. Our research questions are 1) What are the main factors that contribute to a crash? 2) Did the law change to obtaining a driver’s license due to the COVID pandemic impact crash frequency? 3) What are the conditions that lead to worse outcomes in terms of crash injuries?4) Can we forecast the daily number of crashes in Wake County? 5) Can we predict traffic hotspots in Wake County? We assembled a dataset from the Wake County crashes database from 2015 to March 2021. Although some of the input in the database is missing, this data will help provide some information about crashes in Wake County. This will also help us forecast car crashes after 2021. 
+In this report, we will be visualizing, modeling and forecasting car crashes in Wake County. Our research questions are 1) What are the main factors that contribute to a crash? 2) Did the COVID pandemic impact crash frequency? 3) What are the conditions that lead to worse outcomes in terms of crash injuries?4) Can we forecast the daily number of crashes in Wake County? 5) Can we predict traffic hotspots in Wake County? We assembled a dataset from the Wake County crashes database from 2015 to March 2021. Although some of the input in the database is missing, this data will help provide some information about crashes in Wake County. This will also help us forecast car crashes after 2021. 
 
 # Background 
 
@@ -174,9 +174,7 @@ For the type of vehicle in a crash we had data for the years 2015 to March 2021.
 
 #### Bivariate Explorations
 
-This section is dedicated to visualizing factors that may lead to worse outcomes of crashes in terms of injury. Using percent stacked bar charts, we are able to determine which variables lead to a more or less serious injuries which we can later use to help predict the seriousness of injury through predictive modeling. 
-
-Below are some of the most important bivariate explorations. 
+This section is dedicated to visualizing factors that may lead to worse outcomes of crashes in terms of injury. Using percent stacked bar charts, we are able to determine which variables lead to a more or less serious injuries which we can later use to help predict the seriousness of injury through predictive modeling. Below are some of the most important bivariate explorations. 
 
 ```{r protection-injury, echo=FALSE, fig.width = 10}
 crashes %>%
@@ -318,7 +316,7 @@ saveWidget(my_graph, "tmp.html", selfcontained = F)
 webshot("tmp.html", "wc1.png", delay = 5, vwidth = 2000, vheight = 2000)
 ```
 
-From the word cloud, we can see many crashes occur on 440, 40, and Capital Blvd. This makes sense because 440 and 40 are major interstates that connect to several major junctions and Capital Blvd is a main road in North Carolina as well. 
+From the word cloud, we can see many crashes occur on 440, 40, and Capital Blvd. This makes sense because 440 and 40 are major interstates that connect to several major junctions and Capital Blvd is a main road in North Carolina as well. Due to these streets being heavily trafficked, more crashes are likely to occur. 
 
 ```{r location-at-word-cloud, echo=FALSE, fig.width=10, fig.align='center'}
 location_road_name_at_freq <- crashes %>%
@@ -333,11 +331,11 @@ webshot("tmp.html", "wc2.png", delay = 5, vwidth = 2000, vheight = 2000)
 #webshot::install_phantomjs()
 ```
 
-From the word cloud, we can see that 440, Capital Blvd, 40, and Blue Ridge Rd frequently have crashes that are near by. This would make sense because most of these streets are highly trafficked and populated.
+From the word cloud, we can see that 440, Capital Blvd, 40, and Blue Ridge Rd frequently have crashes that are near by. This would make sense because most of these streets are meet near the center of Raleigh, the capital of North Carolina, therefore, they are highly trafficked and populated. With many cars merging and intersecting onto these common and high speed streets, it is not surprising that many crashes occur at these locations. 
 
 #### Interactive Heat Maps 
 
-Below are two interactive heat maps dedicated to organizing the data in a spatial manner. 
+Below are two interactive heat maps dedicated to organizing the Wake County, North Carolina crash data in a spatial manner. 
 
 ```{r load-library-interactive-map, message=FALSE, echo=FALSE}
 library(ggplot2)
@@ -369,7 +367,7 @@ coords.map.nc <- coords.map.nc + stat_density2d(data=crashes_filter,
 coords.map.nc <- coords.map.nc +   scale_fill_gradientn(colours=rev(brewer.pal(7, "RdBu")))
 
 coords.map.nc <- coords.map.nc + theme_bw() + 
-  ggtitle("Interactive Heat Map of Crashes in North Carolina (Zoomed-Out)") + 
+  ggtitle("Heat Map of Crashes in North Carolina") + 
   xlab("Longitude") + ylab("Latitude")
 
 # ggplotly(coords.map.nc) %>%
@@ -381,7 +379,7 @@ coords.map.nc <- coords.map.nc + theme_bw() +
 coords.map.nc
 ```
 
-In the visual above we created a heat map of common places where road accidents occur in North Carolina. 
+In the visual above we created a zoomed-out heat map of common places where road accidents occur in North Carolina. As we can see from the legend on the right, the more red the area is, the more crashes are likely to occur. The capital of North Carolina, Raleigh is heavily colored in dark red, indicating that many crashes occur here. As we move further from the capital city, the level of crashes tends to decrease. 
 
 ```{r wake-interactive-map, message=FALSE, warning=FALSE, echo=FALSE}
 crashes_filter <- crashes %>%
@@ -406,7 +404,7 @@ coords.map.wake <- coords.map.wake + stat_density2d(data=crashes_filter,
 coords.map.wake <- coords.map.wake + scale_fill_gradientn(colours=rev(brewer.pal(7, "RdYlGn")))
 
 coords.map.wake <- coords.map.wake + theme_bw() + 
-  ggtitle("Heat Map of Crash Locations") + 
+  ggtitle("Heat Map of Crashes in Wake County") + 
   xlab("Latitude") + ylab("Longitude")
 
 # ggplotly(coords.map.wake) %>%
@@ -418,7 +416,7 @@ coords.map.wake <- coords.map.wake + theme_bw() +
 coords.map.wake
 ```
 
-Above we created an interactive heat map for Wake County. This heat map shows popular streets where it is common to have an accident. From the Wake County heat map, we can see that crashes are much more likely to occur in the center of the city. We see that as more streets populate an area, more crashes occur. 
+In addition to the previous map, above we created a zoomed in heat map for crashes in Wake County, North Carolina. This heat map shows streets that appeared in the word clouds in the previous section such as Capital Boulevard. As we can see, Capital Boulevard runs through the heart of the city and intersects with the dark red color indicating a large level of crashes in the area. This corresponds with the world cloud because Capital Boulevard was one of the largest street names which also indicated a higher count of crash occurrences. In general, from the Wake County heat map, we can see that crashes are much more likely to occur in the center of the city. We see that as more streets populate an area, more crashes occur. 
 
 ### Time Series Visualization 
 
@@ -517,6 +515,10 @@ crashes_ts %>%
   ggtitle("Time Series Plot for Frequency of Daily Crashes (With Pandemic Data)")
 ```
 
+Above we have a daily pandemic time series plot with a seven day moving average of the number of crashes from January 1, 2015 to May 31, 2021. We see that there are major spikes around February 2015, late October 2015, and December 2016. The two latter spikes may be related to the popular holidays, Halloween and Christmas where many people are traveling or out on the town preparing for celebrations. 
+
+Additionally, from the time series plot, we can see that there is a significant drop in car crashes in March 2020. This can be explained by the stay-at-home-orders due to the COVID-19 pandemic. After the stay at home orders, the frequency of crashes seems to be slightly lower throughout May 2021. There will likely be an increase in the next few month due to stay-at-home-orders and COVID-19 regulations being lifted now that the vaccination is available. 
+
 ```{r noncovid-daily-ts, echo=FALSE, message=FALSE, fig.width = 10}
 crashes_ts.noncovid = crashes %>%
   filter(as.Date(crash_date) >= "2015/01/01" & as.Date(crash_date) <= "2020/03/01") %>%
@@ -534,9 +536,7 @@ crashes_ts.noncovid %>%
   theme(axis.text.x = element_text(angle = 90), title = element_text(size = 10))
 ```
 
-Above we have a time series plot of a seven day moving average of the number of crashes. We see that there are major spikes around March 2015, late October 2015, and December 2016. The two latter spikes may be related to the popular holidays, Halloween and Christmas. 
-
-Additionally, from the time series plot, we can see that there is a significant drop in car crashes in March 2020. This can be explained by the stay-at-home-orders due to the COVID-19 pandemic. After the stay at home orders, the frequency of crashes seems to be slightly lower throughout May 2021. There will likely be an increase in the next few month due to stay-at-home-orders and COVID-19 regulations being lifted now that the vaccination is available. 
+In the time series plot above, we have taken out the pandemic data and only plotted the daily data from January 1, 2015 to March 1, 2020. We wanted to visualize the overall pattern and trend of the data when the large pandemic dip was taken out. Removing the pandemic data, shows us that the trend is very linear and does not include large or significant changes throughout time. 
 
 ```{r annual-ts, echo=FALSE, fig.width = 10}
 crashes_annual = crashes_ts %>%
@@ -555,10 +555,9 @@ crashes_annual %>%
   facet_wrap(~Year, scales = "free_x")
 ```
 
-Above, we can see the daily time series plot broken into annual plots. This helps better visualize the spikes and dips throughout the specific years. 
+Above, we can see the daily time series plot broken into annual plots. This helps better visualize the spikes and dips throughout the specific years. For example, we can now determine that the first large spike was near the end of February 2015. Inspecting our data set, we were able to find that the large spike actually occured on February 24, 2015. On this day, a huge snow and ice storm hit the Wake County area created dangerous road conditions for drivers (Armstrong 2015). Since North Carolina is a southern state, the drivers there are not accustomed to the slippery and icy road conditions that result from snowfalls, therefore, are more likely to get into more crashes and result in more serious injuries. 
 
 #### Monthly Time Series 
-
 
 ```{r monthly-ts, echo=FALSE, message=FALSE, fig.width=10, fig.align='center'}
 forecast::autoplot(crashes_mts4) +
@@ -571,6 +570,8 @@ forecast::autoplot(crashes_mts4) +
         title = element_text(size=10))
 ```
 
+Seen above is a monthly pandemic time series plot. We decided to visualize the daily data as well as the monthly data in order to inspect the different seasonality and trends between monthly and data data. As the plot shows, there seems to be a spike near the fall to winter months of each year. This may be due to the colder months resulting in more rain, snow, and poorer weather overall. We can also see the large dip in March 2020 where the pandemic first hit, as well as the overall lower average of crashes during the pandemic when the stay-at-home orders were in effect. 
+
 ```{r monthly-ts-noncovid, echo=FALSE, message=FALSE, fig.width = 10}
 forecast::autoplot(crashes_mts4.noncovid) +
   ggtitle("Time Series Plot for Frequency of Monthly Crashes (Without Pandemic Data)") + xlab("Date") + ylab("Monthly Crashes") + 
@@ -582,8 +583,9 @@ forecast::autoplot(crashes_mts4.noncovid) +
         title = element_text(size=10))
 ```
 
-### Time Series Forecasting 
+Similar to the daily time series, we also removed the pandemic data using data only from January 1, 2015 to March 1, 2020 to visualize the monthly data without the COVID-19 dip. Without the pandemic data, the spikes near the end of each year are more prominent and easier to recognize. We also can see that near the beginning of each year there is a large dip right before or right after New Years. This may be due to the fact that people have left the state for vacations, therefore, there are less drivers in Wake County. Or this could be due to the fact that many people are settled in one location by New Years because they probably drove to their relatives or friends before Christmas Day. 
 
+### Time Series Forecasting 
 
 ```{r loading-libraries-2, message=FALSE, warning=FALSE, echo=FALSE, include=FALSE}
 library(reshape2)
@@ -674,8 +676,6 @@ crashes_mts4.noncovid <- window(crashes_mts2.noncovid, start=c(1,01),
 
 First, we had to ensure that the data we working with was stationary. Stationarity is when there is no observed trend or seasonality within a dataset. Therefore, if you pick out a section of points at a specific time, you will not be able pick out a that same pattern within the data set again at a similar time. Stationarity is a large assumption that must be met for many models when forecasting. 
 
-The ndiffs() function checks if the data set needs any first difference calculations. The nsdiffs() function checks if the data set needs any seasonal difference calculations. 
-
 ```{r stationarity-trans-daily-covid, echo=FALSE, eval=FALSE}
 ##Looking at stationarity of crashests2 daily time series 
 library(urca)
@@ -703,6 +703,8 @@ ndiffs(dif_crashests2) #0
 nsdiffs(dif_crashests2) #0
 ```
 
+The ndiffs() function checks if the data set needs any first difference calculations. The nsdiffs() function checks if the data set needs any seasonal difference calculations.
+
 Here our daily pandemic data needs one first difference and we do this with the diff() function. Using the diff() function, we take the first difference and then we check the acf of the data to make sure that it does not take too many lags to hit 0 indicating that the first difference transformed our data to be stationary. 
 
 ```{r stat-trans-daily-covid-plot, fig.width = 10, echo=FALSE}
@@ -713,7 +715,9 @@ cbind("Crashes" = crashests2,
   ggtitle("Stationarity Transformations of Daily Pandemic Data")
 ```
 
-The plot above, shows the data before the stationary transformation and after the first difference was taken (stationary data)
+The plot above, shows the data before the stationary transformation and after the first difference was taken.
+
+Now that our daily pandemic data has been transformed to be stationary, our assumptions for our forecasting models are met and we can begin to forecast. 
 
 ```{r tbats-stationary, echo=FALSE, message=FALSE, include=FALSE}
 #Stationary
@@ -770,7 +774,9 @@ autoplot(crashests2) +
   theme(title = element_text(size = 10), legend.position = "bottom")
 ```
 
-The Exponential smoothing state space model with Box-Cox transformation, ARMA errors, Trend and Seasonal components (TBATS model) was chosen because it is known to perform well at forecasting with long daily time series. 
+The Exponential smoothing state space model with Box-Cox transformation, ARMA errors, Trend and Seasonal components (TBATS model) was chosen because it is known to perform well at forecasting with long daily time series. In order to use this model, we had to transform our data to be stationary, as shown in the steps previously. 
+
+In the plot above, we used our crash data from January 1, 2015 to May 31, 2021 to forecast crashes from June 1, 2021 until January 1, 2022. As we can see from the plot, the TBATS model does well in following the slight spikes and dips throughout the months. However, due to the large dip because of the pandemic data, the forecasts appear to be below the average line of the data. This indicates that the pandemic data affects the forecasts of future crashes. 
 
 ```{r arima, echo=FALSE, fig.width = 10}
 fit_arima <- auto.arima(crashests2)
@@ -783,9 +789,9 @@ autoplot(fc_arima) +
   theme(title = element_text(size = 10))
 ```
 
-The autoregressive integrated moving average (ARIMA) model was chosen because it is known to perform well at forecasting with long daily time series. 
+The autoregressive integrated moving average (ARIMA) model was also chosen because it is known to perform well at forecasting with long daily time series. Unlike the TBATS model (shown previously), the ARIMA model automatically takes the necessary differences on the original data. Therefore, no manual differencing needs to occur. 
 
-From the plot above...
+From the plot above, we can see that the forecasts create some slight spikes and dips at the beginning and then flatten out to a horizontal line. This is most likely due to the fact that the trend is linear for a majority of the time series. As we can see, the horizontal line is closer to the average line of the data after the pandemic rather than before the pandemic. We can see that the pandemic data has a large impact on teh future forecasts of crashes. 
 
 #### Daily without Pandemic Data 
 
@@ -1137,6 +1143,7 @@ q %>%
 The Seasonal and Trend Decomposition using Loess Forecasting Model (STLF) was chosen because it is able to automatically handle our monthly nonpandemic data that needs to be seasonally differenced. It was also chosen because it has been shown to create accurate forecasts for seasonally adjusted data. 
 
 ### Modeling Crash Injuries 
+
 ```{r, echo=FALSE, include=FALSE}
 crashes_pm = crashes %>%
   filter(Injury != "", Injury != "Unknown",  WeatherCondition1 != "Unknown",
@@ -1694,6 +1701,10 @@ Although there have been a couple of research projects done on this topic. Most 
 This report highlights the many different factors of car crashes. In this report our goal was to analyze car crashes from 2015 to March 2021 and forecast crashes after 2021. Though our research was thorough to our best ability, data from the Wake County crashes data set had some human error. This was because the police report was filled out by officers and they did not fill in the document correctly. If it was possible to work with a dataset that was filled out correctly we would be able to give a better analysis on car crashes in Wake County. 
 
 # References
+
+Armstrong, Tim. “Snow and Ice: February 24, 2015.” National Weather Service, NOAA's National Weather Service, 14 Mar. 2015, 
+www.weather.gov/ilm/SnowIce2015Feb24#:~:text=Freezing%20rain%20increased%20in%
+20intensity,at%20the%20Wilmington%20International%20Airport. 
 
 Hodler, Axel. “Creating a Heat Map from Coordinates Using R.” Medium, Medium, 20 Dec. 2018, axelhodler.medium.com/creating-a-heat-map-from-coordinates-using-r-780db4901075. 
 
