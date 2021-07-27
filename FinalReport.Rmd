@@ -6,6 +6,7 @@ author:
 - Research Mentors Dr. Sayed Mostafa and Chinedu Jude Nzekwe
 date: "7/14/2021"
 output:
+  pdf_document: default
   html_document:
     df_print: paged
 header-includes: \usepackage{setspace}\doublespacing
@@ -300,12 +301,12 @@ devtools::install_github("gaospecial/wordcloud2")
 ```{r load-library-word-cloud, message=FALSE, echo=FALSE}
 #install.packages('wordcloud2')
 library(wordcloud2)
-install
+#install.packages("webshot")
 library(webshot)
 library(htmlwidgets)
 ```
 
-```{r location-on-word-cloud, echo=FALSE}
+```{r location-on-word-cloud, echo=FALSE, fig.width=10, fig.align='center'}
 location_road_name_on_freq <- crashes %>%
   count(LocationRoadNameOn)
 
@@ -313,23 +314,23 @@ set.seed(101)
 my_graph <- location_road_name_on_freq %>%
   wordcloud2(shape = 'circle', backgroundColor = "black", minSize = 5) 
 
-
+saveWidget(my_graph, "tmp.html", selfcontained = F)
+webshot("tmp.html", "wc1.png", delay = 5, vwidth = 2000, vheight = 2000)
 ```
 
 From the word cloud, we can see many crashes occur on 440, 40, and Capital Blvd. This makes sense because 440 and 40 are major interstates that connect to several major junctions and Capital Blvd is a main road in North Carolina as well. 
 
-```{r location-at-word-cloud, echo=FALSE}
+```{r location-at-word-cloud, echo=FALSE, fig.width=10, fig.align='center'}
 location_road_name_at_freq <- crashes %>%
   count(LocationRoadNameAt)
 
 set.seed(102)
-my_graph <- location_road_name_at_freq %>%
+my_graph2 <- location_road_name_at_freq %>%
   wordcloud2(shape = 'circle', backgroundColor = "black", minSize = 5)
 
-saveWidget(my_graph, "tmp.html", selfcontained = F)
-webshot("tmp.html", "wc1.png", delay = 5, vwidth = 2000, vheight = 2000)
-
-!wordcloud(wc1.png)
+saveWidget(my_graph2, "tmp.html", selfcontained = F)
+webshot("tmp.html", "wc2.png", delay = 5, vwidth = 2000, vheight = 2000)
+#webshot::install_phantomjs()
 ```
 
 From the word cloud, we can see that 440, Capital Blvd, 40, and Blue Ridge Rd frequently have crashes that are near by. This would make sense because most of these streets are highly trafficked and populated.
@@ -1646,7 +1647,8 @@ Interactive Maps in R, 2019, bhaskarvk.github.io/user2017.geodataviz/notebooks/0
 
 Pierre LPierre L 26.8k55 gold badges3939 silver badges5959 bronze badges, and hrbrmstrhrbrmstr 71.8k1111 gold badges120120 silver badges180180 bronze badges. “Heatmap Plot by Value Using Ggmap.” Stack Overflow, 1 Mar. 1964, stackoverflow.com/questions/32148564/heatmap-plot-by-value-using-ggmap. 
 
-Salas-Eljatib, Christian, et al. “A Study on the Effects of Unbalanced Data When Fitting Logistic Regression Models in Ecology.” Ecological Indicators, Elsevier, 7 Nov. 2017, www.sciencedirect.com/science/article/abs/pii/S1470160X17306659. 
+Salas-Eljatib, Christian, et al. “A Study on the Effects of Unbalanced Data When Fitting Logistic Regression Models in Ecology.” Ecological Indicators, Elsevier, 7 Nov. 2017,
+www.sciencedirect.com/science/article/abs/pii/S1470160X17306659. 
 
 Sievert, Carson. “Interactive Web-Based Data Visualization with R, Plotly, and Shiny.” 4 Maps, 19 Dec. 2019, plotly-r.com/maps.html. 
 
