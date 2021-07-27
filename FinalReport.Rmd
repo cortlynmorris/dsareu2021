@@ -1136,9 +1136,67 @@ q %>%
 The Seasonal and Trend Decomposition using Loess Forecasting Model (STLF) was chosen because it is able to automatically handle our monthly nonpandemic data that needs to be seasonally differenced. It was also chosen because it has been shown to create accurate forecasts for seasonally adjusted data. 
 
 ### Modeling Crash Injuries 
+```{r, echo=FALSE, include=FALSE}
+crashes_pm = crashes %>%
+  filter(Injury != "", Injury != "Unknown",  WeatherCondition1 != "Unknown",
+         WeatherCondition1 != "", MostHarmfulEvent != "Unknown",
+         MostHarmfulEvent != "", RoadFeature != "Unknown", RoadFeature != "", 
+         RoadFeature != "NaN", TrafficControlType != "NaN", RoadClassification != "NaN",
+         TrafficControlType != "Unknown", TrafficControlType != "",
+         RoadClassification != "Unknown", RoadClassification != "",
+         PersonType != "", PersonType != "Unknown", 
+         VehicleType != "All terrain vehicle (ATV)",
+         VehicleType != "Farm equipment", VehicleType != "Farm tractor",
+         VehicleType != "Military", VehicleType != "Motor scooter or motor bike",
+         VehicleType != "Motor home/recreational vehicle", 
+         VehicleType != "Tractor/doubles", VehicleType != "Truck/tractor (i.e., bobtail)",
+         ContributingCircumstance1 != "Passed stopped school bus", 
+         ContributingCircumstance1 != "Passed on hill", 
+         ContributingCircumstance1 != "Passed on curve",
+         ContributingCircumstance1 != "Driver distracted by other electronic 
+         device (navigation device, DVD player, etc.) ",
+         Protection != "Lighting", Protection != "Protective pads",
+         Protection != "Reflective clothing", WeatherCondition1 != "Blowing sand, dirt, snow",
+         WeatherCondition1 != "Severe crosswinds", MostHarmfulEvent != "Jackknife",
+         MostHarmfulEvent != "RR train, engine", TrafficControlType != "RR cross bucks only",
+         TrafficControlType != "RR flasher", TrafficControlType != "RR gate and flasher",
+         TrafficControlType != "School zone signs", VisionObstruction != "Blinded, headlights",
+         VisionObstruction != "Blinded, other lights", VisionObstruction != "Building(s)",
+         VisionObstruction != "Embankment", VisionObstruction != "Sign(s)") %>%
+  mutate(Injury = as.factor(Injury)) %>%
+  mutate(Injury2 = if_else(Injury == "No injury", "No injury", "Injury"), 
+         Injury2 = as.factor(Injury2)) %>%
+  mutate(VehicleType = if_else(VehicleType %in% c("Unknown",""), 
+                               "Unknown/Blank", VehicleType),
+         VehicleType = as.factor(VehicleType)) %>%
+  mutate(ContributingCircumstance1 = if_else(ContributingCircumstance1 %in% c("Unknown",""), 
+                                             "Unknown/Blank", ContributingCircumstance1),
+         ContributingCircumstance1 = as.factor(ContributingCircumstance1)) %>%
+  mutate(Protection = if_else(Protection %in% c("Unable to determine",""), 
+                              "Unknown/Blank", Protection),
+         Protection = as.factor(Protection)) %>%
+  mutate(WeatherCondition1 = as.factor(WeatherCondition1)) %>%
+  mutate(MostHarmfulEvent = as.factor(MostHarmfulEvent)) %>%
+  mutate(RoadFeature = as.factor(RoadFeature)) %>%
+  mutate(TrafficControlType = as.factor(TrafficControlType)) %>%
+  mutate(RoadClassification = as.factor(RoadClassification)) %>%
+  mutate(PersonType = as.factor(PersonType)) %>%
+  mutate(VisionObstruction = if_else(VisionObstruction %in% c("Unknown",""), 
+                                     "Unknown/Blank", VisionObstruction),
+         VisionObstruction = as.factor(VisionObstruction))
+```
+
 The original data that we used for this project included a variable called “Injury” which was made up of the following levels: no injury, A type injury (disabling), B type injury (evident), C type injury (possible), killed, and unknown. In order to look at this from a binary standpoint, we created a new variable called “Injury2” where any of the responses with A type injury, B type injury, C type injury, or killed were assigned the value of injury, the responses with no injury were assigned to no injury, and unknown and blank responses were removed. After doing so, we were left with extremely unbalanced data which can be seen in the barplot below. When you work with balanced data, parameter variability decreases and the ratio between sensitivity and specificity has been shown to be much better than when working with unbalanced data.
 
-(Insert Injury vs. Noninjury Frequency Bar chart)
+```{r}
+crashes_pm %>% 
+  ggplot() +
+  geom_bar(aes(Injury2, fill=Injury2), show.legend = FALSE) +
+  geom_text(stat="count", aes(x=Injury2, label=..count..), vjust=-0.25) +
+  labs(title = "Frequency of Injury2",
+       x = "Injury2",
+       y = "Count")
+```
 
 #### Logistic Regression 
 Due to this imbalance, we decided to test a variety of balancing methods to compare the accuracy of each of these using the logistic regression model to predict the value of Injury2. We used the unbalanced data as our base to compare oversampled, undersampled, and a combination of both over- and undersampled balanced datasets that we created. We then fitted a logistic regression model for each of these datasets using 11 predictors. These predictors were variables that we took from our original crashes dataset that we found to be factors that impacted crash frequency when doing our exploratory data analysis early on in the project. The 11 variables that we selected were Age, VehicleType, ContributingCircumstance1, Protection, WeatherCondition1, MostHarmfulEvent, RoadFeature, TrafficControlType, RoadClassification, PersonType, and VisionObstruction. Before we could use all of these variables for our models, we had to clean the data to remove unknown, blank, NA, and NaN responses as well as levels of each variable that did not have enough responses to be considered important (fewer than 100 responses). However, we could not remove all of the unknown and blank responses from all of the variables because if we were to do so, we would be removing too much information. To solve this problem, we mutated the data so that there was a level for the variables VehicleType, ContributingCircumstance1, Protection, and VisionObstruction titled Unknown/Blank.
