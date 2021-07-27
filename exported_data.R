@@ -3260,6 +3260,15 @@ crashes_pm = crashes %>%
                                      "Unknown/Blank", VisionObstruction),
          VisionObstruction = as.factor(VisionObstruction))
 
+
+crashes_pm %>% 
+  ggplot() +
+  geom_bar(aes(Injury2, fill=Injury2), show.legend = FALSE) +
+  geom_text(stat="count", aes(x=Injury2, label=..count..), vjust=-0.25) +
+  labs(title = "Frequency of Injury2",
+       x = "Injury2",
+       y = "Count")
+
 summary(crashes_pm$Injury)
 summary(crashes_pm$Injury2)
 
@@ -3565,7 +3574,7 @@ overunder.pred2 <- factor(overunder.pred2, levels = c("No injury", "Injury")) #p
 (stats5 = calc_stats(tab5, prevalence = NULL, positive = "Injury"))
 
 StatisticsComparison = cbind(SampleType = c("Unbalanced", "Oversample", "Undersample", "Combination Full Sample", 
-        "Combination Sub-Sample"),rbind(stats, stats2, stats3, stats4, stats5))
+        "Combination Sub-Sample"),round(rbind(stats, stats2, stats3, stats4, stats5), 4))
 require(knitr)
 kable(StatisticsComparison)
 
@@ -3744,7 +3753,7 @@ overunder2.rf.pred <-predict(overunder2.rf.fit.train, data=overunder2.rf.test, t
 
 
 StatisticsComparison.rf = cbind(SampleType = c("Unbalanced", "Oversample", "Undersample", "Combination Full Sample", 
-                                            "Combination Sub-Sample"),rbind(stats.rf, stats.rf2, stats.rf3, stats.rf4, stats.rf5))
+                                            "Combination Sub-Sample"),round(rbind(stats.rf, stats.rf2, stats.rf3, stats.rf4, stats.rf5), 4))
 require(knitr)
 kable(StatisticsComparison.rf)
 
