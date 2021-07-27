@@ -1,15 +1,15 @@
 ---
-title: 
-  \vspace{3in} "Visualizing, Modeling, and Forecasting Crashes in Wake County, North Carolina"
-author: 
-  - Cortlyn Morris, Kelly Wenzlof, Ayan Gulzar
-  - Research Mentors Dr. Sayed Mostafa and Chinedu Jude Nzekwe 
+title: \vspace{3in} "Visualizing, Modeling, and Forecasting Crashes in Wake County,
+  North Carolina"
+author:
+- Cortlyn Morris, Kelly Wenzlof, Ayan Gulzar
+- Research Mentors Dr. Sayed Mostafa and Chinedu Jude Nzekwe
 date: "7/14/2021"
-header-includes:
-    - \usepackage{setspace}\doublespacing
-output: 
-  pdf_document
-always_allow_html: true
+output:
+  html_document:
+    df_print: paged
+header-includes: \usepackage{setspace}\doublespacing
+always_allow_html: yes
 ---
 
 ```{r setup, include=FALSE}
@@ -300,6 +300,9 @@ devtools::install_github("gaospecial/wordcloud2")
 ```{r load-library-word-cloud, message=FALSE, echo=FALSE}
 #install.packages('wordcloud2')
 library(wordcloud2)
+install
+library(webshot)
+library(htmlwidgets)
 ```
 
 ```{r location-on-word-cloud, echo=FALSE}
@@ -307,8 +310,10 @@ location_road_name_on_freq <- crashes %>%
   count(LocationRoadNameOn)
 
 set.seed(101)
-location_road_name_on_freq %>%
+my_graph <- location_road_name_on_freq %>%
   wordcloud2(shape = 'circle', backgroundColor = "black", minSize = 5) 
+
+
 ```
 
 From the word cloud, we can see many crashes occur on 440, 40, and Capital Blvd. This makes sense because 440 and 40 are major interstates that connect to several major junctions and Capital Blvd is a main road in North Carolina as well. 
@@ -318,8 +323,13 @@ location_road_name_at_freq <- crashes %>%
   count(LocationRoadNameAt)
 
 set.seed(102)
-location_road_name_at_freq %>%
+my_graph <- location_road_name_at_freq %>%
   wordcloud2(shape = 'circle', backgroundColor = "black", minSize = 5)
+
+saveWidget(my_graph, "tmp.html", selfcontained = F)
+webshot("tmp.html", "wc1.png", delay = 5, vwidth = 2000, vheight = 2000)
+
+!wordcloud(wc1.png)
 ```
 
 From the word cloud, we can see that 440, Capital Blvd, 40, and Blue Ridge Rd frequently have crashes that are near by. This would make sense because most of these streets are highly trafficked and populated.
@@ -361,11 +371,13 @@ coords.map.nc <- coords.map.nc + theme_bw() +
   ggtitle("Interactive Heat Map of Crashes in North Carolina (Zoomed-Out)") + 
   xlab("Longitude") + ylab("Latitude")
 
-ggplotly(coords.map.nc) %>%
-  highlight(
-    "plotly_hover",
-    selected = attrs_selected(line = list(color = "black"))
-  )
+# ggplotly(coords.map.nc) %>%
+#   highlight(
+#     "plotly_hover",
+#     selected = attrs_selected(line = list(color = "black"))
+#   )
+
+coords.map.nc
 ```
 
 In the visual above we created a heat map of common places where road accidents occur in North Carolina. 
@@ -396,11 +408,13 @@ coords.map.wake <- coords.map.wake + theme_bw() +
   ggtitle("Heat Map of Crash Locations") + 
   xlab("Latitude") + ylab("Longitude")
 
-ggplotly(coords.map.wake) %>%
-  highlight(
-    "plotly_hover",
-    selected = attrs_selected(line = list(color = "black"))
-  )
+# ggplotly(coords.map.wake) %>%
+#   highlight(
+#     "plotly_hover",
+#     selected = attrs_selected(line = list(color = "black"))
+#   )
+
+coords.map.wake
 ```
 
 Above we created an interactive heat map for Wake County. This heat map shows popular streets where it is common to have an accident. From the Wake County heat map, we can see that crashes are much more likely to occur in the center of the city. We see that as more streets populate an area, more crashes occur. 
@@ -1121,9 +1135,17 @@ q %>%
 
 The Seasonal and Trend Decomposition using Loess Forecasting Model (STLF) was chosen because it is able to automatically handle our monthly nonpandemic data that needs to be seasonally differenced. It was also chosen because it has been shown to create accurate forecasts for seasonally adjusted data. 
 
-### Statistical Analyses 
+### Modeling Crash Injuries 
 
-### Predictive Models 
+#### Logistic Regression 
+
+The original data that we used for this project included a variable called “Injury” which was made up of the following levels: no injury, A type injury (disabling), B type injury (evident), C type injury (possible), killed, and unknown. In order to look at this from a binary standpoint, we created a new variable called “Injury2” where any of the responses with A type injury, B type injury, C type injury, or killed were assigned the value of injury, the responses with no injury were assigned to no injury, and unknown and blank responses were removed. After doing so, we were left with extremely unbalanced data which can be seen in the barplot below. When you work with balanced data, parameter variability decreases and the ratio between sensitivity and specificity has been shown to be much better than when working with unbalanced data.
+
+(Insert Injury vs. Noninjury Frequency Bar chart) 
+
+Due to this imbalance, we decided to test a variety of balancing methods to compare the accuracy of each of these using the logistic regression model.
+
+#### Random Forest 
 
 # Results 
 
@@ -1596,19 +1618,13 @@ This model shows the SARIMA model and the STLF model as well as the combination 
 
 Despite the very similar plots, from the RMSE (Root Mean Squared Error) we can see that the combination performs slightly better than the other two models. 
 
-## Predictive Modeling Results 
+## Modeling Crash Injuries 
 
 This section is dedicated to showing the results of the predictive modeling of the outcomes of crashes in terms of crashes. 
 
 From the logistic regression and the random forest model, we can determine the main conditions that lead to worse outcomes in terms of injury. Hopefully resulting in these models helping policy makers to make the roads safer by adding necessary precautions and transportation development. 
 
 ### Logistic Regression 
-
-The original data that we used for this project included a variable called “Injury” which was made up of the following levels: no injury, A type injury (disabling), B type injury (evident), C type injury (possible), killed, and unknown. In order to look at this from a binary standpoint, we created a new variable called “Injury2” where any of the responses with A type injury, B type injury, C type injury, or killed were assigned the value of injury, the responses with no injury were assigned to no injury, and unknown and blank responses were removed. After doing so, we were left with extremely unbalanced data which can be seen in the barplot below. When you work with balanced data, parameter variability decreases and the ratio between sensitivity and specificity has been shown to be much better than when working with unbalanced data.
-
-(Insert Injury vs. Noninjury Frequency Bar chart) 
-
-Due to this imbalance, we decided to test a variety of balancing methods to compare the accuracy of each of these using the logistic regression model.
 
 ### Random Forest
 
