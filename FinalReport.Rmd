@@ -4,7 +4,7 @@ title: \vspace{3in} "Visualizing, Modeling, and Forecasting Crashes in Wake Coun
 author:
 - Cortlyn Morris, Kelly Wenzlof, Ayan Gulzar
 - Research Mentors Dr. Sayed Mostafa and Chinedu Jude Nzekwe
-date: "7/14/2021"
+date: "7/30/2021"
 output:
   pdf_document: default
   html_document:
@@ -71,6 +71,7 @@ library(ggthemes)
 library(maps)
 library(scales)
 library(zoo)
+#devtools::install_github("m-clark/confusionMatrix")
 library(confusionMatrix)
 library(ROSE)
 ```
@@ -504,7 +505,6 @@ crashes_ts = crashes %>%
   group_by(Date) %>%
   summarize(count = length(unique(key_crash)))
 ```
-
 
 ```{r 7-day-ma-ts, echo=FALSE, warning=FALSE, fig.width = 10, fig.align='center'}
 crashes_ts %>%
@@ -1220,7 +1220,7 @@ crashes_pm = crashes %>%
 
 The original data that we used for this project included a variable called “Injury” which was made up of the following levels: no injury, A type injury (disabling), B type injury (evident), C type injury (possible), killed, and unknown. In order to look at this from a binary standpoint, we created a new variable called “Injury2” where any of the responses with A type injury, B type injury, C type injury, or killed were assigned the value of injury, the responses with no injury were assigned to no injury, and unknown and blank responses were removed. After doing so, we were left with extremely unbalanced data which can be seen in the barplot below. When you work with balanced data, parameter variability decreases and the ratio between sensitivity and specificity has been shown to be much better than when working with unbalanced data.
 
-```{r}
+```{r, echo=FALSE}
 crashes_pm %>% 
   ggplot() +
   geom_bar(aes(Injury2, fill=Injury2), show.legend = FALSE) +
@@ -1911,3 +1911,189 @@ Viet, Truc. Spatial Heat Map Plotting Using R, 2021, trucvietle.me/r/tutorial/20
 The authors acknowledge financial support from the NSF HBCU-UP ACE: NSF HRD-1719498 and Research Experiences for Undergraduate Students in Data Science Analytics, National Security Agency H98230-18-1-0097. 
 
 # Appendix 
+
+## Libraries 
+
+```{r libraries-code, eval=FALSE}
+library(reshape2)
+library(tidyverse)
+library(ggplot2)
+library(dplyr)
+library(dslabs)
+library(ggrepel)
+library(ggthemes)
+library(maps)
+library(scales)
+library(zoo)
+library(forecast)
+library(urca)
+library(sf)
+library(TTR)
+library(fpp2)
+library(confusionMatrix)
+library(ROSE)
+library(wordcloud2) 
+library(webshot)
+library(htmlwidgets)
+library(ggmap)
+library(RColorBrewer)
+library(plotly)
+library(asta)
+```
+
+## Data
+
+```{r data-code, eval=FALSE}
+#Code for Cortlyns computer (Mac)
+ # setwd("/Users/cmorris/Desktop/dsreu2021/rstudiodirectory/ResearchProject")
+ # persons <- read.csv(file="Persons_Involved_in_Crashes.csv")
+ # glimpse(persons)
+ #    
+ # locations <- read.csv(file="Reported_Crash_Locations.csv")
+ # glimpse(locations)
+ #    
+ # crashes <- persons %>% left_join(locations, by="key_crash")
+
+#Code for Kelly's computer (Windows)
+#library(readr)
+persons <- read_csv("~/NCAT REU/Mostafa/Data/Persons_Involved_in_Crashes.csv")
+
+locations <- read_csv("~/NCAT REU/Mostafa/Data/Reported_Crash_Locations.csv")
+
+crashes <- persons %>% left_join(locations, by="key_crash")
+
+# Code for Ayan's computer (Window)
+#library(readr)
+# persons <- read_csv("C:/Users/ayang/Desktop/Project FIles REU A&T/REU Research Project1/Persons_Involved_in_Crashes.csv")
+# 
+# locations <- read_csv("C:/Users/ayang/Desktop/Project FIles REU A&T/REU Research Project1/Reported_Crash_Locations.csv")
+# 
+# crashes <- persons %>% left_join(locations, by="key_crash")
+```
+
+### Data Wrangling and Cleaning 
+
+```{r data-wrangling, eval=FALSE}
+crashes_ts = crashes %>%
+  filter(as.Date(crash_date) >= "2015/01/01" & as.Date(crash_date) <= "2021/05/31") %>%
+  separate(crash_date, 
+           into = c("Date", "Hour"), sep = 11) %>%
+  group_by(Date) %>%
+  summarize(count = length(unique(key_crash)))
+
+crashests2 <- ts(crashes_ts$count, start = c(2015,1), end = c(2021,153),
+                frequency = 365)
+```
+
+```{r data-wrangling-2, eval=FALSE}
+crashes_ts.noncovid = crashes %>%
+  filter(as.Date(crash_date) >= "2015/01/01" & as.Date(crash_date) <= "2020/03/01") %>%
+  separate(crash_date, 
+           into = c("Date", "Hour"), sep = 11) %>%
+  group_by(Date) %>%
+  summarize(count = length(unique(key_crash)))
+
+crashests.noncovid <- ts(crashes_ts.noncovid$count, start = c(2015,1), 
+                         end = c(2020,59), frequency = 365)
+```
+
+```{r data-wrangling-3, eval=FALSE}
+crashes_mts = crashes %>%
+  filter(as.Date(crash_date) >= "2015/01/01" & as.Date(crash_date) <= "2021/05/31") %>%
+  separate(crash_date, 
+           into = c("Date", "Hour"), sep = 11) %>%
+  group_by(Date) %>%
+  summarize(count = length(unique(key_crash))) %>%
+  separate(Date, into = c("Year", "Month", "Day"), sep = "/") %>%
+  group_by(Year, Month) %>%
+  summarise(mcount = sum(count)) %>%
+  tidyr::spread(key=Month, value=mcount)
+
+crashes_mts = as.data.frame(crashes_mts)
+
+rownames(crashes_mts) = seq(2015, 2021)
+
+crashes_mts3 = crashes_mts %>%
+  select(02:13)
+
+crashes_mts2 <- ts(c(t(crashes_mts3)), frequency=12)
+
+crashes_mts4 <- window(crashes_mts2, start=c(1,01), end=c(7,05), frequency=12)
+```
+
+```{r data-wrangling-4, eval=FALSE}
+crashes_mts.noncovid = crashes %>%
+  filter(as.Date(crash_date) >= "2015/01/01" & as.Date(crash_date) <= "2020/02/29") %>%
+  separate(crash_date, 
+           into = c("Date", "Hour"), sep = 11) %>%
+  group_by(Date) %>%
+  summarize(count = length(unique(key_crash))) %>%
+  separate(Date, into = c("Year", "Month", "Day"), sep = "/") %>%
+  group_by(Year, Month) %>%
+  summarise(mcount = sum(count)) %>%
+  tidyr::spread(key=Month, value=mcount)
+
+crashes_mts.noncovid = as.data.frame(crashes_mts.noncovid)
+
+rownames(crashes_mts.noncovid) = seq(2015, 2020)
+
+crashes_mts3.noncovid = crashes_mts.noncovid %>%
+  select(02:13)
+
+crashes_mts2.noncovid <- ts(c(t(crashes_mts3.noncovid)), frequency=12)
+
+crashes_mts4.noncovid <- window(crashes_mts2.noncovid, start=c(1,01), 
+                                end=c(6,02), frequency=12)
+```
+
+```{r data-wrangling-5, eval=FALSE}
+crashes_pm = crashes %>%
+  filter(Injury != "", Injury != "Unknown",  WeatherCondition1 != "Unknown",
+         WeatherCondition1 != "", MostHarmfulEvent != "Unknown",
+         MostHarmfulEvent != "", RoadFeature != "Unknown", RoadFeature != "", 
+         RoadFeature != "NaN", TrafficControlType != "NaN", RoadClassification != "NaN",
+         TrafficControlType != "Unknown", TrafficControlType != "",
+         RoadClassification != "Unknown", RoadClassification != "",
+         PersonType != "", PersonType != "Unknown", 
+         VehicleType != "All terrain vehicle (ATV)",
+         VehicleType != "Farm equipment", VehicleType != "Farm tractor",
+         VehicleType != "Military", VehicleType != "Motor scooter or motor bike",
+         VehicleType != "Motor home/recreational vehicle", 
+         VehicleType != "Tractor/doubles", VehicleType != "Truck/tractor (i.e., bobtail)",
+         ContributingCircumstance1 != "Passed stopped school bus", 
+         ContributingCircumstance1 != "Passed on hill", 
+         ContributingCircumstance1 != "Passed on curve",
+         ContributingCircumstance1 != "Driver distracted by other electronic 
+         device (navigation device, DVD player, etc.) ",
+         Protection != "Lighting", Protection != "Protective pads",
+         Protection != "Reflective clothing", WeatherCondition1 != "Blowing sand, dirt, snow",
+         WeatherCondition1 != "Severe crosswinds", MostHarmfulEvent != "Jackknife",
+         MostHarmfulEvent != "RR train, engine", TrafficControlType != "RR cross bucks only",
+         TrafficControlType != "RR flasher", TrafficControlType != "RR gate and flasher",
+         TrafficControlType != "School zone signs", VisionObstruction != "Blinded, headlights",
+         VisionObstruction != "Blinded, other lights", VisionObstruction != "Building(s)",
+         VisionObstruction != "Embankment", VisionObstruction != "Sign(s)") %>%
+  mutate(Injury = as.factor(Injury)) %>%
+  mutate(Injury2 = if_else(Injury == "No injury", "No injury", "Injury"), 
+         Injury2 = as.factor(Injury2)) %>%
+  mutate(VehicleType = if_else(VehicleType %in% c("Unknown",""), 
+                               "Unknown/Blank", VehicleType),
+         VehicleType = as.factor(VehicleType)) %>%
+  mutate(ContributingCircumstance1 = if_else(ContributingCircumstance1 %in% c("Unknown",""), 
+                                             "Unknown/Blank", ContributingCircumstance1),
+         ContributingCircumstance1 = as.factor(ContributingCircumstance1)) %>%
+  mutate(Protection = if_else(Protection %in% c("Unable to determine",""), 
+                              "Unknown/Blank", Protection),
+         Protection = as.factor(Protection)) %>%
+  mutate(WeatherCondition1 = as.factor(WeatherCondition1)) %>%
+  mutate(MostHarmfulEvent = as.factor(MostHarmfulEvent)) %>%
+  mutate(RoadFeature = as.factor(RoadFeature)) %>%
+  mutate(TrafficControlType = as.factor(TrafficControlType)) %>%
+  mutate(RoadClassification = as.factor(RoadClassification)) %>%
+  mutate(PersonType = as.factor(PersonType)) %>%
+  mutate(VisionObstruction = if_else(VisionObstruction %in% c("Unknown",""), 
+                                     "Unknown/Blank", VisionObstruction),
+         VisionObstruction = as.factor(VisionObstruction))
+```
+
+
