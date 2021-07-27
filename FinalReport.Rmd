@@ -491,7 +491,7 @@ crashes_ts = crashes %>%
 ```
 
 
-```{r 7-day-ma-ts, echo=FALSE, warning=FALSE, fig.width = 10}
+```{r 7-day-ma-ts, echo=FALSE, warning=FALSE, fig.width = 10, fig.align='center'}
 crashes_ts %>%
   filter(as.Date(Date) >= "2015/01/01") %>%
   ggplot(aes(x = as.Date(Date), y = count)) + 
@@ -545,9 +545,9 @@ Above, we can see the daily time series plot broken into annual plots. This help
 #### Monthly Time Series 
 
 
-```{r monthly-ts, echo=FALSE, message=FALSE, fig.width=10}
+```{r monthly-ts, echo=FALSE, message=FALSE, fig.width=10, fig.align='center'}
 forecast::autoplot(crashes_mts4) +
-  ggtitle("Time Series Plot for Frequency of Daily Crashes (With Pandemic Data)") + xlab("Date") + ylab("Monthly Crashes") + 
+  ggtitle("Time Series Plot for Frequency of Monthly Crashes (With Pandemic Data)") + xlab("Date") + ylab("Monthly Crashes") + 
   scale_x_continuous(breaks = c(1,2,3,4,5,6,7,8), 
                      labels = c("Jan 2015", "Jan 2016", "Jan 2017", 
                                 "Jan 2018", "Jan 2019", "Jan 2020", 
@@ -558,7 +558,7 @@ forecast::autoplot(crashes_mts4) +
 
 ```{r monthly-ts-noncovid, echo=FALSE, message=FALSE, fig.width = 10}
 forecast::autoplot(crashes_mts4.noncovid) +
-  ggtitle("Time Series Plot for Frequency of Daily Crashes (Without Pandemic Data)") + xlab("Date") + ylab("Monthly Crashes") + 
+  ggtitle("Time Series Plot for Frequency of Monthly Crashes (Without Pandemic Data)") + xlab("Date") + ylab("Monthly Crashes") + 
   scale_x_continuous(breaks = c(1,2,3,4,5,6,7,8), 
                      labels = c("Jan 2015", "Jan 2016", "Jan 2017", 
                                 "Jan 2018", "Jan 2019", "Jan 2020", 
@@ -690,7 +690,7 @@ nsdiffs(dif_crashests2) #0
 
 Here our daily pandemic data needs one first difference and we do this with the diff() function. Using the diff() function, we take the first difference and then we check the acf of the data to make sure that it does not take too many lags to hit 0 indicating that the first difference transformed our data to be stationary. 
 
-```{r stat-trans-daily-covid-plot, fig.width = 10}
+```{r stat-trans-daily-covid-plot, fig.width = 10, echo=FALSE}
 cbind("Crashes" = crashests2,
       "First differenced" = diff(crashests2)) %>%
   autoplot(facets=TRUE) +
@@ -1127,13 +1127,11 @@ The Seasonal and Trend Decomposition using Loess Forecasting Model (STLF) was ch
 
 # Results 
 
-## Time Series Analysis Results 
+## Forecasting Daily and Monthly Crashes in Wake County Account for the COVID-19 Pandemic Effect
 
-These forecasts and comparison of models help us determine which model best forecasts for daily pandemic data, daily nonpandemic data, monthly pandemic data, and monthly nonpandemic data. Additionally, we have determined that the pandemic data not only effected the crash counts in Wake County, NC, but they also affect the future accuracy of forecasting crashes. 
+These multi-step forecasts and comparison of models help us determine which model best forecasts for daily pandemic data, daily nonpandemic data, monthly pandemic data, and monthly nonpandemic data. Additionally, we have determined that the pandemic data not only effected the crash counts in Wake County, NC, but they also affect the future accuracy of forecasting crashes. 
 
-### Time Series Forecasting 
-
-#### Daily with Pandemic Data 
+### Daily with Pandemic Data 
 
 ```{r tbats-ms-stationary, echo=FALSE, message=FALSE, include=FALSE}
 #Stationary
@@ -1165,7 +1163,7 @@ Yhat_ms_TBATS <- cumsum(c(training_TBATS2[length(training_TBATS2)], dYhat_ms_TBA
 Yhat_ms_TBATS <- ts(Yhat_ms_TBATS, start = c(2021, 1), frequency = 365)
 ```
 
-```{r tbats-ms-stationary-plot, echo=FALSE, fig.width = 10}
+```{r tbats-ms-stationary-plot, echo=FALSE, fig.width = 10, fig.align='center'}
 #Stationary 
 autoplot(training_TBATS2) + 
   autolayer(Yhat_ms_TBATS, series="Point Forecasts") + 
