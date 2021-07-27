@@ -3260,7 +3260,6 @@ crashes_pm = crashes %>%
                                      "Unknown/Blank", VisionObstruction),
          VisionObstruction = as.factor(VisionObstruction))
 
-
 crashes_pm %>% 
   ggplot() +
   geom_bar(aes(Injury2, fill=Injury2), show.legend = FALSE) +
