@@ -1881,3 +1881,6 @@ Injury2.fit4.summary = dplyr::select(Injury2.fit4_Summary, -term)
 require(knitr)
 kable(Injury2.fit4.summary)
 ```
+
+### Random Forest 
+
