@@ -16,8 +16,6 @@ knitr::opts_chunk$set(echo = TRUE)
 
 Studies have shown that road traffic crashes are one of the leading causes of non-natural death for U.S citizens. There are many different ways that road crashes occur, and several various factors lead to it. It is essential to analyze the most common elements of road crashes. In this report, our goal is to model and forecast crashes in Wake County, North Carolina. To accomplish this goal, a public dataset  called  North Carolina Wake County crashes was available to use. The crash dataset used in this research was from 2015 to March 2021. Using the dataset to our advantage our intent is to  observe which factors have a higher cause of crashes in Wake County. The objective of this research is to address the above research question by using bar plots of common factors leading to crashes and Time Series Forecasting crashes in Wake County.
 
-\newpage
-
 # Introduction 
 
 Car crashes are something that occurs nearly every day. On average, there are 16,438 car crashes per day in the U.S. When it comes to car accidents, several factors correlate. However, it is crucial to understand some of the most frequent causes of crashes. Analyzing the most common reasons can help notify other drivers on the road so that there can be a decrease in crashes. 
