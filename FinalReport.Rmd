@@ -1963,19 +1963,12 @@ undersample_df2.pred <-predict(undersample_df2.fit.train, data=undersample_df2.t
 (stats.rf3 = calc_stats(tab.rf3, prevalence = NULL, positive = "Injury"))
 ```
 
-```{rcombo-datasets-rf, echo=FALSE, include=FALSE}
+```{r combo-datasets-rf, echo=FALSE, include=FALSE}
 overunder.rf <- ROSE::ovun.sample(Injury2~Age+VehicleType+ContributingCircumstance1+Protection+
                                  WeatherCondition1+MostHarmfulEvent+RoadFeature+
                                  TrafficControlType+RoadClassification+PersonType+VisionObstruction, 
                                data = crashes_pm.clean.train, method = "both", N = 245633)$data
 
-overunder2.rf <- ROSE::ovun.sample(Injury2~Age+VehicleType+ContributingCircumstance1+Protection+
-                                     WeatherCondition1+MostHarmfulEvent+RoadFeature+
-                                     TrafficControlType+RoadClassification+PersonType+VisionObstruction, 
-                                   data = crashes_pm.clean.train, method = "both", N = 100000)$data
-```
-
-```{r combo-data-pred-acc-rf, echo=FALSE, include=FALSE}
 set.seed(101) #for reproducibility of results
 sample.rf4 <- sample(c(TRUE, FALSE), nrow(overunder.rf), replace = T, prob = c(0.7,0.3)) #70/30% training/test sets
 overunder.rf.train <- overunder.rf[sample.rf4, ]
@@ -1989,6 +1982,13 @@ overunder.rf.pred <-predict(overunder.rf.fit.train, data=overunder.rf.test, type
 (tab.rf4 <- table(pred=overunder.rf.pred$predictions, actual=overunder.rf.test$Injury2)) #confusion matrix: cross-tab of predictions vs actual class
 (accuracy.rf4=mean(overunder.rf.pred$predictions==overunder.rf.test$Injury2, na.rm=T)*100) #percent of correct predictions in test data
 (stats.rf4 = calc_stats(tab.rf4, prevalence = NULL, positive = "Injury"))
+```
+
+```{r combo-data-pred-acc-rf, echo=FALSE, include=FALSE}
+overunder2.rf <- ROSE::ovun.sample(Injury2~Age+VehicleType+ContributingCircumstance1+Protection+
+                                     WeatherCondition1+MostHarmfulEvent+RoadFeature+
+                                     TrafficControlType+RoadClassification+PersonType+VisionObstruction, 
+                                   data = crashes_pm.clean.train, method = "both", N = 100000)$data
 
 set.seed(101) #for reproducibility of results
 sample.rf5 <- sample(c(TRUE, FALSE), nrow(overunder2.rf), replace = T, prob = c(0.7,0.3)) #70/30% training/test sets
