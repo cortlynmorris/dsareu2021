@@ -1964,7 +1964,7 @@ undersample_df2.pred <-predict(undersample_df2.fit.train, data=undersample_df2.t
 (stats.rf3 = calc_stats(tab.rf3, prevalence = NULL, positive = "Injury"))
 ```
 
-```{rcombo-datasets-rf, echo=FALSE, include=FALSE}
+```{r combo-datasets-rf, echo=FALSE, include=FALSE}
 overunder.rf <- ROSE::ovun.sample(Injury2~Age+VehicleType+ContributingCircumstance1+Protection+
                                  WeatherCondition1+MostHarmfulEvent+RoadFeature+
                                  TrafficControlType+RoadClassification+PersonType+VisionObstruction, 
