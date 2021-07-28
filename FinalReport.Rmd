@@ -1916,7 +1916,7 @@ oversample_df2 <- crashes_pm.clean[c(df_crashes_pm.clean_NoInjury_ind,
                                rep(df_crashes_pm.clean_Injury_ind, 5)), ]
 ```
 
-```{r oversample-data-pred-acc, echo=FALSE, include=FALSE}
+```{r oversample-data-pred-acc-rf, echo=FALSE, include=FALSE}
 set.seed(101) #for reproducibility of results
 sample.rf2 <- sample(c(TRUE, FALSE), nrow(oversample_df2), replace = T, prob = c(0.7,0.3)) #70/30% training/test sets
 oversample_df2.train <- oversample_df2[sample.rf2, ]
