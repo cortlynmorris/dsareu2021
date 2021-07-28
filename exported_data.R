@@ -3527,7 +3527,7 @@ summary(Injury2.select4)
 
 require(broom)
 require(knitr)
-out <- tidy(Injury2.select4)
+out <- tidy(Injury2.fit4)
 kable(out)
 
 
@@ -3572,10 +3572,17 @@ overunder.pred2 <- factor(overunder.pred2, levels = c("No injury", "Injury")) #p
 (accuracy5=mean(overunder.pred2==overunder.test2$Injury2, na.rm=T)*100) #percent of correct predictions in test
 (stats5 = calc_stats(tab5, prevalence = NULL, positive = "Injury"))
 
-StatisticsComparison = cbind(SampleType = c("Unbalanced", "Oversample", "Undersample", "Combination Full Sample", 
-        "Combination Sub-Sample"),round(rbind(stats, stats2, stats3, stats4, stats5), 4))
+(StatisticsComparison = cbind(SampleType = c("Unbalanced", "Oversample", "Undersample", "Combination Full Sample", 
+        "Combination Sub-Sample"),round(rbind(stats, stats2, stats3, stats4, stats5), 4)))
+
+Injury2.fit4_Summary = cbind(out, odds.ratio = round(exp(coef(Injury2.fit4)), digits = 4))
+
+Injury2.fit4.summary = dplyr::select(Injury2.fit4_Summary, -term)
+
 require(knitr)
+kable(Injury2.fit4.summary)
 kable(StatisticsComparison)
+
 
 #Random Forest Model
 install.packages("ranger")
@@ -3731,6 +3738,11 @@ rf.fit5 = ranger(Injury2~Age+VehicleType+ContributingCircumstance1+Protection+
                    TrafficControlType+RoadClassification+PersonType+
                    VisionObstruction, data=overunder2.rf, 
                  num.trees = 500, mtry = round(11/2), importance = "impurity", classification = T)
+
+rf.fit5_Summary = cbind(out, odds.ratio = round(exp(coef(rf.fit5)), digits = 4))
+rf.fit.summary = dplyr::select(Injury2.fit4_Summary, -term)
+require(knitr)
+kable(rf.fit5.summary)
 
 summary(rf.fit5)
 
