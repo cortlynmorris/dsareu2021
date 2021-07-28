@@ -292,9 +292,6 @@ devtools::install_github("gaospecial/wordcloud2")
 ```{r load-library-word-cloud, message=FALSE, echo=FALSE}
 #install.packages('wordcloud2')
 library(wordcloud2)
-#install.packages("webshot")
-library(webshot)
-library(htmlwidgets)
 ```
 
 ```{r location-on-word-cloud, echo=FALSE, fig.width=10, fig.align='center'}
@@ -302,11 +299,8 @@ location_road_name_on_freq <- crashes %>%
   count(LocationRoadNameOn)
 
 set.seed(101)
-my_graph <- location_road_name_on_freq %>%
+location_road_name_on_freq %>%
   wordcloud2(shape = 'circle', backgroundColor = "black", minSize = 5) 
-
-saveWidget(my_graph, "tmp.html", selfcontained = F)
-webshot("tmp.html", "wc1.png", delay = 5, vwidth = 2000, vheight = 2000)
 ```
 
 From the word cloud, we can see many crashes occur on 440, 40, and Capital Blvd. This makes sense because 440 and 40 are major interstates that connect to several major junctions and Capital Blvd is a main road in North Carolina as well. Due to these streets being heavily trafficked, more crashes are likely to occur. 
@@ -316,12 +310,8 @@ location_road_name_at_freq <- crashes %>%
   count(LocationRoadNameAt)
 
 set.seed(102)
-my_graph2 <- location_road_name_at_freq %>%
+location_road_name_at_freq %>%
   wordcloud2(shape = 'circle', backgroundColor = "black", minSize = 5)
-
-saveWidget(my_graph2, "tmp.html", selfcontained = F)
-webshot("tmp.html", "wc2.png", delay = 5, vwidth = 2000, vheight = 2000)
-#webshot::install_phantomjs()
 ```
 
 From the word cloud, we can see that 440, Capital Blvd, 40, and Blue Ridge Rd frequently have crashes that are near by. This would make sense because most of these streets are meet near the center of Raleigh, the capital of North Carolina, therefore, they are highly trafficked and populated. With many cars merging and intersecting onto these common and high speed streets, it is not surprising that many crashes occur at these locations. 
@@ -363,13 +353,11 @@ coords.map.nc <- coords.map.nc + theme_bw() +
   ggtitle("Heat Map of Crashes in North Carolina") + 
   xlab("Longitude") + ylab("Latitude")
 
-# ggplotly(coords.map.nc) %>%
-#   highlight(
-#     "plotly_hover",
-#     selected = attrs_selected(line = list(color = "black"))
-#   )
-
-coords.map.nc
+ggplotly(coords.map.nc) %>%
+  highlight(
+    "plotly_hover",
+    selected = attrs_selected(line = list(color = "black"))
+  )
 ```
 
 In the visual above we created a zoomed-out heat map of common places where road accidents occur in North Carolina. As we can see from the legend on the right, the more red the area is, the more crashes are likely to occur. The capital of North Carolina, Raleigh is heavily colored in dark red, indicating that many crashes occur here. As we move further from the capital city, the level of crashes tends to decrease. 
@@ -400,13 +388,11 @@ coords.map.wake <- coords.map.wake + theme_bw() +
   ggtitle("Heat Map of Crashes in Wake County") + 
   xlab("Latitude") + ylab("Longitude")
 
-# ggplotly(coords.map.wake) %>%
-#   highlight(
-#     "plotly_hover",
-#     selected = attrs_selected(line = list(color = "black"))
-#   )
-
-coords.map.wake
+ggplotly(coords.map.wake) %>%
+  highlight(
+    "plotly_hover",
+    selected = attrs_selected(line = list(color = "black"))
+  )
 ```
 
 In addition to the previous map, above we created a zoomed in heat map for crashes in Wake County, North Carolina. This heat map shows streets that appeared in the word clouds in the previous section such as Capital Boulevard. As we can see, Capital Boulevard runs through the heart of the city and intersects with the dark red color indicating a large level of crashes in the area. This corresponds with the world cloud because Capital Boulevard was one of the largest street names which also indicated a higher count of crash occurrences. In general, from the Wake County heat map, we can see that crashes are much more likely to occur in the center of the city. We see that as more streets populate an area, more crashes occur. 
@@ -1888,7 +1874,7 @@ set.seed(101) #for reproducibility of results
 sample.rf <- sample(c(TRUE, FALSE), nrow(crashes_pm.clean), replace = T, prob = c(0.7,0.3)) #70/30% training/test sets
 crashes_pm.clean.train <- crashes_pm.clean[sample.rf, ]
 crashes_pm.clean.test <- crashes_pm.clean[!sample.rf, ]
-crashes_pm.clean.fit.train <- ranger::ranger(Injury2~Age+VehicleType+ContributingCircumstance1+Protection+
+crashes_pm.clean.fit.train<-ranger::ranger(Injury2~Age+VehicleType+ContributingCircumstance1+Protection+
                                  WeatherCondition1+MostHarmfulEvent+RoadFeature+
                                  TrafficControlType+RoadClassification+PersonType+
                                  VisionObstruction, data=crashes_pm.clean, 
@@ -1952,7 +1938,7 @@ undersample_df2.pred <-predict(undersample_df2.fit.train, data=undersample_df2.t
 (stats.rf3 = calc_stats(tab.rf3, prevalence = NULL, positive = "Injury"))
 ```
 
-```{rcombo-datasets-rf, echo=FALSE, include=FALSE}
+```{r combo-datasets-rf, echo=FALSE, include=FALSE}
 overunder.rf <- ROSE::ovun.sample(Injury2~Age+VehicleType+ContributingCircumstance1+Protection+
                                  WeatherCondition1+MostHarmfulEvent+RoadFeature+
                                  TrafficControlType+RoadClassification+PersonType+VisionObstruction, 
