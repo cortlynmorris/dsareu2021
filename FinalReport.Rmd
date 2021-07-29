@@ -80,22 +80,22 @@ library(Rcpp)
 
 ```{r read-data, message=FALSE, echo=FALSE, include=FALSE}
 #Code for Cortlyns computer (Mac)
- setwd("/Users/cmorris/Desktop/dsreu2021/rstudiodirectory/ResearchProject")
- persons <- read.csv(file="Persons_Involved_in_Crashes.csv")
- glimpse(persons)
- #    
- locations <- read.csv(file="Reported_Crash_Locations.csv")
- glimpse(locations)
- #    
- crashes <- persons %>% left_join(locations, by="key_crash")
+ # setwd("/Users/cmorris/Desktop/dsreu2021/rstudiodirectory/ResearchProject")
+ # persons <- read.csv(file="Persons_Involved_in_Crashes.csv")
+ # glimpse(persons)
+ # #    
+ # locations <- read.csv(file="Reported_Crash_Locations.csv")
+ # glimpse(locations)
+ # #    
+ # crashes <- persons %>% left_join(locations, by="key_crash")
 
 #Code for Kelly's computer (Windows)
 #library(readr)
-#persons <- read_csv("~/NCAT REU/Mostafa/Data/Persons_Involved_in_Crashes.csv")
+persons <- read_csv("~/NCAT REU/Mostafa/Data/Persons_Involved_in_Crashes.csv")
 
-#locations <- read_csv("~/NCAT REU/Mostafa/Data/Reported_Crash_Locations.csv")
+locations <- read_csv("~/NCAT REU/Mostafa/Data/Reported_Crash_Locations.csv")
 
-#crashes <- persons %>% left_join(locations, by="key_crash")
+crashes <- persons %>% left_join(locations, by="key_crash")
 
 # Code for Ayan's computer (Window)
 #library(readr)
@@ -1238,7 +1238,7 @@ Due to this imbalance, we decided to test a variety of balancing methods to comp
 
 #### Random Forest 
 
-```{r random forest dataset, echo=FALSE, include=FALSE}
+```{r random-forest-dataset, echo=FALSE, include=FALSE}
 crashes_pm.clean = crashes_pm %>%
   dplyr::select(Injury2,Age,VehicleType,ContributingCircumstance1,Protection,
            WeatherCondition1,MostHarmfulEvent,RoadFeature,
@@ -1895,11 +1895,12 @@ kable(Injury2.fit4.summary)
 ### Random Forest
 
 ```{r unbalanced-data-pred-acc-rf, echo=FALSE, include=FALSE}
+library(ranger)
 set.seed(101) #for reproducibility of results
 sample.rf <- sample(c(TRUE, FALSE), nrow(crashes_pm.clean), replace = T, prob = c(0.7,0.3)) #70/30% training/test sets
 crashes_pm.clean.train <- crashes_pm.clean[sample.rf, ]
 crashes_pm.clean.test <- crashes_pm.clean[!sample.rf, ]
-crashes_pm.clean.fit.train <- ranger(Injury2~Age+VehicleType+ContributingCircumstance1+Protection+
+crashes_pm.clean.fit.train <- ranger::ranger(Injury2~Age+VehicleType+ContributingCircumstance1+Protection+
                                  WeatherCondition1+MostHarmfulEvent+RoadFeature+
                                  TrafficControlType+RoadClassification+PersonType+
                                  VisionObstruction, data=crashes_pm.clean, 
@@ -2012,7 +2013,6 @@ Just as we were able to do after running the logistic regression models, we were
 (StatisticsComparison.rf = cbind(SampleType = c("Unbalanced", "Oversample", "Undersample", "Combination Full Sample", 
                                             "Combination Sub-Sample"),round(rbind(stats.rf, stats.rf2, stats.rf3, stats.rf4, stats.rf5), 4)))
 ```
-
 
 # Conclusion 
 
