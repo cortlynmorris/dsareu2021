@@ -2077,7 +2077,7 @@ Viet, Truc. Spatial Heat Map Plotting Using R, 2021, trucvietle.me/r/tutorial/20
 
 # Acknowledgements 
 
-The authors acknowledge financial support from the NSF HBCU-UP ACE: NSF HRD-1719498 and Research Experiences for Undergraduate Students in Data Science Analytics, National Security Agency H98230-18-1-0097. 
+The authors acknowledge financial support by NSF Grant HRD#1719498 and NSA Grant #H98230-21-1-0026.
 
 # Appendix 
 
