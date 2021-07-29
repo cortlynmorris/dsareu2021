@@ -1,7 +1,7 @@
 ---
 title: "Visualizing, Modeling, and Forecasting Crashes in Wake County, North Carolina"
 author: "Kelly Wentzlof, Cortlyn Morris, Ayan Gulzar"
-date: "7/30/2021"
+date: "07/30/2021"
 output:
   html_document:
     toc: true
