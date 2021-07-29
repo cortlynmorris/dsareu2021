@@ -2014,6 +2014,26 @@ Just as we were able to do after running the logistic regression models, we were
                                             "Combination Sub-Sample"),round(rbind(stats.rf, stats.rf2, stats.rf3, stats.rf4, stats.rf5), 4)))
 ```
 
+```{r variableimportance, echo=FALSE}
+VariableImportance<-as.vector(round(rf.fit5$variable.importance,2))
+Variable<-(as.vector((colnames(crashes_pm.clean[-1]))))
+DF<-cbind(Variable,VariableImportance)
+DF<-as.data.frame(DF)
+
+library(forcats)
+DF %>%
+  mutate(Variable = fct_reorder(Variable, VariableImportance)) %>%
+  ggplot(aes(x=Variable, y=VariableImportance, fill=Variable)) +
+  geom_bar(stat = "identity", position = "dodge") + 
+  coord_flip() +
+  ylab("Variable Importance") +
+  xlab("") +
+  ggtitle("Information Value Summary") +
+  guides(fill=F) +
+  theme(axis.text.x = element_text(angle = -50))
+```
+
+
 # Conclusion 
 
 Although there have been a couple of research projects done on this topic. Most of the research has not been in-depth about car accidents. When looking at a car crash there are many different factors that come into play. There are also a lot of factors that take place when forecasting car crashes. There has not been a lot of research done on what conditions lead to the outcome of car crashes. Within our exploratory data analysis, we are able to visually see what common factors contribute to car crashes in Wake County. From this stage, we found out that it is essential to understand factors of car crashes so that we can learn how to forecast them in the future. 
