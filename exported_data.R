@@ -3769,6 +3769,21 @@ require(knitr)
 kable(StatisticsComparison.rf)
 
 
+VariableImportance<-as.vector(round(rf.fit5$variable.importance,2))
+Variable<-(as.vector((colnames(crashes_pm.clean[-1]))))
+DF<-cbind(Variable,VariableImportance)
+DF<-as.data.frame(DF)
+DF
 
-
-
+library(forcats)
+DF %>%
+  mutate(Variable = fct_reorder(Variable, VariableImportance)) %>%
+  ggplot(aes(x=Variable, y=VariableImportance, fill=Variable)) +
+  geom_bar(stat = "identity", position = "dodge") + 
+  coord_flip() +
+  ylab("Variable Importance") +
+  xlab("") +
+  ggtitle("Information Value Summary") +
+  guides(fill=F) +
+  theme(axis.text.x = element_text(angle = -50))
+  
