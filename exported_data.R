@@ -3776,14 +3776,28 @@ DF<-as.data.frame(DF)
 DF
 
 library(forcats)
-DF %>%
-  mutate(Variable = fct_reorder(Variable, VariableImportance)) %>%
+importance %>%
+  mutate(Variable = fct_reorder(Variable2, VariableImportance2)) %>%
   ggplot(aes(x=Variable, y=VariableImportance, fill=Variable)) +
   geom_bar(stat = "identity", position = "dodge") + 
   coord_flip() +
+  geom_text(aes(label = VariableImportance2))+
   ylab("Variable Importance") +
   xlab("") +
   ggtitle("Information Value Summary") +
   guides(fill=F) +
   theme(axis.text.x = element_text(angle = -50))
-  
+
+Variable2 = c("Age", "VehicleType", "ContributingCircumstance1", "Protection", 
+              "WeatherCondition1", "MostHarmfulEvent", "RoadFeature", 
+              "TrafficControlType", "RoadClassification", "PersonType", 
+              "VisionObstruction")  
+VariableImportance2 = c(10510.48, 2500.6, 3133.69, 1297.42, 2106.5, 5964.53, 
+                        2371.4, 1660.17, 3090.18, 1022.37, 561.31)
+importance = cbind.data.frame(Variable2, VariableImportance2)
+order(importance$VariableImportance2)
+
+rf.fit5$variable.importance
+
+
+
