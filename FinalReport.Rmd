@@ -3,7 +3,8 @@ title: \vspace{3in} "Visualizing, Modeling, and Forecasting Crashes in Wake Coun
   North Carolina"
 author:
 - Cortlyn Morris, Kelly Wenzlof, Ayan Gulzar
-- Research Mentors Dr. Sayed Mostafa and Chinedu Jude Nzekwe
+- Faculty Research Mentor Dr. Sayed Mostafa 
+- Graduate Research Assistant Mentor Chinedu Jude Nzekwe
 date: "7/30/2021"
 output:
   pdf_document: default
@@ -24,7 +25,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Abstract
 
-Studies have shown that road traffic crashes are one of the leading causes of non-natural death for U.S citizens. There are many different ways that road crashes occur, and several various factors lead to it. It is essential to analyze the most common elements of road crashes. In this report, our goal is to model and forecast crashes in Wake County, North Carolina. To accomplish this goal, a public dataset  called  North Carolina Wake County crashes was available to use. The crash dataset used in this research was from 2015 to March 2021. Using the dataset to our advantage our intent is to  observe which factors have a higher cause of crashes in Wake County. The objective of this research is to address the above research question by using bar plots of common factors leading to crashes and Time Series Forecasting crashes in Wake County.
+Studies have shown that road traffic crashes are one of the leading causes of non-natural death for U.S citizens. There are many different ways that road crashes occur, and several various factors lead to it. It is essential to analyze the most common elements of road crashes. In this report, our goal is to model and forecast crashes in Wake County, North Carolina. More specifically, we aim to address three research questions: (1) Where are the hotspots for crashes in the Wake County area?; (2) Can we reliably forecast the daily/monthly number of crashes in Wake County? Given the weather and road features and drivers’ characteristics, can we predict the crash outcome (whether it results injuries)? To accomplish this aim, two public datasets obtained from the North Carolina Wake County Open Data Portal we’re used (persons involved in crashes and crash locations). The datasets used in this research covered the period between January 2015 to May 2021. We addressed the above research questions using a combination of exploratory data analysis techniques, time series forecasting techniques and predictive modeling techniques. After conducting research we found out that hotspots in Wake County like 440, 40, and Capital Blvd are known to have the most accidents since they are the most common roads. After studying crashes before and after the pandemic we have noticed that the pandemic is one of the prominent factors that affects crash counts and car crash forecasts. The best models for forecasting car crashes were TBATS, ARIMA, HoltWinters, and a combination of STLF and SARIMA. Furthermore, we noticed that the best way to model injury types was by applying random forest with a combination of over and under subsampling and by utilizing logistic regression with a combination of under and over full sampling.
 
 \newpage
 
@@ -2047,7 +2048,6 @@ importance %>%
   theme(axis.text.x = element_text(angle = -50))
 ```
 
-
 # Conclusion 
 
 Although there have been a couple of research projects done on this topic. Most of the research has not been in-depth about car accidents. When looking at a car crash there are many different factors that come into play. There are also a lot of factors that take place when forecasting car crashes. There has not been a lot of research done on what conditions lead to the outcome of car crashes. Within our exploratory data analysis, we are able to visually see what common factors contribute to car crashes in Wake County. From this stage, we found out that it is essential to understand factors of car crashes so that we can learn how to forecast them in the future. 
@@ -2091,7 +2091,7 @@ Viet, Truc. Spatial Heat Map Plotting Using R, 2021, trucvietle.me/r/tutorial/20
 
 # Acknowledgements 
 
-The authors acknowledge financial support from the NSF HBCU-UP ACE: NSF HRD-1719498 and Research Experiences for Undergraduate Students in Data Science Analytics, National Security Agency H98230-18-1-0097. 
+The authors acknowledge financial support by NSF Grant HRD#1719498 and NSA Grant #H98230-21-1-0026.
 
 # Appendix 
 
