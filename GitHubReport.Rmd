@@ -1,6 +1,9 @@
 ---
 title: "Visualizing, Modeling, and Forecasting Crashes in Wake County, North Carolina"
-author: "Kelly Wentzlof, Cortlyn Morris, Ayan Gulzar"
+author: 
+- Kelly Wentzlof, Cortlyn Morris, Ayan Gulzar
+- Faculty Research Mentor Dr. Sayed Mostafa 
+- Graduate Research Assistant Mentor Chinedu Jude Nzekwe
 date: "7/30/2021"
 output:
   html_document:

@@ -3,7 +3,8 @@ title: \vspace{3in} "Visualizing, Modeling, and Forecasting Crashes in Wake Coun
   North Carolina"
 author:
 - Cortlyn Morris, Kelly Wenzlof, Ayan Gulzar
-- Research Mentors Dr. Sayed Mostafa and Chinedu Jude Nzekwe
+- Faculty Research Mentor Dr. Sayed Mostafa 
+- Graduate Research Assistant Mentor Chinedu Jude Nzekwe
 date: "7/30/2021"
 output:
   pdf_document: default
@@ -2032,7 +2033,6 @@ DF %>%
   guides(fill=F) +
   theme(axis.text.x = element_text(angle = -50))
 ```
-
 
 # Conclusion 
 
