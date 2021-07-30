@@ -1234,7 +1234,15 @@ crashes_pm %>%
 
 #### Logistic Regression 
 
-Due to this imbalance, we decided to test a variety of balancing methods to compare the accuracy of each of these using the logistic regression model to predict the value of Injury2. We used the unbalanced data as our base to compare oversampled, undersampled, and a combination of both over- and undersampled balanced datasets that we created. We decided to create two combination samples of different sizes to see if there was any difference in accuracy where one is the same size as the unbalanced data and the other is a subsample. We then fitted a logistic regression model for each of these datasets using 11 predictors. These predictors were variables that we took from our original crashes dataset that we found to be factors that impacted crash frequency when doing our exploratory data analysis early on in the project. The 11 variables that we selected were Age, VehicleType, ContributingCircumstance1, Protection, WeatherCondition1, MostHarmfulEvent, RoadFeature, TrafficControlType, RoadClassification, PersonType, and VisionObstruction. Before we could use all of these variables for our models, we had to clean the data to remove unknown, blank, and NaN responses as well as levels of each variable that did not have enough responses to be considered important (fewer than 100 responses). However, we could not remove all of the unknown and blank responses from all of the variables because if we were to do so, we would be removing too much information. To solve this problem, we mutated the data so that there was a level for the variables VehicleType, ContributingCircumstance1, Protection, and VisionObstruction titled Unknown/Blank. 
+Due to this imbalance, we decided to test a variety of balancing methods to compare the accuracy of each of these using the logistic regression model to predict the value of Injury2. We used the unbalanced data as our base to compare oversampled, undersampled, and a combination of both over- and undersampled balanced datasets that we created. We decided to create two combination samples of different sizes to see if there was any difference in accuracy where one is the same size as the unbalanced data and the other is a subsample. We then fitted a logistic regression model for each of these datasets using 11 predictors. These predictors were variables that we took from our original crashes dataset that we found to be factors that impacted crash frequency when doing our exploratory data analysis early on in the project. The 11 variables that we selected were Age, VehicleType, ContributingCircumstance1, Protection, WeatherCondition1, MostHarmfulEvent, RoadFeature, TrafficControlType, RoadClassification, PersonType, and VisionObstruction. Before we could use all of these variables for our models, we had to clean the data to remove unknown, blank, and NaN responses as well as levels of each variable that did not have enough responses to be considered important (fewer than 100 responses). However, we could not remove all of the unknown and blank responses from all of the variables because if we were to do so, we would be removing too much information. To solve this problem, we mutated the data so that there was a level for the variables VehicleType, ContributingCircumstance1, Protection, and VisionObstruction titled Unknown/Blank. In order to begin running these predictive models, we had to split the data into 70% training and 30% testing sets. This allows us to make predictions based on the training set and compare them to the test set to determine the accuracy.
+
+```{r training-test, eval=FALSE}
+set.seed(101) #for reproducibility of results
+sample <- sample(c(TRUE, FALSE), nrow(crashes_pm), replace = T, prob = c(0.7,0.3)) #70/30% training/test sets
+crashes_pm.train <- crashes_pm[sample, ]
+crashes_pm.test <- crashes_pm[!sample, ]
+```
+
 
 #### Random Forest 
 
@@ -1880,7 +1888,7 @@ After running the logistic regression models on each of the datasets, we were ab
 
 ```
 
-The full combination dataset proved to be the most accurate of the datasets for our logistic regression model so we chose to analyze its fitted model. We ran the stepAIC() command in R to make sure that all of the variables were significant to the model and because none of them were removed, we will be looking at the fitted model itself. In addition to the regular summary, we added the odds ratio to the final data we analyzed. When looking at this table and the various results, we can highlight some important variables. If the MostHarmfulEvent of an accident is Overturn/rollover, then you are 5.0065 times more likely to be injured. If the VehicleType is a Motorcycle, then you are 31.7351 more likely to be injured in a crash. These are some of the more expected results but we can also look at a few that defied our initial perception of the variable's effect on the injury outcome of a crash. For example, if the WeatherCondition1 at the time of the crash is Snow, a condition that is typically known to heighten the number of crashes, you are only 0.6251 more likely to be injured in a crash.
+The full combination dataset proved to be the most accurate of the datasets for our logistic regression model so we chose to analyze its fitted model. We ran the stepAIC() command in R to make sure that all of the variables were significant to the model and because none of them were removed, we will be looking at the fitted model itself. In addition to the regular summary, we added the odds ratio to the final data we analyzed. When looking at this table and the various results, we can highlight some important variables using the odds ratio column. If the MostHarmfulEvent of an accident is Overturn/rollover, then you are 5.0065 times more likely to be injured. If the VehicleType is a Motorcycle, then you are 31.7351 more likely to be injured in a crash. These are some of the more expected results but we can also look at a few that defied our initial perception of the variable's effect on the injury outcome of a crash. For example, if the WeatherCondition1 at the time of the crash is Snow, a condition that is typically known to heighten the number of crashes, you are only 0.6251 more likely to be injured in a crash which could be an indicator of the common severity of crashes during the snow.
 
 ```{r Injury2.fit4-table, echo=FALSE}
 Injury2.fit4 <- glm(Injury2~., data=overunder, family = "binomial")
@@ -2007,25 +2015,31 @@ overunder2.rf.pred <-predict(overunder2.rf.fit.train, data=overunder2.rf.test, t
 (stats.rf5 = calc_stats(tab.rf5, prevalence = NULL, positive = "Injury"))
 ```
 
-Just as we were able to do after running the logistic regression models, we were able to put together a table with the statistics that meausre the accuracy of each of the random forest models. By looking at the balanced accuracy and F1 scores, we can see substantially higher values in both for all 5 datasets. However, the model that has the highest accuracy is the combination sub sample with a balanced accuracy of 0.8519 and an F1 score of 0.8529. These statistics make this model the most accurate out of all of the logistic regression and random forest models.
+Just as we were able to do after running the logistic regression models, we were able to put together a table with the statistics that measure the accuracy of each of the random forest models. By looking at the balanced accuracy and F1 scores, we can see substantially higher values in both for all 5 datasets. However, the model that has the highest accuracy is the combination sub sample with a balanced accuracy of 0.8519 and an F1 score of 0.8529. These statistics make this model the most accurate out of all of the logistic regression and random forest models.
 
 ```{r StatisticsComparison-table-rf, echo=FALSE}
 (StatisticsComparison.rf = cbind(SampleType = c("Unbalanced", "Oversample", "Undersample", "Combination Full Sample", 
                                             "Combination Sub-Sample"),round(rbind(stats.rf, stats.rf2, stats.rf3, stats.rf4, stats.rf5), 4)))
 ```
 
+By using the ranger() command for our random forest fitted models to identify which was the most accurate, we are able to then look at the variable importance for each of the 11 predictors we used. The variable importance shows us how much removing each variable would affect the accuracy of the predictions. As we can see from the barpolt below, the variable that has the biggest impact on the accuracy of this model is age followed by most harmful event. These results make sense because a person's age is a large factor with injuries and the most harmful event during the crash is a big indicator of the seriousness of a crash which helps to predict whether or not there will be an injury. It is slightly surprising to see person type so low on the list, however, the majority of the data is made up of drivers and passengers which differe very little in terms of injury frequency. 
+
 ```{r variableimportance, echo=FALSE}
-VariableImportance<-as.vector(round(rf.fit5$variable.importance,2))
-Variable<-(as.vector((colnames(crashes_pm.clean[-1]))))
-DF<-cbind(Variable,VariableImportance)
-DF<-as.data.frame(DF)
+Variable = c("Age", "VehicleType", "ContributingCircumstance1", "Protection", 
+              "WeatherCondition1", "MostHarmfulEvent", "RoadFeature", 
+              "TrafficControlType", "RoadClassification", "PersonType", 
+              "VisionObstruction")  
+VariableImportance = c(10510.48, 2500.6, 3133.69, 1297.42, 2106.5, 5964.53, 
+                        2371.4, 1660.17, 3090.18, 1022.37, 561.31)
+importance = cbind.data.frame(Variable, VariableImportance)
 
 library(forcats)
-DF %>%
+importance %>%
   mutate(Variable = fct_reorder(Variable, VariableImportance)) %>%
   ggplot(aes(x=Variable, y=VariableImportance, fill=Variable)) +
   geom_bar(stat = "identity", position = "dodge") + 
   coord_flip() +
+  geom_text(aes(label = round(VariableImportance,0))) +
   ylab("Variable Importance") +
   xlab("") +
   ggtitle("Information Value Summary") +
